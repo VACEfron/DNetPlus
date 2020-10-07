@@ -3,6 +3,7 @@ This is a fork of discord.net with many tweaks and added functionality instead o
 
 # Fixes by me
 - [Increase connection wait limit instead of timeouts](https://github.com/xXBuilderBXx/DNetPlus/commit/34e4cd07ea2147cf5fd449087a278567e14bb0b9)
+- [Make GetShardForId public.](https://github.com/xXBuilderBXx/DNetPlus/commit/9e5d4b99f5061538db87ef316e54bddfc262fe32)
 - Allowed mentions property on modifymessage (updating)
 
 # Fixes by other
