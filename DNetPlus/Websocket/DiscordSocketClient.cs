@@ -223,6 +223,24 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override async Task StartAsync()
             => await _connection.StartAsync().ConfigureAwait(false);
+
+        public async Task StartAsync(UserStatus status, string name = null, string streamUrl = null, ActivityType type = ActivityType.Playing)
+        {
+            Status = status;
+            if (status == UserStatus.AFK)
+                _statusSince = DateTimeOffset.UtcNow;
+            else
+                _statusSince = null;
+            if (name != null)
+            {
+                if (streamUrl != null)
+                    Activity = new StreamingGame(name, streamUrl);
+                else
+                    Activity = new Game(name, type);
+            }
+            await StartAsync().ConfigureAwait(false);
+        }
+
         /// <inheritdoc />
         public override async Task StopAsync()
             => await _connection.StopAsync().ConfigureAwait(false);
@@ -244,7 +262,28 @@ namespace Discord.WebSocket
                 else
                 {
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
-                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
+                    if (Activity is RichGame)
+                        throw new NotSupportedException("Outgoing Rich Presences are not supported via WebSocket.");
+
+                    if (Activity == null)
+                    {
+                        await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, presence: new StatusUpdateParams
+                        {
+                            Game = Activity == null ? null : new GameModel
+                            {
+                                Name = Activity.Name,
+                                Type = Activity.Type,
+                                StreamUrl = Activity is StreamingGame sg ? sg.Url : null,
+                            },
+                            Status = Status,
+                            IsAFK = Status == UserStatus.AFK,
+                            IdleSince = _statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null
+                        }).ConfigureAwait(false);
+                    }
                 }
 
                 //Wait for READY

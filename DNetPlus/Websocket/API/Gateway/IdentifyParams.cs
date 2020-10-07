@@ -19,5 +19,7 @@ namespace Discord.API.Gateway
         public Optional<bool> GuildSubscriptions { get; set; }
         [JsonProperty("intents")]
         public Optional<int> Intents { get; set; }
+        [JsonProperty("presence")]
+        public Optional<StatusUpdateParams> Presence { get; set; }
     }
 }
