@@ -27,7 +27,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
-        Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null);
+        Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null, AllowedMentions allowedMentions = null);
         /// <summary>
         ///     Modifies the suppression of this message.
         /// </summary>

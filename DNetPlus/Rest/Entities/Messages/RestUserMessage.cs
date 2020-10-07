@@ -124,9 +124,9 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        public async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
+        public async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null, AllowedMentions allowedMentions = null)
         {
-            var model = await MessageHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            var model = await MessageHelper.ModifyAsync(this, Discord, func, options, allowedMentions).ConfigureAwait(false);
             Update(model);
         }
 
