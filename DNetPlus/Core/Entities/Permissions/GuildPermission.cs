@@ -51,11 +51,15 @@ namespace Discord
         ///     authentication when used on a guild that has server-wide 2FA enabled.
         /// </remarks>
         ManageGuild         = 0x00_00_00_20,
+        /// <summary>
+        ///     Allows for viewing of guild insights
+        /// </summary>
+        ViewGuildInsights = 0x00_08_00_00,
 
         // Text
-		/// <summary>
-		///     Allows for the addition of reactions to messages.
-		/// </summary>
+        /// <summary>
+        ///     Allows for the addition of reactions to messages.
+        /// </summary>
         AddReactions        = 0x00_00_00_40,
 		/// <summary>
 		///		Allows for viewing of audit logs.

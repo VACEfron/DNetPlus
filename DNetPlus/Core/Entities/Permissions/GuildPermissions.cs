@@ -12,7 +12,7 @@ namespace Discord
         /// <summary> Gets a <see cref="GuildPermissions"/> that grants all guild permissions for webhook users. </summary>
         public static readonly GuildPermissions Webhook = new GuildPermissions(0b00000_0000000_0001101100000_000000);
         /// <summary> Gets a <see cref="GuildPermissions"/> that grants all guild permissions. </summary>
-        public static readonly GuildPermissions All = new GuildPermissions(0b11111_1111110_1111111111111_111111);
+        public static readonly GuildPermissions All = new GuildPermissions(0b11111_1111111_1111111111111_111111);
 
         /// <summary> Gets a packed value representing all the permissions in this <see cref="GuildPermissions"/>. </summary>
         public ulong RawValue { get; }
@@ -29,6 +29,8 @@ namespace Discord
         public bool ManageChannels => Permissions.GetValue(RawValue, GuildPermission.ManageChannels);
         /// <summary> If <c>true</c>, a user may adjust guild properties. </summary>
         public bool ManageGuild => Permissions.GetValue(RawValue, GuildPermission.ManageGuild);
+
+        public bool ViewGuildInsights => Permissions.GetValue(RawValue, GuildPermission.ViewGuildInsights);
 
         /// <summary> If <c>true</c>, a user may add reactions. </summary>
         public bool AddReactions => Permissions.GetValue(RawValue, GuildPermission.AddReactions);
@@ -95,6 +97,7 @@ namespace Discord
             bool? administrator = null,
             bool? manageChannels = null,
             bool? manageGuild = null,
+            bool? viewGuildInsights = null,
             bool? addReactions = null,
             bool? viewAuditLog = null,
             bool? viewChannel = null,
@@ -128,6 +131,7 @@ namespace Discord
             Permissions.SetValue(ref value, administrator, GuildPermission.Administrator);
             Permissions.SetValue(ref value, manageChannels, GuildPermission.ManageChannels);
             Permissions.SetValue(ref value, manageGuild, GuildPermission.ManageGuild);
+            Permissions.SetValue(ref value, viewGuildInsights, GuildPermission.ViewGuildInsights);
             Permissions.SetValue(ref value, addReactions, GuildPermission.AddReactions);
             Permissions.SetValue(ref value, viewAuditLog, GuildPermission.ViewAuditLog);
             Permissions.SetValue(ref value, viewChannel, GuildPermission.ViewChannel);
@@ -164,6 +168,7 @@ namespace Discord
             bool administrator = false,
             bool manageChannels = false,
             bool manageGuild = false,
+            bool viewGuildInsights = false,
             bool addReactions = false,
             bool viewAuditLog = false,
             bool viewChannel = false,
@@ -196,6 +201,7 @@ namespace Discord
                 administrator: administrator,
                 manageChannels: manageChannels,
                 manageGuild: manageGuild,
+                viewGuildInsights: viewGuildInsights,
                 addReactions: addReactions,
                 viewAuditLog: viewAuditLog,
                 viewChannel: viewChannel,
@@ -229,6 +235,7 @@ namespace Discord
             bool? administrator = null,
             bool? manageChannels = null,
             bool? manageGuild = null,
+            bool? viewGuildInsights = null,
             bool? addReactions = null,
             bool? viewAuditLog = null,
             bool? viewChannel = null,
@@ -253,7 +260,7 @@ namespace Discord
             bool? manageRoles = null,
             bool? manageWebhooks = null,
             bool? manageEmojis = null)
-            => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
+            => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, viewGuildInsights, addReactions,
                 viewAuditLog, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojis);
