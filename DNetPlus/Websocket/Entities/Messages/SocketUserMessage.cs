@@ -127,8 +127,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Only the author of a message may modify the message.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
-            => MessageHelper.ModifyAsync(this, Discord, func, options);
+        public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null, AllowedMentions allowedMentions = null)
+            => MessageHelper.ModifyAsync(this, Discord, func, options, allowedMentions);
 
         /// <inheritdoc />
         public Task PinAsync(RequestOptions options = null)
