@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    internal class ModifyGuildEmbedParams
+    internal class ModifyGuildWidgetParams
     {        
         [JsonProperty("enabled")]
         public Optional<bool> Enabled { get; set; }

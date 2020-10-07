@@ -1,9 +1,9 @@
-namespace Discord
+﻿namespace Discord
 {
     /// <summary>
     ///     Provides properties that are used to modify the widget of an <see cref="IGuild" /> with the specified changes.
     /// </summary>
-    public class GuildEmbedProperties
+    public class GuildWidgetProperties
     {
         /// <summary>
         ///     Sets whether the widget should be enabled.

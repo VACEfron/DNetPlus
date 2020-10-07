@@ -808,7 +808,7 @@ namespace Discord.API
         }
 
         //Guilds
-        public async Task<Guild> GetGuildAsync(ulong guildId, RequestOptions options = null)
+        public async Task<Guild> GetGuildAsync(ulong guildId, bool withCounts, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
@@ -816,7 +816,7 @@ namespace Discord.API
             try
             {
                 var ids = new BucketIds(guildId: guildId);
-                return await SendAsync<Guild>("GET", () => $"guilds/{guildId}", ids, options: options).ConfigureAwait(false);
+                return await SendAsync<Guild>("GET", () => $"guilds/{guildId}?with_counts={(withCounts ? "true" : "false")}", ids, options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
@@ -928,9 +928,9 @@ namespace Discord.API
             await SendAsync("DELETE", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
         }
 
-        //Guild Embeds
+        //Guild Wdiget
         /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
-        public async Task<GuildEmbed> GetGuildEmbedAsync(ulong guildId, RequestOptions options = null)
+        public async Task<GuildWidget> GetGuildWidgetAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
@@ -938,20 +938,20 @@ namespace Discord.API
             try
             {
                 var ids = new BucketIds(guildId: guildId);
-                return await SendAsync<GuildEmbed>("GET", () => $"guilds/{guildId}/embed", ids, options: options).ConfigureAwait(false);
+                return await SendAsync<GuildWidget>("GET", () => $"guilds/{guildId}/widget", ids, options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
-        public async Task<GuildEmbed> ModifyGuildEmbedAsync(ulong guildId, Rest.ModifyGuildEmbedParams args, RequestOptions options = null)
+        public async Task<GuildWidget> ModifyGuildWidgetAsync(ulong guildId, Rest.ModifyGuildWidgetParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<GuildEmbed>("PATCH", () => $"guilds/{guildId}/embed", args, ids, options: options).ConfigureAwait(false);
+            return await SendJsonAsync<GuildWidget>("PATCH", () => $"guilds/{guildId}/widget", args, ids, options: options).ConfigureAwait(false);
         }
 
         //Guild Integrations

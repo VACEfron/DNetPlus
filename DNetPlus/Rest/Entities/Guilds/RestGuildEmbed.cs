@@ -1,22 +1,22 @@
 using System.Diagnostics;
-using Model = Discord.API.GuildEmbed;
+using Model = Discord.API.GuildWidget;
 
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct RestGuildEmbed
+    public struct RestGuildWidget
     {
         public bool IsEnabled { get; private set; }
         public ulong? ChannelId { get; private set; }
 
-        internal RestGuildEmbed(bool isEnabled, ulong? channelId)
+        internal RestGuildWidget(bool isEnabled, ulong? channelId)
         {
             ChannelId = channelId;
             IsEnabled = isEnabled;
         }
-        internal static RestGuildEmbed Create(Model model)
+        internal static RestGuildWidget Create(Model model)
         {
-            return new RestGuildEmbed(model.Enabled, model.ChannelId);
+            return new RestGuildWidget(model.Enabled, model.ChannelId);
         }
 
         public override string ToString() => ChannelId?.ToString() ?? "Unknown";

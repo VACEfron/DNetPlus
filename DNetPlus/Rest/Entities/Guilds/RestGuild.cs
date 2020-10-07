@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using EmbedModel = Discord.API.GuildEmbed;
+using WidgetModel = Discord.API.GuildWidget;
 using Model = Discord.API.Guild;
 
 namespace Discord.Rest
@@ -26,7 +26,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public int AFKTimeout { get; private set; }
         /// <inheritdoc />
-        public bool IsEmbeddable { get; private set; }
+        public bool IsWidgetEnabled { get; private set; }
         /// <inheritdoc />
         public VerificationLevel VerificationLevel { get; private set; }
         /// <inheritdoc />
@@ -39,9 +39,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public ulong? AFKChannelId { get; private set; }
         /// <inheritdoc />
-        public ulong? EmbedChannelId { get; private set; }
+        public ulong? WidgetChannelId { get; private set; }
         /// <inheritdoc />
         public ulong? SystemChannelId { get; private set; }
+        public ulong? RulesChannelId { get; private set; }
+        /// <inheritdoc />
+        public ulong? PublicUpdatesChannelId { get; private set; }
         /// <inheritdoc />
         public ulong OwnerId { get; private set; }
         /// <inheritdoc />
@@ -50,6 +53,8 @@ namespace Discord.Rest
         public string IconId { get; private set; }
         /// <inheritdoc />
         public string SplashId { get; private set; }
+        /// <inheritdoc />
+        public string DiscoverySplashId { get; private set; }
         internal bool Available { get; private set; }
         /// <inheritdoc />
         public ulong? ApplicationId { get; private set; }
@@ -67,6 +72,16 @@ namespace Discord.Rest
         public int PremiumSubscriptionCount { get; private set; }
         /// <inheritdoc />
         public string PreferredLocale { get; private set; }
+        /// <inheritdoc />
+        public int? MaxPresences { get; private set; }
+        /// <inheritdoc />
+        public int? MaxMembers { get; private set; }
+        /// <inheritdoc />
+        public int? MaxVideoChannelUsers { get; private set; }
+        /// <inheritdoc />
+        public int? ApproximateMemberCount { get; private set; }
+        /// <inheritdoc />
+        public int? ApproximatePresenceCount { get; private set; }
 
         /// <inheritdoc />
         public CultureInfo PreferredCulture { get; private set; }
@@ -80,6 +95,9 @@ namespace Discord.Rest
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+        /// <inheritdoc />
+        public string DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Id, DiscoverySplashId);
+
         /// <inheritdoc />
         public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId);
 
@@ -110,15 +128,20 @@ namespace Discord.Rest
         internal void Update(Model model)
         {
             AFKChannelId = model.AFKChannelId;
-            EmbedChannelId = model.EmbedChannelId;
+            if (model.WidgetChannelId.IsSpecified)
+                WidgetChannelId = model.WidgetChannelId.Value;
             SystemChannelId = model.SystemChannelId;
+            RulesChannelId = model.RulesChannelId;
+            PublicUpdatesChannelId = model.PublicUpdatesChannelId;
             AFKTimeout = model.AFKTimeout;
-            IsEmbeddable = model.EmbedEnabled;
+            if (model.WidgetEnabled.IsSpecified)
+                IsWidgetEnabled = model.WidgetEnabled.Value;
             IconId = model.Icon;
             Name = model.Name;
             OwnerId = model.OwnerId;
             VoiceRegionId = model.Region;
             SplashId = model.Splash;
+            DiscoverySplashId = model.DiscoverySplash;
             VerificationLevel = model.VerificationLevel;
             MfaLevel = model.MfaLevel;
             DefaultMessageNotifications = model.DefaultMessageNotifications;
@@ -130,8 +153,18 @@ namespace Discord.Rest
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
             PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
+            if (model.MaxPresences.IsSpecified)
+                MaxPresences = model.MaxPresences.Value ?? 25000;
+            if (model.MaxMembers.IsSpecified)
+                MaxMembers = model.MaxMembers.Value;
+            if (model.MaxVideoChannelUsers.IsSpecified)
+                MaxVideoChannelUsers = model.MaxVideoChannelUsers.Value;
             PreferredLocale = model.PreferredLocale;
             PreferredCulture = new CultureInfo(PreferredLocale);
+            if (model.ApproximateMemberCount.IsSpecified)
+                ApproximateMemberCount = model.ApproximateMemberCount.Value;
+            if (model.ApproximatePresenceCount.IsSpecified)
+                ApproximatePresenceCount = model.ApproximatePresenceCount.Value;
 
             if (model.Emojis != null)
             {
@@ -158,16 +191,30 @@ namespace Discord.Rest
 
             Available = true;
         }
-        internal void Update(EmbedModel model)
+        internal void Update(WidgetModel model)
         {
-            EmbedChannelId = model.ChannelId;
-            IsEmbeddable = model.Enabled;
+            WidgetChannelId = model.ChannelId;
+            IsWidgetEnabled = model.Enabled;
         }
 
         //General
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
-            => Update(await Discord.ApiClient.GetGuildAsync(Id, options).ConfigureAwait(false));
+            => Update(await Discord.ApiClient.GetGuildAsync(Id, false, options).ConfigureAwait(false));
+        /// <summary>
+        ///     Updates this object's properties with its current state.
+        /// </summary>
+        /// <param name="withCounts">
+        ///     If true, <see cref="ApproximateMemberCount"/> and <see cref="ApproximatePresenceCount"/>
+        ///     will be updated as well.
+        /// </param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <remarks>
+        ///     If <paramref name="withCounts"/> is true, <see cref="ApproximateMemberCount"/> and
+        ///     <see cref="ApproximatePresenceCount"/> will be updated as well.
+        /// </remarks>
+        public async Task UpdateAsync(bool withCounts, RequestOptions options = null)
+            => Update(await Discord.ApiClient.GetGuildAsync(Id, withCounts, options).ConfigureAwait(false));
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => GuildHelper.DeleteAsync(this, Discord, options);
@@ -182,9 +229,9 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
-        public async Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
+        public async Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions options = null)
         {
-            var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options).ConfigureAwait(false);
+            var model = await GuildHelper.ModifyWidgetAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
 
@@ -394,18 +441,18 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Gets the embed channel (i.e. the channel set in the guild's widget settings) in this guild.
+        ///     Gets the widget channel (i.e. the channel set in the guild's widget settings) in this guild.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains the embed channel set
+        ///     A task that represents the asynchronous get operation. The task result contains the widget channel set
         ///     within the server's widget settings; <c>null</c> if none is set.
         /// </returns>
-        public async Task<RestGuildChannel> GetEmbedChannelAsync(RequestOptions options = null)
+        public async Task<RestGuildChannel> GetWidgetChannelAsync(RequestOptions options = null)
         {
-            var embedId = EmbedChannelId;
-            if (embedId.HasValue)
-                return await GuildHelper.GetChannelAsync(this, Discord, embedId.Value, options).ConfigureAwait(false);
+            var widgetChannelId = WidgetChannelId;
+            if (widgetChannelId.HasValue)
+                return await GuildHelper.GetChannelAsync(this, Discord, widgetChannelId.Value, options).ConfigureAwait(false);
             return null;
         }
 
@@ -427,6 +474,44 @@ namespace Discord.Rest
             }
             return null;
         }
+        /// <summary>
+        ///     Gets the text channel where guilds with the "PUBLIC" feature can display rules and/or guidelines.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel
+        ///     where guilds with the "PUBLIC" feature can display rules and/or guidelines; <c>null</c> if none is set.
+        /// </returns>
+        public async Task<RestTextChannel> GetRulesChannelAsync(RequestOptions options = null)
+        {
+            var rulesChannelId = RulesChannelId;
+            if (rulesChannelId.HasValue)
+            {
+                var channel = await GuildHelper.GetChannelAsync(this, Discord, rulesChannelId.Value, options).ConfigureAwait(false);
+                return channel as RestTextChannel;
+            }
+            return null;
+        }
+
+        /// <summary>
+        ///     Gets the text channel channel where admins and moderators of guilds with the "PUBLIC" feature receive notices from Discord.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel channel where
+        ///     admins and moderators of guilds with the "PUBLIC" feature receive notices from Discord; <c>null</c> if none is set.
+        /// </returns>
+        public async Task<RestTextChannel> GetPublicUpdatesChannelAsync(RequestOptions options = null)
+        {
+            var publicUpdatesChannelId = PublicUpdatesChannelId;
+            if (publicUpdatesChannelId.HasValue)
+            {
+                var channel = await GuildHelper.GetChannelAsync(this, Discord, publicUpdatesChannelId.Value, options).ConfigureAwait(false);
+                return channel as RestTextChannel;
+            }
+            return null;
+        }
+
         /// <summary>
         ///     Creates a new text channel in this guild.
         /// </summary>
@@ -808,10 +893,10 @@ namespace Discord.Rest
                 return null;
         }
         /// <inheritdoc />
-        async Task<IGuildChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
+        async Task<IGuildChannel> IGuild.GetWidgetChannelAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return await GetEmbedChannelAsync(options).ConfigureAwait(false);
+                return await GetWidgetChannelAsync(options).ConfigureAwait(false);
             else
                 return null;
         }
@@ -823,6 +908,23 @@ namespace Discord.Rest
             else
                 return null;
         }
+        /// <inheritdoc />
+        async Task<ITextChannel> IGuild.GetRulesChannelAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetRulesChannelAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        /// <inheritdoc />
+        async Task<ITextChannel> IGuild.GetPublicUpdatesChannelAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetPublicUpdatesChannelAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
+
         /// <inheritdoc />
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, Action<TextChannelProperties> func, RequestOptions options)
             => await CreateTextChannelAsync(name, func, options).ConfigureAwait(false);
