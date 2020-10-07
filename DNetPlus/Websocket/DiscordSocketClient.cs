@@ -1728,6 +1728,7 @@ namespace Discord.WebSocket
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_UPDATE)").ConfigureAwait(false);
                                 break;
                             case "GUILD_INTEGRATIONS_UPDATE":
+                            case "INTEGRATION_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_INTEGRATIONS_UPDATE)").ConfigureAwait(false);
                                 break;
                             case "MESSAGE_ACK":
