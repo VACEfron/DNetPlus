@@ -39,7 +39,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets or sets the time, in milliseconds, to wait for a connection to complete before aborting.
         /// </summary>
-        public int ConnectionTimeout { get; set; } = 30000;
+        public int ConnectionTimeout { get; set; } = 50000;
 
         /// <summary>
         ///     Gets or sets the ID for this shard. Must be less than <see cref="TotalShards"/>.
