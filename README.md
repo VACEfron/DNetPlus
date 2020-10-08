@@ -1,5 +1,8 @@
 # Info
-This is a fork of discord.net with many tweaks and added functionality instead of waiting for months.
+This is a fork of [Discord.net](https://github.com/discord-net/Discord.Net) with many tweaks and added functionality instead of waiting for months.
+
+# Install
+Remove any discord.net packages such as discord.net.commands, discord.net.websocket, discord.net.webhook and install the package from nuget with https://www.nuget.org/packages/DNetPlus
 
 # Fixes by me
 - [Increase connection wait limit instead of timeouts](https://github.com/xXBuilderBXx/DNetPlus/commit/34e4cd07ea2147cf5fd449087a278567e14bb0b9)
@@ -10,6 +13,8 @@ This is a fork of discord.net with many tweaks and added functionality instead o
 # Fixes by other
 - [Limit request members batch size due to intents](https://github.com/xXBuilderBXx/DNetPlus/commit/0a68feaebb7b440c7e9393eaa3d6bfb8a8f00a87) from Discord.Net/pull/1647
 - [Rename and update guildembed to guildwidget](https://github.com/xXBuilderBXx/DNetPlus/commit/466b230e5501212eb1a7c9ba80f79b89c813c66d) from Discord.Net/pull/1573
+- [Add missing guild properties](https://github.com/xXBuilderBXx/DNetPlus/commit/466b230e5501212eb1a7c9ba80f79b89c813c66d) from Discord.Net/pull/1573
+> Missing guild properties are for Discovery Splash, Rules channel, Max presence count, Max member count, Public updates channel, Approximate member count for online and current count using rest with the withCounts: true option.
 - [Fix OperationCancelledException and thread blocking](https://github.com/xXBuilderBXx/DNetPlus/commit/308d73007533ef3d109d05a9b53c293fbe7270f5) from Discord.Net/pull/1562
 - [Fix DM permissions not having add reactions](https://github.com/xXBuilderBXx/DNetPlus/commit/1bd3ea7d374b594edbaf33760ca26f4762a267bf) from Discord.Net/pull/1244
 - [Add status and game on identify](https://github.com/xXBuilderBXx/DNetPlus/commit/15c23b2f70ffcaa8985b5a980832e57dd489f8f1) from Discord.Net/pull/1444
