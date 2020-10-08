@@ -1,12 +1,12 @@
 # Info
-This is a fork of [Discord.net](https://github.com/discord-net/Discord.Net) 2.3.0-dev-20200904.2 with many tweaks and added functionality instead of waiting for months.
+This is a fork of [Discord.net](https://github.com/discord-net/Discord.Net) v2.3.0-dev-20200904.2 with many tweaks and added functionality instead of waiting for months.
 
 # Install
 Remove any discord.net packages such as discord.net.commands, discord.net.websocket, discord.net.webhook and install the package from nuget with https://www.nuget.org/packages/DNetPlus
 
 # Addons
 You can install these optional addons to extend the functionality of DNetPlus.
-- [Discord Interactive](https://www.nuget.org/packages/DNetPlus-Interactive) by [Foxbot](https://github.com/foxbot/Discord.Addons.Interactive)
+- [Discord Interactive](https://www.nuget.org/packages/DNetPlus-Interactive) by [Foxbot](https://github.com/foxbot/Discord.Addons.Interactive) v2.2
 
 # Fixes/Tweaks by me
 - [Increase connection wait limit instead of timeouts](https://github.com/xXBuilderBXx/DNetPlus/commit/34e4cd07ea2147cf5fd449087a278567e14bb0b9)
