@@ -4,13 +4,15 @@ This is a fork of [Discord.net](https://github.com/discord-net/Discord.Net) 2.3.
 # Install
 Remove any discord.net packages such as discord.net.commands, discord.net.websocket, discord.net.webhook and install the package from nuget with https://www.nuget.org/packages/DNetPlus
 
-# Fixes by me
+# Fixes/Tweaks by me
 - [Increase connection wait limit instead of timeouts](https://github.com/xXBuilderBXx/DNetPlus/commit/34e4cd07ea2147cf5fd449087a278567e14bb0b9)
 - [Make GetShardForId public](https://github.com/xXBuilderBXx/DNetPlus/commit/9e5d4b99f5061538db87ef316e54bddfc262fe32)
 - [Allowed mentions property on modifymessage](https://github.com/xXBuilderBXx/DNetPlus/commit/506bab4e1af5b1c3960040e6125cc7b4ce3a34d0)
 - [Ignore integration update events](https://github.com/xXBuilderBXx/DNetPlus/commit/f8c8387c277525d9488abb2a0671d45b7b585008)
+- [Expose config for client and add ownerids override list for team/external users](https://github.com/xXBuilderBXx/DNetPlus/commit/faec9248120cf808de68996763459d00348192da)
+> new DiscordSocketConfig { OwnerIds = new ulong[] { 190590364871032834 } };
 
-# Fixes by others
+# Fixes/Tweaks by others
 - [Limit request members batch size due to intents](https://github.com/xXBuilderBXx/DNetPlus/commit/0a68feaebb7b440c7e9393eaa3d6bfb8a8f00a87) from Discord.Net/pull/1647
 - [Rename and update guildembed to guildwidget](https://github.com/xXBuilderBXx/DNetPlus/commit/466b230e5501212eb1a7c9ba80f79b89c813c66d) from Discord.Net/pull/1573
 - [Add missing guild properties](https://github.com/xXBuilderBXx/DNetPlus/commit/466b230e5501212eb1a7c9ba80f79b89c813c66d) from Discord.Net/pull/1573
