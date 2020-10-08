@@ -7,10 +7,10 @@ Remove any discord.net packages such as discord.net.commands, discord.net.websoc
 # Addons
 You can install these optional addons to extend the functionality of DNetPlus.
 - [Discord Interactive](https://www.nuget.org/packages/DNetPlus-Interactive) by [Foxbot](https://github.com/foxbot/Discord.Addons.Interactive) v2.2
-   > `test string lmao`
 
 # Fixes/Tweaks by me
 - [Increase connection wait limit instead of timeouts](https://github.com/xXBuilderBXx/DNetPlus/commit/34e4cd07ea2147cf5fd449087a278567e14bb0b9)
+   `This helps with bigger bots with 15+ shards to connect better.`
 - [Make GetShardForId public](https://github.com/xXBuilderBXx/DNetPlus/commit/9e5d4b99f5061538db87ef316e54bddfc262fe32)
 - [Allowed mentions property on modifymessage](https://github.com/xXBuilderBXx/DNetPlus/commit/506bab4e1af5b1c3960040e6125cc7b4ce3a34d0)
 - [Ignore integration update events](https://github.com/xXBuilderBXx/DNetPlus/commit/f8c8387c277525d9488abb2a0671d45b7b585008)
