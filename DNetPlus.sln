@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30516.212
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNetPlus", "DNetPlus\DNetPlus.csproj", "{6AFD5761-AAD5-4776-BDC1-D6D14DC8024D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DNetPlus", "DNetPlus\DNetPlus.csproj", "{6AFD5761-AAD5-4776-BDC1-D6D14DC8024D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBot", "TestBot\TestBot.csproj", "{A7991B1F-FB46-47E1-AFA0-B67DD67DC50E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBot", "TestBot\TestBot.csproj", "{A7991B1F-FB46-47E1-AFA0-B67DD67DC50E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
