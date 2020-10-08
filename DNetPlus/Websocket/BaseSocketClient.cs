@@ -11,7 +11,7 @@ namespace Discord.WebSocket
     /// </summary>
     public abstract partial class BaseSocketClient : BaseDiscordClient, IDiscordClient
     {
-        protected readonly DiscordSocketConfig BaseConfig;
+        public readonly DiscordSocketConfig BaseConfig;
 
         /// <summary>
         ///     Gets the estimated round-trip latency, in milliseconds, to the gateway server.

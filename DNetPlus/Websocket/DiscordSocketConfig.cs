@@ -161,6 +161,11 @@ namespace Discord.WebSocket
         public GatewayIntents? GatewayIntents { get; set; }
 
         /// <summary>
+        /// Allows you to add or override owners of the bot for cases such as team/external users and will also be used in the RequireOwner attribute.
+        /// </summary>
+        public ulong[] OwnerIds { get; set; }
+
+        /// <summary>
         ///     Initializes a default configuration.
         /// </summary>
         public DiscordSocketConfig()

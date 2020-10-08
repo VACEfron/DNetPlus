@@ -1,4 +1,6 @@
+using Discord.WebSocket;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -43,7 +45,9 @@ namespace Discord.Commands
             switch (context.Client.TokenType)
             {
                 case TokenType.Bot:
-                    var application = await context.Client.GetApplicationInfoAsync().ConfigureAwait(false);
+                    if ((context.Client as BaseSocketClient).BaseConfig.OwnerIds != null && (context.Client as BaseSocketClient).BaseConfig.OwnerIds.Contains(context.User.Id))
+                        return PreconditionResult.FromSuccess();
+                    IApplication application = await context.Client.GetApplicationInfoAsync().ConfigureAwait(false);
                     if (context.User.Id != application.Owner.Id)
                         return PreconditionResult.FromError(ErrorMessage ?? "Command can only be run by the owner of the bot.");
                     return PreconditionResult.FromSuccess();
