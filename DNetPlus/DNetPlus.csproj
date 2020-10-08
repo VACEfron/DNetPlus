@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <Version>1.0.7</Version>
-    <AssemblyName>Discord.Net.Core</AssemblyName>
-    <RootNamespace>Discord</RootNamespace>
+    <Version>1.1.0</Version>
+    <AssemblyName>DNetPlus</AssemblyName>
+    <RootNamespace>DNetPlus</RootNamespace>
     <PackageId>DNetPlus</PackageId>
     <Authors>xXBuilderBXx</Authors>
     <Company>Fluxpoint Development</Company>
@@ -17,6 +17,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>
