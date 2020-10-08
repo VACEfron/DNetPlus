@@ -4,6 +4,10 @@ This is a fork of [Discord.net](https://github.com/discord-net/Discord.Net) 2.3.
 # Install
 Remove any discord.net packages such as discord.net.commands, discord.net.websocket, discord.net.webhook and install the package from nuget with https://www.nuget.org/packages/DNetPlus
 
+# Addons
+You can install these optional addons to extend the functionality of DNetPlus.
+- [Discord Interactive](https://www.nuget.org/packages/DNetPlus-Interactive) by [Foxbot](https://github.com/foxbot/Discord.Addons.Interactive)
+
 # Fixes/Tweaks by me
 - [Increase connection wait limit instead of timeouts](https://github.com/xXBuilderBXx/DNetPlus/commit/34e4cd07ea2147cf5fd449087a278567e14bb0b9)
 - [Make GetShardForId public](https://github.com/xXBuilderBXx/DNetPlus/commit/9e5d4b99f5061538db87ef316e54bddfc262fe32)
