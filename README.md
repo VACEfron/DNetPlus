@@ -6,7 +6,7 @@ Remove any discord.net packages such as discord.net.commands, discord.net.websoc
 
 # Addons
 You can install these optional addons to extend the functionality of DNetPlus.
-- [Discord Interactive](https://www.nuget.org/packages/DNetPlus-Interactive) by [Foxbot](https://github.com/foxbot/Discord.Addons.Interactive) v2.2
+https://github.com/xXBuilderBXx/DNetPlus-Addons
 
 # Fixes/Tweaks by me
 - [Increase connection wait limit instead of timeouts](https://github.com/xXBuilderBXx/DNetPlus/commit/34e4cd07ea2147cf5fd449087a278567e14bb0b9)
