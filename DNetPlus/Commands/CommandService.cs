@@ -531,7 +531,7 @@ namespace Discord.Commands
                 var bestCandidate = preconditionResults
                     .OrderByDescending(x => x.Key.Command.Priority)
                     .FirstOrDefault(x => !x.Value.IsSuccess);
-
+                context.Command = bestCandidate.Key.Command;
                 await _commandExecutedEvent.InvokeAsync(bestCandidate.Key.Command, context, bestCandidate.Value).ConfigureAwait(false);
                 return bestCandidate.Value;
             }
@@ -590,13 +590,15 @@ namespace Discord.Commands
                 //All parses failed, return the one from the highest priority command, using score as a tie breaker
                 var bestMatch = parseResults
                     .FirstOrDefault(x => !x.Value.IsSuccess);
-
+                context.Command = bestMatch.Key.Command;
                 await _commandExecutedEvent.InvokeAsync(bestMatch.Key.Command, context, bestMatch.Value).ConfigureAwait(false);
                 return bestMatch.Value;
             }
 
+          
             //If we get this far, at least one parse was successful. Execute the most likely overload.
             var chosenOverload = successfulParses[0];
+            context.Command = chosenOverload.Key.Command;
             var result = await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
             if (!result.IsSuccess && !(result is RuntimeResult || result is ExecuteResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
                 await _commandExecutedEvent.InvokeAsync(chosenOverload.Key.Command, context, result);

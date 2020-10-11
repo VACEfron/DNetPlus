@@ -1,3 +1,5 @@
+using System.Windows.Input;
+
 namespace Discord.Commands
 {
     /// <summary>
@@ -25,5 +27,7 @@ namespace Discord.Commands
         ///     Gets the <see cref="IUserMessage" /> that the command is interpreted from.
         /// </summary>
         IUserMessage Message { get; }
+
+        CommandInfo Command { get; set; }
     }
 }

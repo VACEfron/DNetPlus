@@ -1,3 +1,5 @@
+using System.Windows.Input;
+
 namespace Discord.Commands
 {
     /// <summary> The context of a command which may contain the client, user, guild, channel, and message. </summary>
@@ -13,6 +15,8 @@ namespace Discord.Commands
         public IUser User { get; }
         /// <inheritdoc/>
         public IUserMessage Message { get; }
+
+        public CommandInfo Command { get; set; }
 
         /// <summary> Indicates whether the channel that the command is executed in is a private channel. </summary>
         public bool IsPrivate => Channel is IPrivateChannel;
