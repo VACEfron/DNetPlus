@@ -405,9 +405,9 @@ namespace Discord.Rest
             );
         }
         public static async Task<int> PruneUsersAsync(IGuild guild, BaseDiscordClient client,
-            int days, bool simulate, RequestOptions options)
+            int days, bool simulate, RequestOptions options, IEnumerable<ulong> includeRoleIds)
         {
-            var args = new GuildPruneParams(days);
+            var args = new GuildPruneParams(days, includeRoleIds?.ToArray());
             GetGuildPruneCountResponse model;
             if (simulate)
                 model = await client.ApiClient.GetGuildPruneCountAsync(guild.Id, args, options).ConfigureAwait(false);

@@ -8,10 +8,13 @@ namespace Discord.API.Rest
     {
         [JsonProperty("days")]
         public int Days { get; }
+        [JsonProperty("include_roles")]
+        public ulong[] IncludeRoleIds { get; }
 
-        public GuildPruneParams(int days)
+        public GuildPruneParams(int days, ulong[] includeRoleIds)
         {
             Days = days;
+            IncludeRoleIds = includeRoleIds;
         }
     }
 }

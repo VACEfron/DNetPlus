@@ -802,7 +802,7 @@ namespace Discord
         ///     A task that represents the asynchronous prune operation. The task result contains the number of users to
         ///     be or has been removed from this guild.
         /// </returns>
-        Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
+        Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null);
         /// <summary>
         ///     Gets a collection of users in this guild that the name or nickname starts with the
         ///     provided <see cref="string"/> at <paramref name="query"/>.
