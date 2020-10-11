@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DNetPlus", "DNetPlus\DNetPl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBot", "TestBot\TestBot.csproj", "{A7991B1F-FB46-47E1-AFA0-B67DD67DC50E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNetPlus-Interactive", "DNetPlus-Interactive\DNetPlus-Interactive.csproj", "{E3114546-045E-4D86-9706-AC7488A43C15}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{A7991B1F-FB46-47E1-AFA0-B67DD67DC50E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7991B1F-FB46-47E1-AFA0-B67DD67DC50E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7991B1F-FB46-47E1-AFA0-B67DD67DC50E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E3114546-045E-4D86-9706-AC7488A43C15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E3114546-045E-4D86-9706-AC7488A43C15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E3114546-045E-4D86-9706-AC7488A43C15}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E3114546-045E-4D86-9706-AC7488A43C15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
