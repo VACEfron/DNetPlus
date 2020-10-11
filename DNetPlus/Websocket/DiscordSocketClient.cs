@@ -1738,6 +1738,18 @@ namespace Discord.WebSocket
                             case "INTEGRATION_UPDATE":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_INTEGRATIONS_UPDATE)").ConfigureAwait(false);
                                 break;
+                            case "INTEGRATION_CREATE":
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (INTEGRATION_CREATE)").ConfigureAwait(false);
+                                break;
+                            case "INTEGRATION_DELETE":
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (INTEGRATION_DELETE)").ConfigureAwait(false);
+                                break;
+                            case "INVITE_CREATE":
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (INVITE_CREATE)").ConfigureAwait(false);
+                                break;
+                            case "INVITE_DELETE":
+                                await _gatewayLogger.DebugAsync("Ignored Dispatch (INVITE_DELETE)").ConfigureAwait(false);
+                                break;
                             case "MESSAGE_ACK":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (MESSAGE_ACK)").ConfigureAwait(false);
                                 break;
