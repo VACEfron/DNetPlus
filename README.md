@@ -18,13 +18,21 @@ https://github.com/xXBuilderBXx/DNetPlus-Addons
 - [Allowed mentions property on modifymessage](https://github.com/xXBuilderBXx/DNetPlus/commit/506bab4e1af5b1c3960040e6125cc7b4ce3a34d0)
    - Adds allowed mentions property when modifying a message, useful because editing a message resets allowed mentions by default.
 
-- [Ignore integration update events](https://github.com/xXBuilderBXx/DNetPlus/commit/f8c8387c277525d9488abb2a0671d45b7b585008)
+- [Ignore integration update events](https://github.com/xXBuilderBXx/DNetPlus/commit/f8c8387c277525d9488abb2a0671d45b7b585008) | [Integration create/remove](https://github.com/xXBuilderBXx/DNetPlus/commit/f5b8c1d7585e92fae57bda4dcb419db15de9909b)
    - New event type that is now ignored instead of spamming console logs.
 
 - [Expose config for client and add ownerids override list for team/external users](https://github.com/xXBuilderBXx/DNetPlus/commit/faec9248120cf808de68996763459d00348192da)
    - new DiscordSocketConfig { OwnerIds = new ulong[] { 190590364871032834 } };
    - This also works with RequireOwner command attribute.
    - Exposed config allows you to get Client.baseConfig properties from DiscordSocketConfig instead of being hidden.
+
+- [Add command attribute for RequireTeamMember](https://github.com/xXBuilderBXx/DNetPlus/commit/4c7c9e31f0521ff9ff236a53a275e8b4f9b3f5dc)
+
+- [Add command info to the command context](https://github.com/xXBuilderBXx/DNetPlus/commit/5c084d045d71ab908026b34adaaa4a2f2b808e18)
+   - Allows you to get command info from the current command executed with Context.Command.
+
+- [Customize version](https://github.com/xXBuilderBXx/DNetPlus/commit/02019b2bd1dcc277f80a26a426e7a45ab5d105f8)
+   - Customize the version string from X.X.X to X.X.X (Custom DNetPlus)
 
 # Fixes/Tweaks by others
 - [Limit request members batch size due to intents](https://github.com/xXBuilderBXx/DNetPlus/commit/0a68feaebb7b440c7e9393eaa3d6bfb8a8f00a87) from Discord.Net/pull/1647
@@ -57,3 +65,13 @@ https://github.com/xXBuilderBXx/DNetPlus-Addons
 
 - [Handle null prefered locale](https://github.com/xXBuilderBXx/DNetPlus/commit/26b4b1888ca0a3ab206d216639962e863a47d332) from Discord.Net/pull/1624
    - This only happens in rare cases but worth fix to not break guild stuff.
+
+- [Fix websocket regex in some cases](https://github.com/xXBuilderBXx/DNetPlus/commit/d9d377630457d321d28007acd16bd0e1b63be93f) from Discord.Net/pull/1637
+
+- [Allow UserUpdate to be invoked from GuildMemberUpdate](https://github.com/xXBuilderBXx/DNetPlus/commit/ada2fa72ae014a3496f1f13b39c8df7f79a37c66) from Discord.Net/pull/1623
+   - This allows for some global changes like username/avatar to be fired from UserUpdate without the Presence Intent.
+
+- [Add team properties to the application info](https://github.com/xXBuilderBXx/DNetPlus/commit/4aff5bb4646ddd0fce2973af13cb9b1232e5af1e) from Discord.Net/pull/1604
+
+- [Add include roles option for guild prune users](https://github.com/xXBuilderBXx/DNetPlus/commit/9e6bea6ca8cfa52ff6ab615db526fc95a751685b) from Discord.Net/pull/1581
+   - Allows you to select a list of roles to include in the prune users aside from just no roles.
