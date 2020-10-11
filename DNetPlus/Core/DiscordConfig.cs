@@ -34,7 +34,7 @@ namespace Discord
         /// </returns>
         public static string Version { get; } =
             typeof(DiscordConfig).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ??
-            typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) ??
+            typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) + " (Custom DNetPlus)" ??
             "Unknown";
 
         /// <summary>
