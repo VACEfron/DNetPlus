@@ -57,5 +57,13 @@ namespace Discord
         ///     The message for when a news channel subscription is added to a text channel.
         /// </summary>
         ChannelFollowAdd = 12,
+        /// <summary>
+        ///     The message for when a guild is removed from Discovery.
+        /// </summary>
+        GuildDiscoveryDisqualified = 14,
+        /// <summary>
+        ///     The message for when a guild is added to Discovery.
+        /// </summary>
+        GuildDiscoveryRequalified = 15,
     }
 }

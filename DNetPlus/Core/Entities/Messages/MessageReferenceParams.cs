@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Discord
 {
+    /// <summary>
+    /// Not available yet
+    /// </summary>
     public class MessageReferenceParams
     {
         [JsonProperty("guild_id")]
