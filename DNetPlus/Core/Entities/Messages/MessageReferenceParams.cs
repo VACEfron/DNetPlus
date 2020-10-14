@@ -6,7 +6,7 @@ using System.Text;
 namespace Discord
 {
     /// <summary>
-    /// Not available yet
+    /// Not available yet.
     /// </summary>
     public class MessageReferenceParams
     {

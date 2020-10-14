@@ -27,6 +27,9 @@ namespace Discord
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
+        /// <param name="reference">
+        ///    Not available yet.
+        /// </param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.

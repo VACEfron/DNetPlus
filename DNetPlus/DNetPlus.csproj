@@ -2,13 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <AssemblyName>DNetPlus</AssemblyName>
     <RootNamespace>DNetPlus</RootNamespace>
     <PackageId>DNetPlus</PackageId>
-    <Authors>xXBuilderBXx</Authors>
+    <Authors>xXBuilderBXx;Discord.Net Contributors</Authors>
     <Company>Fluxpoint Development</Company>
     <Product>DNetPlus</Product>
+    <PackageProjectUrl>https://github.com/xXBuilderBXx/DNetPlus</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/xXBuilderBXx/DNetPlus</RepositoryUrl>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageTags>discord;discordapp;discordlib;dnetplus</PackageTags>
+    <PackageReleaseNotes>Fork of discord.net with many tweaks and added functionality instead of waiting months for them.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
