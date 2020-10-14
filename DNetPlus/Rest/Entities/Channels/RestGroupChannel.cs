@@ -95,8 +95,8 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
-            => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, allowedMentions, options);
+        public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReferenceParams reference = null)
+            => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, allowedMentions, reference, options);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">
@@ -184,8 +184,8 @@ namespace Discord.Rest
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler, allowedMentions).ConfigureAwait(false);
 
-        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions)
-            => await SendMessageAsync(text, isTTS, embed, options, allowedMentions).ConfigureAwait(false);
+        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReferenceParams reference)
+            => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, reference).ConfigureAwait(false);
 
         //IAudioChannel
         /// <inheritdoc />

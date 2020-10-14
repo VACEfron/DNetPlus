@@ -70,6 +70,16 @@ namespace Discord.Rest
                 Users = entity.UserIds?.ToArray(),
             };
         }
+
+        public static MessageReferenceParams ToModel(this MessageReferenceParams entity)
+        {
+            return new MessageReferenceParams
+            {
+                ChannelId = entity.ChannelId,
+                MessageId = entity.MessageId
+            };
+        }
+
         public static IEnumerable<string> EnumerateMentionTypes(this AllowedMentionTypes mentionTypes)
         {
             if (mentionTypes.HasFlag(AllowedMentionTypes.Everyone))

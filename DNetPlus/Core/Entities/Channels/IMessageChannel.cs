@@ -31,7 +31,7 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null);
+        Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReferenceParams reference = null);
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
