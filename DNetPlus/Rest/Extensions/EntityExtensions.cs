@@ -1,3 +1,4 @@
+using Discord.API;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -60,6 +61,21 @@ namespace Discord.Rest
             if (entity.Video != null)
                 model.Video = entity.Video.Value.ToModel();
             return model;
+        }
+
+        public static MessageSticker ToEntity(this Sticker model)
+        {
+            return new MessageSticker
+            {
+                Id = model.Id,
+                Description = model.Description,
+                Asset = model.Asset,
+                Name = model.Name,
+                PackId = model.PackId,
+                Tag = model.Tag,
+                Type = model.Type,
+                PreviewAsset = model.PreviewAsset
+            };
         }
         public static API.AllowedMentions ToModel(this AllowedMentions entity)
         {

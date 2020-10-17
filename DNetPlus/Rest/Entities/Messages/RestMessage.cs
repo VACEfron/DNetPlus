@@ -1,3 +1,4 @@
+using Discord.API;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -64,6 +65,11 @@ namespace Discord.Rest
         public MessageApplication Application { get; private set; }
         /// <inheritdoc />
         public MessageReference Reference { get; private set; }
+        /// <summary>
+        ///     Gets a collection of the <see cref="ISticker"/>'s on the message.
+        /// </summary>
+        public virtual IReadOnlyCollection<MessageSticker> Stickers => ImmutableArray.Create<MessageSticker>();
+
 
         internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id)
@@ -163,6 +169,8 @@ namespace Discord.Rest
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
         /// <inheritdoc />
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
+
+        IReadOnlyCollection<ISticker> IMessage.Stickers => Stickers;
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
 

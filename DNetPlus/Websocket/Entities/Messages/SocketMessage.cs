@@ -1,3 +1,4 @@
+using Discord.API;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -95,6 +96,8 @@ namespace Discord.WebSocket
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
+
+        public virtual IReadOnlyCollection<ISticker> Stickers => ImmutableArray.Create<ISticker>();
 
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);

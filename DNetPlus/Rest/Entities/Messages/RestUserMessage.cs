@@ -1,3 +1,4 @@
+using Discord.API;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -17,6 +18,7 @@ namespace Discord.Rest
         private long? _editedTimestampTicks;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
+        private ImmutableArray<MessageSticker> _stickers = ImmutableArray.Create<MessageSticker>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
 
         /// <inheritdoc />
@@ -39,6 +41,8 @@ namespace Discord.Rest
         public override IReadOnlyCollection<RestUser> MentionedUsers => MessageHelper.FilterTagsByValue<RestUser>(TagType.UserMention, _tags);
         /// <inheritdoc />
         public override IReadOnlyCollection<ITag> Tags => _tags;
+
+        public override IReadOnlyCollection<MessageSticker> Stickers => _stickers;
 
         internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id, channel, author, source)
@@ -94,6 +98,20 @@ namespace Discord.Rest
                 }
                 else
                     _embeds = ImmutableArray.Create<Embed>();
+            }
+
+            if (model.Stickers.IsSpecified)
+            {
+                var value = model.Stickers.Value;
+                if (value.Length > 0)
+                {
+                    var stickers = ImmutableArray.CreateBuilder<MessageSticker>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                        stickers.Add(value[i].ToEntity());
+                    _stickers = stickers.ToImmutable();
+                }
+                else
+                    _stickers = ImmutableArray.Create<MessageSticker>();
             }
 
             ImmutableArray<IUser> mentions = ImmutableArray.Create<IUser>();

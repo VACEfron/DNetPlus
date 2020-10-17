@@ -56,5 +56,8 @@ namespace Discord.API
         public Optional<MessageFlags> Flags { get; set; }
         [JsonProperty("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
+
+        [JsonProperty("stickers")]
+        public Optional<Sticker[]> Stickers { get; set; }
     }
 }

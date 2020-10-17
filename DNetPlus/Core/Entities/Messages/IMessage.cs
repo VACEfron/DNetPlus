@@ -1,3 +1,4 @@
+using Discord.API;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -151,6 +152,8 @@ namespace Discord
         ///     A message's reference, if any is associated.
         /// </returns>
         MessageReference Reference { get; }
+
+        IReadOnlyCollection<ISticker> Stickers { get; }
 
         /// <summary>
         ///     Gets all reactions included in this message.
