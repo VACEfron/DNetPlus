@@ -1,3 +1,4 @@
+using Discord.API;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace Discord.WebSocket
         private long? _editedTimestampTicks;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
+        private ImmutableArray<MessageSticker> _stickers = ImmutableArray.Create<MessageSticker>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
         
         /// <inheritdoc />
@@ -35,6 +37,8 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<Embed> Embeds => _embeds;
         /// <inheritdoc />
         public override IReadOnlyCollection<ITag> Tags => _tags;
+
+        public override IReadOnlyCollection<MessageSticker> Stickers => _stickers;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => MessageHelper.FilterTagsByValue<SocketGuildChannel>(TagType.ChannelMention, _tags);
         /// <inheritdoc />
@@ -96,6 +100,20 @@ namespace Discord.WebSocket
                 }
                 else
                     _embeds = ImmutableArray.Create<Embed>();
+            }
+
+            if (model.Stickers.IsSpecified)
+            {
+                var value = model.Stickers.Value;
+                if (value.Length > 0)
+                {
+                    var stickers = ImmutableArray.CreateBuilder<MessageSticker>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                        stickers.Add(value[i].ToEntity());
+                    _stickers = stickers.ToImmutable();
+                }
+                else
+                    _stickers = ImmutableArray.Create<MessageSticker>();
             }
 
             IReadOnlyCollection<IUser> mentions = ImmutableArray.Create<SocketUnknownUser>(); //Is passed to ParseTags to get real mention collection

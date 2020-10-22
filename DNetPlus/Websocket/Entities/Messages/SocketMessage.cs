@@ -97,7 +97,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
 
-        public virtual IReadOnlyCollection<ISticker> Stickers => ImmutableArray.Create<ISticker>();
+        public virtual IReadOnlyCollection<MessageSticker> Stickers => ImmutableArray.Create<MessageSticker>();
 
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
@@ -183,6 +183,8 @@ namespace Discord.WebSocket
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
         /// <inheritdoc />
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
+
+        IReadOnlyCollection<ISticker> IMessage.Stickers => Stickers;
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannels.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
