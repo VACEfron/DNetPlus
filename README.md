@@ -34,6 +34,9 @@ https://github.com/xXBuilderBXx/DNetPlus-Addons
 - [Customize version](https://github.com/xXBuilderBXx/DNetPlus/commit/02019b2bd1dcc277f80a26a426e7a45ab5d105f8)
    - Customize the version string from X.X.X to X.X.X (Custom DNetPlus)
 
+- [Add sticker properties to messages](https://github.com/xXBuilderBXx/DNetPlus/commit/4565b38ece01b29c4ad8b21567ff2098201de330)
+  - You can only get sticker messages, bots can not send stickers yet.
+
 # Fixes/Tweaks by others
 - [Limit request members batch size due to intents](https://github.com/xXBuilderBXx/DNetPlus/commit/0a68feaebb7b440c7e9393eaa3d6bfb8a8f00a87) from Discord.Net/pull/1647
    - Fixes an issue with downloading all guild members when using intents.
