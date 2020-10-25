@@ -29,5 +29,7 @@ namespace Discord.Commands
         IUserMessage Message { get; }
 
         CommandInfo Command { get; set; }
+
+        string Prefix { get; set; }
     }
 }

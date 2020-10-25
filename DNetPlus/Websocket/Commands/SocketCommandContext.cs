@@ -33,7 +33,9 @@ namespace Discord.Commands
         /// </summary>
         public bool IsPrivate => Channel is IPrivateChannel;
 
-        CommandInfo Command { get; set; }
+        public CommandInfo Command { get; set; }
+
+        public string Prefix { get; set; }
 
         /// <summary>
         ///     Initializes a new <see cref="SocketCommandContext" /> class with the provided client and message.
@@ -60,7 +62,5 @@ namespace Discord.Commands
         IUser ICommandContext.User => User;
         /// <inheritdoc/>
         IUserMessage ICommandContext.Message => Message;
-
-        CommandInfo ICommandContext.Command { get => Command; set => Command = value; }
     }
 }

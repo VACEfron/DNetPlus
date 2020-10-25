@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <Version>1.2.4</Version>
+    <Version>1.2.5</Version>
     <AssemblyName>DNetPlus</AssemblyName>
     <RootNamespace>DNetPlus</RootNamespace>
     <PackageId>DNetPlus</PackageId>
@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/xXBuilderBXx/DNetPlus</RepositoryUrl>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageTags>discord;discordapp;discordlib;dnetplus</PackageTags>
-    <PackageReleaseNotes>Fix sticker support for websocket messages.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added prefix property to context.</PackageReleaseNotes>
     <Description>Fork of discord.net with many tweaks and added functionality instead of waiting months for them.</Description>
   </PropertyGroup>
 

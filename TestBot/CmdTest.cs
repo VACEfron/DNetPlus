@@ -14,6 +14,7 @@ namespace TestBot
         public async Task Test()
         {
             Console.Write(Context.Command.Name);
+            Console.Write(Context.Prefix);
             await ReplyAsync("Test");
         }
 

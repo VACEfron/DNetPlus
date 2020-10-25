@@ -18,6 +18,8 @@ namespace Discord.Commands
 
         public CommandInfo Command { get; set; }
 
+        public string Prefix { get; set; }
+
         /// <summary> Indicates whether the channel that the command is executed in is a private channel. </summary>
         public bool IsPrivate => Channel is IPrivateChannel;
 

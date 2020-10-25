@@ -489,7 +489,7 @@ namespace Discord.Commands
         ///     command execution.
         /// </returns>
         public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
-            => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
+            => ExecuteAsync(context, context.Message.Content.Substring(argPos), argPos, services, multiMatchHandling);
         /// <summary>
         ///     Executes the command.
         /// </summary>
@@ -501,10 +501,10 @@ namespace Discord.Commands
         ///     A task that represents the asynchronous execution operation. The task result contains the result of the
         ///     command execution.
         /// </returns>
-        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        internal async Task<IResult> ExecuteAsync(ICommandContext context, string input, int argPos, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
-
+            context.Prefix = context.Message.Content.Substring(0, argPos);
             var searchResult = Search(input);
             if (!searchResult.IsSuccess)
             {
