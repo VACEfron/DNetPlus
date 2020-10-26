@@ -1,9 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TestBot
@@ -14,6 +12,17 @@ namespace TestBot
         public async Task Test()
         {
             await ReplyAsync("Test");
+        }
+
+        [Command("testemote")]
+        public async Task TestEmote([Remainder] string emote)
+        {
+            Console.WriteLine($"Test - {emote}");
+            var e = Emoji.FromUnicode(emote);
+            if (e == null)
+                await ReplyAsync("Not valid");
+            else
+                await ReplyAsync("Valid");
         }
 
         [Command("getsticker")]
