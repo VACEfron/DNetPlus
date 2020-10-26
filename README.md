@@ -37,6 +37,15 @@ https://github.com/xXBuilderBXx/DNetPlus-Addons
 - [Add sticker properties to messages](https://github.com/xXBuilderBXx/DNetPlus/commit/4565b38ece01b29c4ad8b21567ff2098201de330)
   - You can only get sticker messages, bots can not send stickers yet.
 
+- [Add support methods and properties for guild features](https://github.com/xXBuilderBXx/DNetPlus/commit/b9becf80271407bfde6d825bd40e1e1eb17c2e99)
+  - Instead of a list of features like VANITY_URL i have added a GetGuildFeatures method that has guild features as bools.
+
+- [Added guild modify for rules and public updates channel](https://github.com/xXBuilderBXx/DNetPlus/commit/87552609d7691b3f17d25af1c12eb15a81826b3e)
+  - Allows you to modify the guild rules channel and public updates channel.
+
+- [Add channel follow properties to webhooks](https://github.com/xXBuilderBXx/DNetPlus/commit/587b7dfa050981ee24cb2a9a218a028a4a29d7d6)
+  - Allows you to get webhook info for channel follows with guild id/name/icon and channel id/name.
+
 # Fixes/Tweaks by others
 - [Limit request members batch size due to intents](https://github.com/xXBuilderBXx/DNetPlus/commit/0a68feaebb7b440c7e9393eaa3d6bfb8a8f00a87) from Discord.Net/pull/1647
    - Fixes an issue with downloading all guild members when using intents.
