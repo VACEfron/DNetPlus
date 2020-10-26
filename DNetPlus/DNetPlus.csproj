@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/xXBuilderBXx/DNetPlus</RepositoryUrl>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageTags>discord;discordapp;discordlib;dnetplus</PackageTags>
-    <PackageReleaseNotes>Added prefix property to context.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added guild features class and GetGuildFeatures method.</PackageReleaseNotes>
     <Description>Fork of discord.net with many tweaks and added functionality instead of waiting months for them.</Description>
   </PropertyGroup>
 
