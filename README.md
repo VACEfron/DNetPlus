@@ -46,6 +46,9 @@ https://github.com/xXBuilderBXx/DNetPlus-Addons
 - [Add channel follow properties to webhooks](https://github.com/xXBuilderBXx/DNetPlus/commit/587b7dfa050981ee24cb2a9a218a028a4a29d7d6)
   - Allows you to get webhook info for channel follows with guild id/name/icon and channel id/name.
 
+- [Add support for emote parsing names/unicode](https://github.com/xXBuilderBXx/DNetPlus/commit/0b2efe37772a194d7af30721d54c05cb51c2be1f)
+  - Added Emoji support methods for validating emotes using Emoji.FromName or Emoji.FromUnicode which will return an Emoji or null if it's invalid.
+
 # Fixes/Tweaks by others
 - [Limit request members batch size due to intents](https://github.com/xXBuilderBXx/DNetPlus/commit/0a68feaebb7b440c7e9393eaa3d6bfb8a8f00a87) from Discord.Net/pull/1647
    - Fixes an issue with downloading all guild members when using intents.
