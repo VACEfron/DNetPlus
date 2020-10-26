@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DNetPlus.Core.Entities.Guilds
+namespace Discord
 {
     public class GuildFeatures
     {

@@ -1,5 +1,3 @@
-using DNetPlus.Core.Entities.Guilds;
-
 namespace Discord
 {
     /// <summary>
