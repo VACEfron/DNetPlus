@@ -28,8 +28,8 @@ https://github.com/xXBuilderBXx/DNetPlus-Addons
 
 - [Add command attribute for RequireTeamMember](https://github.com/xXBuilderBXx/DNetPlus/commit/4c7c9e31f0521ff9ff236a53a275e8b4f9b3f5dc)
 
-- [Add command info to the command context](https://github.com/xXBuilderBXx/DNetPlus/commit/5c084d045d71ab908026b34adaaa4a2f2b808e18)
-   - Allows you to get command info from the current command executed with Context.Command.
+- [Add command info to the command context](https://github.com/xXBuilderBXx/DNetPlus/commit/5c084d045d71ab908026b34adaaa4a2f2b808e18) | [Add prefix to command context](https://github.com/xXBuilderBXx/DNetPlus/commit/bfb34c27dae7de124c6d0632d22ae5c5fabcd6c3)
+   - Allows you to get command info and prefix from the current command executed with Context.Command and Context.Prefix.
 
 - [Customize version](https://github.com/xXBuilderBXx/DNetPlus/commit/02019b2bd1dcc277f80a26a426e7a45ab5d105f8)
    - Customize the version string from X.X.X to X.X.X (Custom DNetPlus)
