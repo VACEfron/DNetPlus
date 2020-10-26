@@ -9,6 +9,8 @@ You can install these optional addons to extend the functionality of DNetPlus.
 https://github.com/xXBuilderBXx/DNetPlus-Addons
 
 # Fixes/Tweaks by me
+A docs website will be setup with information and list of changes with a better design instead of using this github readme. 
+
 - [Increase connection wait limit instead of timeouts](https://github.com/xXBuilderBXx/DNetPlus/commit/34e4cd07ea2147cf5fd449087a278567e14bb0b9)
    - This helps with bigger bots with 15+ shards to connect better.
 
