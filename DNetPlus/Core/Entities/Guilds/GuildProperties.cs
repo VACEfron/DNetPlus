@@ -29,25 +29,9 @@ namespace Discord
         /// </summary>
         public Optional<DefaultMessageNotifications> DefaultMessageNotifications { get; set; }
         /// <summary>
-        ///     Gets or sets how many seconds before a user is sent to AFK. This value MUST be one of: (60, 300, 900,
-        ///     1800, 3600).
+        ///     Gets or sets the explicit content filter level of this guild.
         /// </summary>
-        public Optional<int> AfkTimeout { get; set; }
-        /// <summary>
-        ///     Gets or sets the icon of the guild.
-        /// </summary>
-        public Optional<Image?> Icon { get; set; }
-        /// <summary>
-        ///     Gets or sets the banner of the guild.
-        /// </summary>
-        public Optional<Image?> Banner { get; set; }
-        /// <summary>
-        ///     Gets or sets the guild's splash image.
-        /// </summary>
-        /// <remarks>
-        ///     The guild must be partnered for this value to have any effect.
-        /// </remarks>
-        public Optional<Image?> Splash { get; set; }
+        public Optional<ExplicitContentFilterLevel> ExplicitContentFilter { get; set; }
         /// <summary>
         ///     Gets or sets the <see cref="IVoiceChannel"/> where AFK users should be sent.
         /// </summary>
@@ -57,13 +41,14 @@ namespace Discord
         /// </summary>
         public Optional<ulong?> AfkChannelId { get; set; }
         /// <summary>
-        ///     Gets or sets the <see cref="ITextChannel" /> where system messages should be sent.
+        ///     Gets or sets how many seconds before a user is sent to AFK. This value MUST be one of: (60, 300, 900,
+        ///     1800, 3600).
         /// </summary>
-        public Optional<ITextChannel> SystemChannel { get; set; }
+        public Optional<int> AfkTimeout { get; set; }
         /// <summary>
-        ///     Gets or sets the ID of the <see cref="ITextChannel" /> where system messages should be sent.
+        ///     Gets or sets the icon of the guild.
         /// </summary>
-        public Optional<ulong?> SystemChannelId { get; set; }
+        public Optional<Image?> Icon { get; set; }
         /// <summary>
         ///     Gets or sets the owner of this guild.
         /// </summary>
@@ -73,9 +58,40 @@ namespace Discord
         /// </summary>
         public Optional<ulong> OwnerId { get; set; }
         /// <summary>
-        ///     Gets or sets the explicit content filter level of this guild.
+        ///     Gets or sets the guild's splash image.
         /// </summary>
-        public Optional<ExplicitContentFilterLevel> ExplicitContentFilter { get; set; }
+        /// <remarks>
+        ///     The guild must be partnered for this value to have any effect.
+        /// </remarks>
+        public Optional<Image?> Splash { get; set; }
+        /// <summary>
+        ///     Gets or sets the banner of the guild.
+        /// </summary>
+        public Optional<Image?> Banner { get; set; }
+        /// <summary>
+        ///     Gets or sets the <see cref="ITextChannel" /> where system messages should be sent.
+        /// </summary>
+        public Optional<ITextChannel> SystemChannel { get; set; }
+        /// <summary>
+        ///     Gets or sets the ID of the <see cref="ITextChannel" /> where system messages should be sent.
+        /// </summary>
+        public Optional<ulong?> SystemChannelId { get; set; }
+        /// <summary>
+        ///     Gets or sets the <see cref="ITextChannel" /> for rules channel.
+        /// </summary>
+        public Optional<ITextChannel> RulesChannel { get; set; }
+        /// <summary>
+        ///     Gets or sets the ID of the <see cref="ITextChannel" /> for rules channel.
+        /// </summary>
+        public Optional<ulong?> RulesChannelId { get; set; }
+        /// <summary>
+        ///     Gets or sets the <see cref="ITextChannel" /> where public update messages should be sent.
+        /// </summary>
+        public Optional<ITextChannel> PublicUpdatesChannel { get; set; }
+        /// <summary>
+        ///     Gets or sets the ID of the <see cref="ITextChannel" /> where public update messages should be sent.
+        /// </summary>
+        public Optional<ulong?> PublicUpdatesChannelId { get; set; }
         /// <summary>
         ///     Gets or sets the flags that DISABLE types of system channel messages.
         /// </summary>
