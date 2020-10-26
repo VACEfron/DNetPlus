@@ -850,6 +850,8 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(args.AfkChannelId, 0, nameof(args.AfkChannelId));
+            Preconditions.NotEqual(args.RulesChannelId, 0, nameof(args.RulesChannelId));
+            Preconditions.NotEqual(args.PublicUpdatesChannelId, 0, nameof(args.PublicUpdatesChannelId));
             Preconditions.AtLeast(args.AfkTimeout, 0, nameof(args.AfkTimeout));
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
             Preconditions.GreaterThan(args.OwnerId, 0, nameof(args.OwnerId));
