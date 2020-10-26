@@ -50,6 +50,15 @@ namespace Discord
         IUser Creator { get; }
 
         /// <summary>
+        /// The guild of the channel that this webhook is following.
+        /// </summary>
+        WebhookFollowGuild? SourceGuild { get; }
+        /// <summary>
+        /// The channel that this webhook is following.
+        /// </summary>
+        WebhookFollowChannel? SourceChannel { get; }
+
+        /// <summary>
         ///     Modifies this webhook.
         /// </summary>
         Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null);

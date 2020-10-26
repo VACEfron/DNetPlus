@@ -17,6 +17,8 @@ namespace Discord.Webhook
         public string Name { get; private set; }
         public string AvatarId { get; private set; }
         public ulong? GuildId { get; private set; }
+        public WebhookFollowGuild? SourceGuild { get; private set; }
+        public WebhookFollowChannel? SourceChannel { get; private set; }
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
@@ -42,6 +44,19 @@ namespace Discord.Webhook
                 GuildId = model.GuildId.Value;
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
+            if (model.SourceGuild.IsSpecified)
+                SourceGuild = new WebhookFollowGuild
+                {
+                    Id = model.SourceGuild.Value.Id,
+                    Icon = model.SourceGuild.Value.Icon,
+                    Name = model.SourceGuild.Value.Name
+                };
+            if (model.SourceChannel.IsSpecified)
+                SourceChannel = new WebhookFollowChannel
+                {
+                    Id = model.SourceChannel.Value.Id,
+                    Name = model.SourceChannel.Value.Name
+                };
         }
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
@@ -62,5 +77,7 @@ namespace Discord.Webhook
         IUser IWebhook.Creator => null;
         ITextChannel IWebhook.Channel => null;
         IGuild IWebhook.Guild => null;
+        WebhookFollowGuild IWebhook.SourceGuild => SourceGuild;
+        WebhookFollowChannel IWebhook.SourceChannel => SourceChannel;
     }
 }

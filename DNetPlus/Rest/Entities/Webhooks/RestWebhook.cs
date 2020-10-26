@@ -25,6 +25,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IUser Creator { get; private set; }
 
+        public WebhookFollowGuild? SourceGuild { get; private set; }
+        public WebhookFollowChannel? SourceChannel { get; private set; }
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
@@ -64,6 +66,19 @@ namespace Discord.Rest
                 GuildId = model.GuildId.Value;
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
+            if (model.SourceGuild.IsSpecified)
+                SourceGuild = new WebhookFollowGuild
+                {
+                    Id = model.SourceGuild.Value.Id,
+                    Icon = model.SourceGuild.Value.Icon,
+                    Name = model.SourceGuild.Value.Name
+                };
+            if (model.SourceChannel.IsSpecified)
+                SourceChannel = new WebhookFollowChannel
+                {
+                    Id = model.SourceChannel.Value.Id,
+                    Name = model.SourceChannel.Value.Name
+                };
         }
 
         /// <inheritdoc />
@@ -97,6 +112,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         ITextChannel IWebhook.Channel 
             => Channel ?? throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
+
+        WebhookFollowGuild IWebhook.SourceGuild => SourceGuild;
+        WebhookFollowChannel IWebhook.SourceChannel => SourceChannel;
         /// <inheritdoc />
         Task IWebhook.ModifyAsync(Action<WebhookProperties> func, RequestOptions options)
             => ModifyAsync(func, options);

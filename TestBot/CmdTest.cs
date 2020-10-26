@@ -13,8 +13,6 @@ namespace TestBot
         [Command("test")]
         public async Task Test()
         {
-            GuildFeatures features = Context.Guild.GetGuildFeatures();
-            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(features, Newtonsoft.Json.Formatting.Indented));
             await ReplyAsync("Test");
         }
 

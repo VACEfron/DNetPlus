@@ -21,5 +21,10 @@ namespace Discord.API
 
         [JsonProperty("user")]
         public Optional<User> Creator { get; set; }
+
+        [JsonProperty("source_guild")]
+        public Optional<WebhookFollow> SourceGuild { get; set; }
+        [JsonProperty("source_channel")]
+        public Optional<WebhookFollow> SourceChannel { get; set; }
     }
 }
