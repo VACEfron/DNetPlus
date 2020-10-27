@@ -1,3 +1,5 @@
+using Discord.Rest;
+using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,6 +32,13 @@ namespace Discord
         {
             var regions = await discord.GetVoiceRegionsAsync().ConfigureAwait(false);
             return regions.FirstOrDefault(x => x.IsOptimal);
+        }
+
+        public static WebSocket.DiscordSocketRestClient Rest(this IDiscordClient discord)
+        {
+            if (discord is DiscordShardedClient sc)
+                return sc.Rest;
+            return (discord as DiscordSocketClient).Rest;
         }
     }
 }
