@@ -32,11 +32,14 @@ namespace Discord
                 return $"`{text}`";
         }
 
-        /// <summary> Sanitizes the string, safely escaping any Markdown sequences. </summary>
-        public static string Sanitize(string text)
+        /// <summary> Sanitizes the string, safely escaping or removing any Markdown sequences. </summary>
+        public static string Sanitize(string text, bool removeUnsafeCharacters = false)
         {
+            string replaceWith = removeUnsafeCharacters ? string.Empty : $"\\{unsafeChar}";
+                
             foreach (string unsafeChar in SensitiveCharacters)
-                text = text.Replace(unsafeChar, $"\\{unsafeChar}");
+                text = text.Replace(unsafeChar, replaceWith);
+            
             return text;
         }
 
