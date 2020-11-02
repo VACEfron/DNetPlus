@@ -167,10 +167,10 @@ namespace Discord.WebSocket
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, allowedMentions, reference, options);
 
         /// <inheritdoc />
-        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+        public Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, allowedMentions, options, isSpoiler);
         /// <inheritdoc />
-        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, allowedMentions, options, isSpoiler);
 
         /// <inheritdoc />
@@ -293,10 +293,10 @@ namespace Discord.WebSocket
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions)
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
             => await SendFileAsync(filePath, text, isTTS, embed, options, isSpoiler, allowedMentions).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions)
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler, allowedMentions).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReferenceParams reference)
