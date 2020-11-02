@@ -1,17 +1,24 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Rest;
+using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace TestBot
 {
-    public class CmdTest : ModuleBase
+    public class CmdTest : ModuleBase<SocketCommandContext>
     {
         [Command("test")]
         public async Task Test()
         {
-            await ReplyAsync("Test");
+           
+            var WH = await (Context.Client.GetGuild(275054291360940032).GetTextChannel(772956282318880811) as SocketNewsChannel).FollowChannelAsync(Context.Channel as SocketTextChannel);
+            if (WH == null)
+                await ReplyAsync("Failed");
+            else
+                await ReplyAsync("Done");
         }
 
         [Command("testemote")]

@@ -1,3 +1,4 @@
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,6 +28,9 @@ namespace Discord.WebSocket
             entity.Update(state, model);
             return entity;
         }
+
+        public Task<RestWebhook> FollowChannelAsync(ITextChannel target, RequestOptions options = null)
+            => ChannelHelper.CreateNewsWebhookAsync(Discord, this, target, options);
         /// <inheritdoc />
         /// <remarks>
         ///     <note type="important">

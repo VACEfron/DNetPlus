@@ -1412,6 +1412,18 @@ namespace Discord.API
 
             return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/webhooks", args, ids, options: options).ConfigureAwait(false);
         }
+
+        public async Task<Webhook> CreateFollowWebhookAsync(ulong channelId, CreateWebhookNews args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(args.targetChannelId, 0, nameof(args.targetChannelId));
+            options = RequestOptions.CreateOrClone(options);
+            var ids = new BucketIds(channelId: channelId);
+
+            return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/followers", args, ids, options: options).ConfigureAwait(false);
+        }
+
         public async Task<Webhook> GetWebhookAsync(ulong webhookId, RequestOptions options = null)
         {
             Preconditions.NotEqual(webhookId, 0, nameof(webhookId));

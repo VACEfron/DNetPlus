@@ -1,4 +1,5 @@
 using Discord.API.Rest;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -410,6 +411,13 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateWebhookAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestWebhook.Create(client, channel, model);
         }
+        //News
+        public static async Task<RestWebhook> CreateNewsWebhookAsync(BaseDiscordClient client, SocketNewsChannel source, ITextChannel target, RequestOptions options)
+        {
+            var model = await client.ApiClient.CreateFollowWebhookAsync(source.Id, new CreateWebhookNews(target.Id), options).ConfigureAwait(false);
+            return RestWebhook.Create(client, target, model);
+        }
+
         public static async Task<RestWebhook> GetWebhookAsync(ITextChannel channel, BaseDiscordClient client, ulong id, RequestOptions options)
         {
             var model = await client.ApiClient.GetWebhookAsync(id, options: options).ConfigureAwait(false);
