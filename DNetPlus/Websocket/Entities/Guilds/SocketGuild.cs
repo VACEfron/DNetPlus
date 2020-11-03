@@ -94,6 +94,17 @@ namespace Discord.WebSocket
         public string VoiceRegionId { get; private set; }
         /// <inheritdoc />
         public string IconId { get; private set; }
+        public bool IsIconAnimated
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(IconId))
+                    return false;
+                if (IconId[0] == 'a' && IconId[1] == '_')
+                    return true;
+                return false;
+            }
+        }
         /// <inheritdoc />
         public string SplashId { get; private set; }
         public string DiscoverySplashId { get; private set; }

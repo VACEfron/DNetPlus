@@ -21,7 +21,8 @@ namespace TestBot
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 OwnerIds = new ulong[] { 190590364871032834 },
-                GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.GuildMessages
+                GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.GuildMembers,
+                AlwaysDownloadUsers = true
             });
             string File = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/DiscordBots/Boaty/Config.json";
             Client.Log += Client_Log;

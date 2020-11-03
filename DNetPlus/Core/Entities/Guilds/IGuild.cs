@@ -67,6 +67,18 @@ namespace Discord
         ///     An identifier for the splash image; <c>null</c> if none is set.
         /// </returns>
         string IconId { get; }
+
+        public bool IsIconAnimated
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(IconId))
+                    return false;
+                if (IconId[0] == 'a' && IconId[1] == '_')
+                    return true;
+                return false;
+            }
+        }
         /// <summary>
         ///     Gets the URL of this guild's icon.
         /// </summary>

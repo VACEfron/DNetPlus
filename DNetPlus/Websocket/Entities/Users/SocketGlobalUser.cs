@@ -12,6 +12,7 @@ namespace Discord.WebSocket
         public override string Username { get; internal set; }
         public override ushort DiscriminatorValue { get; internal set; }
         public override string AvatarId { get; internal set; }
+
         public SocketDMChannel DMChannel { get; internal set; }
         internal override SocketPresence Presence { get; set; }
 

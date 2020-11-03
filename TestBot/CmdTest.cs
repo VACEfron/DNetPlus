@@ -1,6 +1,6 @@
 ﻿using Discord;
+using Discord.API;
 using Discord.Commands;
-using Discord.Rest;
 using Discord.WebSocket;
 using System;
 using System.Linq;
@@ -11,14 +11,11 @@ namespace TestBot
     public class CmdTest : ModuleBase<SocketCommandContext>
     {
         [Command("test")]
-        public async Task Test()
+        public async Task Test(ulong id)
         {
-           
-            var WH = await (Context.Client.GetGuild(275054291360940032).GetTextChannel(772956282318880811) as SocketNewsChannel).FollowChannelAsync(Context.Channel as SocketTextChannel);
-            if (WH == null)
-                await ReplyAsync("Failed");
-            else
-                await ReplyAsync("Done");
+            Context.Guild
+            Console.Write(GU.AvatarId);
+            await ReplyAsync(Context.Client.CurrentUser.IsAvatarAnimated);
         }
 
         [Command("testemote")]

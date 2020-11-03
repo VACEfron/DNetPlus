@@ -11,6 +11,19 @@ namespace Discord
         ///     Gets the identifier of this user's avatar.
         /// </summary>
         string AvatarId { get; }
+
+        public bool IsAvatarAnimated
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(AvatarId))
+                    return false;
+                if (AvatarId[0] == 'a' && AvatarId[1] == '_')
+                    return true;
+                return false;
+            }
+        }
+
         /// <summary>
         ///     Gets the avatar URL for this user.
         /// </summary>

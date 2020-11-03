@@ -24,6 +24,18 @@ namespace Discord.WebSocket
         public abstract ushort DiscriminatorValue { get; internal set; }
         /// <inheritdoc />
         public abstract string AvatarId { get; internal set; }
+
+        public bool IsAvatarAnimated
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(AvatarId))
+                    return false;
+                if (AvatarId[0] == 'a' && AvatarId[1] == '_')
+                    return true;
+                return false;
+            }
+        }
         /// <inheritdoc />
         public abstract bool IsWebhook { get; }
         internal abstract SocketGlobalUser GlobalUser { get; }
