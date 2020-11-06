@@ -13,7 +13,17 @@ namespace TestBot
         [Command("test")]
         public async Task Test()
         {
-            
+            try
+            {
+                var Temps = await Context.Guild.GetTemplatesAsync();
+                await ReplyAsync(Temps.Count.ToString());
+                var Temps2 = await Context.Guild.GetTemplatesAsync(true);
+                await ReplyAsync(Temps2.First().Snapshot.Value.Roles.Count.ToString());
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         [Command("testemote")]

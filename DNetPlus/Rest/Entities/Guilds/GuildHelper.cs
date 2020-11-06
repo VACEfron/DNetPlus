@@ -8,6 +8,7 @@ using WidgetModel = Discord.API.GuildWidget;
 using Model = Discord.API.Guild;
 using RoleModel = Discord.API.Role;
 using ImageModel = Discord.API.Image;
+using Discord.API;
 
 namespace Discord.Rest
 {
@@ -484,6 +485,21 @@ namespace Discord.Rest
         {
             var models = await client.ApiClient.GetGuildWebhooksAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestWebhook.Create(client, guild, x)).ToImmutableArray();
+        }
+
+        //Templates
+        public static async Task<IReadOnlyCollection<RestGuildTemplate>> GetTemplatesAsync(IGuild guild, BaseDiscordClient client, bool withSnapshot, RequestOptions options)
+        {
+            if (withSnapshot)
+            {
+                var models = await client.ApiClient.GetGuildTemplatesAsync<GuildTemplateSnapshot>(guild.Id, options).ConfigureAwait(false);
+                return models.Select(x => RestGuildTemplate.Create(client, x, withSnapshot)).ToImmutableArray();
+            }
+            else
+            {
+                var models = await client.ApiClient.GetGuildTemplatesAsync<GuildTemplate>(guild.Id, options).ConfigureAwait(false);
+                return models.Select(x => RestGuildTemplate.Create(client, x, withSnapshot)).ToImmutableArray();
+            }
         }
 
         //Emotes

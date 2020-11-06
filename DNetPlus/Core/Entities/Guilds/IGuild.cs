@@ -1,3 +1,4 @@
+using Discord.API;
 using Discord.Audio;
 using System;
 using System.Collections.Generic;
@@ -911,5 +912,7 @@ namespace Discord
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
         Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
+
+        Task<IReadOnlyCollection<IGuildTemplate>> GetTemplatesAsync(bool withSnapshot = false, RequestOptions options = null);
     }
 }

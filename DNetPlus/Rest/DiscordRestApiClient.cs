@@ -86,7 +86,7 @@ namespace Discord.API
                 TokenType.Bot => $"Bot {token}",
                 TokenType.Bearer => $"Bearer {token}",
                 _ => throw new ArgumentException(message: "Unknown OAuth token type.", paramName: nameof(tokenType)),
-            };
+            }; ;
         }
         internal virtual void Dispose(bool disposing)
         {
@@ -1467,6 +1467,14 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Webhook>>("GET", () => $"guilds/{guildId}/webhooks", ids, options: options).ConfigureAwait(false);
+        }
+        public async Task<IReadOnlyCollection<TValue>> GetGuildTemplatesAsync<TValue>(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(guildId: guildId);
+            return await SendAsync<IReadOnlyCollection<TValue>>("GET", () => $"guilds/{guildId}/templates", ids, options: options).ConfigureAwait(false);
         }
         public async Task<IReadOnlyCollection<Webhook>> GetChannelWebhooksAsync(ulong channelId, RequestOptions options = null)
         {

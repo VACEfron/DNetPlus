@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Discord.API
 {
-    public class Sticker
+    internal class Sticker
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }

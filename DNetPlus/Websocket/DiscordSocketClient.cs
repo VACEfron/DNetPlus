@@ -11,6 +11,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -71,6 +72,7 @@ namespace Discord.WebSocket
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
         internal bool? ExclusiveBulkDelete { get; private set; }
+        internal bool DownloadedVoice { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         /// <inheritdoc />
@@ -204,8 +206,21 @@ namespace Discord.WebSocket
         {
             if (_parentClient == null)
             {
-                var voiceRegions = await ApiClient.GetVoiceRegionsAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
-                _voiceRegions = voiceRegions.Select(x => RestVoiceRegion.Create(this, x)).ToImmutableDictionary(x => x.Id);
+                if (this.BaseConfig.Debug.VoiceFix)
+                {
+                    if (!DownloadedVoice)
+                    {
+                        var voiceRegions = await ApiClient.GetVoiceRegionsAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.RetryTimeouts }).ConfigureAwait(false);
+                        DownloadedVoice = true;
+                        _voiceRegions = voiceRegions.Select(x => RestVoiceRegion.Create(this, x)).ToImmutableDictionary(x => x.Id);
+                    }
+                }
+                else
+                {
+                    var voiceRegions = await ApiClient.GetVoiceRegionsAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
+                    DownloadedVoice = true;
+                    _voiceRegions = voiceRegions.Select(x => RestVoiceRegion.Create(this, x)).ToImmutableDictionary(x => x.Id);
+                }
             }
             else
                 _voiceRegions = _parentClient._voiceRegions;
@@ -1576,26 +1591,29 @@ namespace Discord.WebSocket
                                 break;
                             case "TYPING_START":
                                 {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (TYPING_START)").ConfigureAwait(false);
-
-                                    var data = (payload as JToken).ToObject<TypingStartEvent>(_serializer);
-                                    if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
+                                    if (!_parentClient.BaseConfig.Debug.DisableTyping)
                                     {
-                                        var guild = (channel as SocketGuildChannel)?.Guild;
-                                        if (!(guild?.IsSynced ?? true))
-                                        {
-                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
-                                            return;
-                                        }
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (TYPING_START)").ConfigureAwait(false);
 
-                                        var user = (channel as SocketChannel).GetUser(data.UserId);
-                                        if (user == null)
+                                        var data = (payload as JToken).ToObject<TypingStartEvent>(_serializer);
+                                        if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                         {
-                                            if (guild != null)
-                                                user = guild.AddOrUpdateUser(data.Member);
+                                            var guild = (channel as SocketGuildChannel)?.Guild;
+                                            if (!(guild?.IsSynced ?? true))
+                                            {
+                                                await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                                return;
+                                            }
+
+                                            var user = (channel as SocketChannel).GetUser(data.UserId);
+                                            if (user == null)
+                                            {
+                                                if (guild != null)
+                                                    user = guild.AddOrUpdateUser(data.Member);
+                                            }
+                                            if (user != null)
+                                                await TimedInvokeAsync(_userIsTypingEvent, nameof(UserIsTyping), user, channel).ConfigureAwait(false);
                                         }
-                                        if (user != null)
-                                            await TimedInvokeAsync(_userIsTypingEvent, nameof(UserIsTyping), user, channel).ConfigureAwait(false);
                                     }
                                 }
                                 break;

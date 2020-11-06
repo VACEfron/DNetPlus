@@ -4,6 +4,7 @@ using Discord.API.Voice;
 using Discord.Net.Converters;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
+using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -45,16 +46,19 @@ namespace Discord.Audio
         private ulong _nextKeepalive;
 
         public ulong GuildId { get; }
+        public DiscordSocketConfig Config { get; private set; }
         internal IWebSocketClient WebSocketClient { get; }
         public ConnectionState ConnectionState { get; private set; }
 
         public ushort UdpPort => _udp.Port;
 
-        internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, JsonSerializer serializer = null)
+        internal DiscordVoiceAPIClient(DiscordSocketConfig config, ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, JsonSerializer serializer = null)
         {
             GuildId = guildId;
             _connectionLock = new SemaphoreSlim(1, 1);
             _udp = udpSocketProvider();
+            Config = config;
+
             _udp.ReceivedDatagram += async (data, index, count) =>
             {
                 if (index != 0 || count != data.Length)
@@ -68,21 +72,22 @@ namespace Discord.Audio
 
             WebSocketClient = webSocketProvider();
             //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); //(Causes issues in .Net 4.6+)
+
             WebSocketClient.BinaryMessage += async (data, index, count) =>
+        {
+            using (var compressed = new MemoryStream(data, index + 2, count - 2))
+            using (var decompressed = new MemoryStream())
             {
-                using (var compressed = new MemoryStream(data, index + 2, count - 2))
-                using (var decompressed = new MemoryStream())
+                using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
+                    zlib.CopyTo(decompressed);
+                decompressed.Position = 0;
+                using (var reader = new StreamReader(decompressed))
                 {
-                    using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-                        zlib.CopyTo(decompressed);
-                    decompressed.Position = 0;
-                    using (var reader = new StreamReader(decompressed))
-                    {
-                        var msg = JsonConvert.DeserializeObject<SocketFrame>(reader.ReadToEnd());
-                        await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
-                    }
+                    var msg = JsonConvert.DeserializeObject<SocketFrame>(reader.ReadToEnd());
+                    await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
                 }
-            };
+            }
+        };
             WebSocketClient.TextMessage += async text =>
             {
                 var msg = JsonConvert.DeserializeObject<SocketFrame>(text);
@@ -93,7 +98,6 @@ namespace Discord.Audio
                 await DisconnectAsync().ConfigureAwait(false);
                 await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
             };
-
             _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
         }
         private void Dispose(bool disposing)

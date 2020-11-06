@@ -30,11 +30,11 @@ namespace Discord
         /// <summary>
         ///     Gets a packed value representing all the allowed permissions in this <see cref="OverwritePermissions"/>.
         /// </summary>
-        public ulong AllowValue { get; }
+        public ulong AllowValue { get; internal set; }
         /// <summary>
         ///     Gets a packed value representing all the denied permissions in this <see cref="OverwritePermissions"/>.
         /// </summary>
-        public ulong DenyValue { get; }
+        public ulong DenyValue { get; internal set; }
 
         /// <summary> If Allowed, a user may create invites. </summary>
         public PermValue CreateInstantInvite => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.CreateInstantInvite);

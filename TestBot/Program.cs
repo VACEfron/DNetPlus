@@ -22,7 +22,12 @@ namespace TestBot
             {
                 OwnerIds = new ulong[] { 190590364871032834 },
                 GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.GuildMembers,
-                AlwaysDownloadUsers = true
+                AlwaysDownloadUsers = true,
+                LogLevel = Discord.LogSeverity.Verbose,
+                Debug = new DiscordDebugConfig
+                {
+                    VoiceFix = true
+                }
             });
             string File = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/DiscordBots/Boaty/Config.json";
             Client.Log += Client_Log;

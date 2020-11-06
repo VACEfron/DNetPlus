@@ -776,6 +776,9 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
 
+        public Task<IReadOnlyCollection<RestGuildTemplate>> GetTemplatesAsync(bool withSnapshot = false, RequestOptions options = null)
+            => GuildHelper.GetTemplatesAsync(this, Discord, withSnapshot, options);
+
         /// <summary>
         ///     Returns the name of the guild.
         /// </summary>
@@ -1024,8 +1027,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)
             => await GetWebhookAsync(id, options).ConfigureAwait(false);
+
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
+
+        async Task<IReadOnlyCollection<IGuildTemplate>> IGuild.GetTemplatesAsync(bool withSnapshot = false, RequestOptions options = null)
+           => await GetTemplatesAsync(withSnapshot, options).ConfigureAwait(false);
     }
 }

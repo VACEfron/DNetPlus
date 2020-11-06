@@ -969,6 +969,10 @@ namespace Discord.WebSocket
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
 
+        //Templates
+        public Task<IReadOnlyCollection<RestGuildTemplate>> GetTemplatesAsync(bool withSnapshot = false, RequestOptions options = null)
+            => GuildHelper.GetTemplatesAsync(this, Discord, withSnapshot, options);
+
         //Emotes
         /// <inheritdoc />
         public Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null)
@@ -1343,6 +1347,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
+
+        async Task<IReadOnlyCollection<IGuildTemplate>> IGuild.GetTemplatesAsync(bool withSnapshot, RequestOptions options)
+            => await GetTemplatesAsync(withSnapshot, options).ConfigureAwait(false);
 
         void IDisposable.Dispose()
         {
