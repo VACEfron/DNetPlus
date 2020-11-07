@@ -501,6 +501,81 @@ namespace Discord.Rest
                 return models.Select(x => RestGuildTemplate.Create(client, x, withSnapshot)).ToImmutableArray();
             }
         }
+        public static async Task<RestGuildTemplate> CreateTemplateAsync(IGuild guild, BaseDiscordClient client, string name, Optional<string> description, bool withSnapshot, RequestOptions options)
+        {
+            var apiargs = new CreateTemplateParams
+            {
+                Name = name
+            };
+            if (description.IsSpecified)
+                apiargs.Description = description.Value;
+
+            if (withSnapshot)
+            {
+                var model = await client.ApiClient.CreateTemplateAsync<API.GuildTemplateSnapshot>(guild.Id, apiargs, options).ConfigureAwait(false);
+                return RestGuildTemplate.Create(client, model, withSnapshot);
+            }
+            else
+            {
+                var model = await client.ApiClient.CreateTemplateAsync<API.GuildTemplate>(guild.Id, apiargs, options).ConfigureAwait(false);
+                return RestGuildTemplate.Create(client, model, withSnapshot);
+            }
+        }
+
+        public static async Task<RestGuildTemplate> SyncTemplateAsync(IGuild guild, BaseDiscordClient client, string code, bool withSnapshot, RequestOptions options)
+        {
+            if (withSnapshot)
+            {
+                var model = await client.ApiClient.SyncTemplateAsync<API.GuildTemplateSnapshot>(guild.Id, code, options).ConfigureAwait(false);
+                return RestGuildTemplate.Create(client, model, withSnapshot);
+            }
+            else
+            {
+                var model = await client.ApiClient.SyncTemplateAsync<API.GuildTemplate>(guild.Id, code, options).ConfigureAwait(false);
+                return RestGuildTemplate.Create(client, model, withSnapshot);
+            }
+        }
+
+        public static async Task<RestGuildTemplate> ModifyTemplateAsync(IGuild guild, BaseDiscordClient client, string code, Action<TemplateProperties> func, bool withSnapshot, RequestOptions options)
+        {
+            if (func == null) 
+                throw new ArgumentNullException(paramName: nameof(func));
+            var props = new TemplateProperties();
+            func(props);
+
+            var apiargs = new CreateTemplateParams();
+            if (props.Name.IsSpecified)
+                apiargs.Name = props.Name.Value;
+
+            if (props.Description.IsSpecified)
+                apiargs.Description = props.Description.Value;
+
+
+            if (withSnapshot)
+            {
+                var model = await client.ApiClient.ModifyTemplateAsync<API.GuildTemplateSnapshot>(guild.Id, code, apiargs, options).ConfigureAwait(false);
+                return RestGuildTemplate.Create(client, model, withSnapshot);
+            }
+            else
+            {
+                var model = await client.ApiClient.ModifyTemplateAsync<API.GuildTemplate>(guild.Id, code, apiargs, options).ConfigureAwait(false);
+                return RestGuildTemplate.Create(client, model, withSnapshot);
+            }
+        }
+
+        public static async Task<RestGuildTemplate> DeleteTemplateAsync(IGuild guild, BaseDiscordClient client, string code, bool withSnapshot, RequestOptions options)
+        {
+            if (withSnapshot)
+            {
+                var model = await client.ApiClient.DeleteTemplateAsync<API.GuildTemplateSnapshot>(guild.Id, code, options).ConfigureAwait(false);
+                return RestGuildTemplate.Create(client, model, withSnapshot);
+            }
+            else
+            {
+                var model = await client.ApiClient.DeleteTemplateAsync<API.GuildTemplate>(guild.Id, code, options).ConfigureAwait(false);
+                return RestGuildTemplate.Create(client, model, withSnapshot);
+            }
+        }
 
         //Emotes
         public static async Task<GuildEmote> GetEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)

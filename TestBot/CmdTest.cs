@@ -10,20 +10,47 @@ namespace TestBot
 {
     public class CmdTest : ModuleBase<SocketCommandContext>
     {
-        [Command("test")]
+        [Command("tget")]
         public async Task Test()
         {
             try
             {
                 var Temps = await Context.Guild.GetTemplatesAsync();
                 await ReplyAsync(Temps.Count.ToString());
-                var Temps2 = await Context.Guild.GetTemplatesAsync(true);
-                await ReplyAsync(Temps2.First().Snapshot.Value.Roles.Count.ToString());
             }
             catch(Exception ex)
             {
                 Console.WriteLine(ex);
             }
+        }
+
+        [Command("tcreate")]
+        public async Task Create()
+        {
+            var ResGuildTemplate = await Context.Guild.CreateTemplateAsync("Test", "Test", true);
+            if (ResGuildTemplate != null)
+                await ReplyAsync(ResGuildTemplate.Code);
+        }
+
+        [Command("tsync")]
+        public async Task Sync(string code)
+        {
+            await Context.Guild.SyncTemplateAsync(code);
+        }
+
+        [Command("tdelete")]
+        public async Task Delete(string code)
+        {
+            await Context.Guild.DeleteTemplateAsync(code);
+        }
+
+        [Command("tmodify")]
+        public async Task Modify(string code)
+        {
+            await Context.Guild.ModifyTemplateAsync(code, new Action<TemplateProperties>(x =>
+            {
+                x.Description = "YOLO";
+            }));
         }
 
         [Command("testemote")]

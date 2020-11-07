@@ -137,8 +137,9 @@ namespace Discord.Net.Rest
             {
                 cancelToken = cancelTokenSource.Token;
                 HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
-
+                
                 var headers = response.Headers.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault(), StringComparer.OrdinalIgnoreCase);
+                
                 var stream = !headerOnly ? await response.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
 
                 return new RestResponse(response.StatusCode, headers, stream);

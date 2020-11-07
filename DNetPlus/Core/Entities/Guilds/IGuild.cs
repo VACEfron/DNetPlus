@@ -913,6 +913,16 @@ namespace Discord
         /// </returns>
         Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
 
+        Task<IGuildTemplate> GetTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null);
+
         Task<IReadOnlyCollection<IGuildTemplate>> GetTemplatesAsync(bool withSnapshot = false, RequestOptions options = null);
+
+        Task<IGuildTemplate> CreateTemplateAsync(string name = "", Optional<string> description = default(Optional<string>), bool withSnapshot = false, RequestOptions options = null);
+
+        Task<IGuildTemplate> SyncTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null);
+
+        Task<IGuildTemplate> ModifyTemplateAsync(string code, Action<TemplateProperties> func, bool withSnapshot = false, RequestOptions options = null);
+
+        Task<IGuildTemplate> DeleteTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null);
     }
 }

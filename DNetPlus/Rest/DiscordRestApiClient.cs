@@ -5,6 +5,7 @@ using Discord.Net;
 using Discord.Net.Converters;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
+using Discord.Rest;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -1420,7 +1421,6 @@ namespace Discord.API
             Preconditions.NotEqual(args.targetChannelId, 0, nameof(args.targetChannelId));
             options = RequestOptions.CreateOrClone(options);
             var ids = new BucketIds(channelId: channelId);
-
             return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/followers", args, ids, options: options).ConfigureAwait(false);
         }
 
@@ -1438,6 +1438,43 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
+        public async Task<TValue> GetTemplateAsync<TValue>(string templateCode, RequestOptions options = null) where TValue : GuildTemplate
+        {
+            options = RequestOptions.CreateOrClone(options);
+            try
+            {
+                return await SendAsync<TValue>("GET", () => $"guilds/templates/{templateCode}", new BucketIds(), options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return default; }
+        }
+
+        public async Task<TValue> CreateTemplateAsync<TValue>(ulong guildId, CreateTemplateParams args, RequestOptions options = null) where TValue : GuildTemplate
+        {
+            options = RequestOptions.CreateOrClone(options);
+            options.IgnoreState = true;
+            var ids = new BucketIds(guildId: guildId);
+            Console.WriteLine(guildId.ToString());
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(args, Formatting.Indented));
+            return await SendJsonAsync<TValue>("POST", () => $"guilds/{guildId}/templates", args, ids, options: options).ConfigureAwait(false);
+
+        }
+        public async Task<TValue> SyncTemplateAsync<TValue>(ulong guildId, string templateCode, RequestOptions options = null) where TValue : GuildTemplate
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<TValue>("PUT", () => $"guilds/{guildId}/templates/{templateCode}", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task<TValue> ModifyTemplateAsync<TValue>(ulong guildId, string templateCode, CreateTemplateParams args, RequestOptions options = null) where TValue : GuildTemplate
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendJsonAsync<TValue>("PATCH", () => $"guilds/{guildId}/templates/{templateCode}", args, new BucketIds(), options: options).ConfigureAwait(false);
+
+        }
+        public async Task<TValue> DeleteTemplateAsync<TValue>(ulong guildId, string templateCode, RequestOptions options = null) where TValue : GuildTemplate
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<TValue>("DELETE", () => $"guilds/{guildId}/templates/{templateCode}", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
         public async Task<Webhook> ModifyWebhookAsync(ulong webhookId, ModifyWebhookParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(webhookId, 0, nameof(webhookId));

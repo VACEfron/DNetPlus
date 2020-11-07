@@ -970,8 +970,23 @@ namespace Discord.WebSocket
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
 
         //Templates
+        public Task<RestGuildTemplate> GetTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null)
+            => ClientHelper.GetTemplateAsync(Discord, code, withSnapshot, options);
+
         public Task<IReadOnlyCollection<RestGuildTemplate>> GetTemplatesAsync(bool withSnapshot = false, RequestOptions options = null)
             => GuildHelper.GetTemplatesAsync(this, Discord, withSnapshot, options);
+
+        public Task<RestGuildTemplate> CreateTemplateAsync(string name = "", Optional<string> description = default(Optional<string>), bool withSnapshot = false, RequestOptions options = null)
+            => GuildHelper.CreateTemplateAsync(this, Discord, name, description, withSnapshot, options);
+
+        public Task<RestGuildTemplate> SyncTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null)
+            => GuildHelper.SyncTemplateAsync(this, Discord, code, withSnapshot, options);
+
+        public Task<RestGuildTemplate> ModifyTemplateAsync(string code, Action<TemplateProperties> func, bool withSnapshot = false, RequestOptions options = null)
+            => GuildHelper.ModifyTemplateAsync(this, Discord, code, func, withSnapshot, options);
+
+        public Task<RestGuildTemplate> DeleteTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null)
+            => GuildHelper.DeleteTemplateAsync(this, Discord, code, withSnapshot, options);
 
         //Emotes
         /// <inheritdoc />
@@ -1351,11 +1366,29 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IGuildTemplate>> IGuild.GetTemplatesAsync(bool withSnapshot, RequestOptions options)
             => await GetTemplatesAsync(withSnapshot, options).ConfigureAwait(false);
 
+        
+
+
         void IDisposable.Dispose()
         {
             DisconnectAudioAsync().GetAwaiter().GetResult();
             _audioLock?.Dispose();
             _audioClient?.Dispose();
         }
+
+        async Task<IGuildTemplate> IGuild.GetTemplateAsync(string code, bool withSnapshot, RequestOptions options)
+        => await GetTemplateAsync(code, withSnapshot, options).ConfigureAwait(false);
+
+        async Task<IGuildTemplate> IGuild.CreateTemplateAsync(string name = "", Optional<string> description = default(Optional<string>), bool withSnapshot = false, RequestOptions options = null)
+        => await CreateTemplateAsync(name, description, withSnapshot, options).ConfigureAwait(false);
+
+        async Task<IGuildTemplate> IGuild.SyncTemplateAsync(string code, bool withSnapshot, RequestOptions options)
+        => await SyncTemplateAsync(code, withSnapshot, options).ConfigureAwait(false);
+
+        async Task<IGuildTemplate> IGuild.ModifyTemplateAsync(string code, Action<TemplateProperties> func, bool withSnapshot, RequestOptions options)
+        => await ModifyTemplateAsync(code, func, withSnapshot, options).ConfigureAwait(false);
+
+        async Task<IGuildTemplate> IGuild.DeleteTemplateAsync(string code, bool withSnapshot, RequestOptions options)
+        => await DeleteTemplateAsync(code, withSnapshot, options).ConfigureAwait(false);
     }
 }

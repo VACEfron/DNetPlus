@@ -159,6 +159,20 @@ namespace Discord.Rest
             return null;
         }
 
+        public static async Task<RestGuildTemplate> GetTemplateAsync(BaseDiscordClient client, string code, bool withSnapshot, RequestOptions options)
+        {
+            if (withSnapshot)
+            {
+                var model = await client.ApiClient.GetTemplateAsync<API.GuildTemplateSnapshot>(code, options).ConfigureAwait(false);
+                return RestGuildTemplate.Create(client, model, withSnapshot);
+            }
+            else
+            {
+                var model = await client.ApiClient.GetTemplateAsync<API.GuildTemplate>(code, options).ConfigureAwait(false);
+                return RestGuildTemplate.Create(client, model, withSnapshot);
+            }
+        }
+
         public static async Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetVoiceRegionsAsync(options).ConfigureAwait(false);
