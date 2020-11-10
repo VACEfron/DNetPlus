@@ -24,7 +24,7 @@ namespace Discord.WebSocket
         }
         internal new static SocketNewsChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketNewsChannel(guild.Discord, model.Id, guild);
+            SocketNewsChannel entity = new SocketNewsChannel(guild.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }

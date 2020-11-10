@@ -22,7 +22,7 @@ namespace Discord.Rest
 
         internal static RestGuildTemplate Create(BaseDiscordClient discord, Model model, bool withSnapshot)
         {
-            var entity = new RestGuildTemplate();
+            RestGuildTemplate entity = new RestGuildTemplate();
             entity.Update(discord, model, withSnapshot);
             return entity;
         }

@@ -27,7 +27,7 @@ namespace Discord.Rest
         }
         internal static RestVoiceRegion Create(BaseDiscordClient client, Model model)
         {
-            var entity = new RestVoiceRegion(client, model.Id);
+            RestVoiceRegion entity = new RestVoiceRegion(client, model.Id);
             entity.Update(model);
             return entity;
         }

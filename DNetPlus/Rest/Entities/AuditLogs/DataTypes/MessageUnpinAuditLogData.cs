@@ -19,7 +19,7 @@ namespace Discord.Rest
 
         internal static MessageUnpinAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
+            API.User userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
             return new MessageUnpinAuditLogData(entry.Options.MessageId.Value, entry.Options.ChannelId.Value, RestUser.Create(discord, userInfo));
         }
 

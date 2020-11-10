@@ -54,7 +54,7 @@ namespace Discord.Rest
         }
         internal static RestGuildUser Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestGuildUser(discord, guild, model.User.Id);
+            RestGuildUser entity = new RestGuildUser(discord, guild, model.User.Id);
             entity.Update(model);
             return entity;
         }
@@ -76,7 +76,7 @@ namespace Discord.Rest
         }
         private void UpdateRoles(ulong[] roleIds)
         {
-            var roles = ImmutableArray.CreateBuilder<ulong>(roleIds.Length + 1);
+            ImmutableArray<ulong>.Builder roles = ImmutableArray.CreateBuilder<ulong>(roleIds.Length + 1);
             roles.Add(Guild.Id);
             for (int i = 0; i < roleIds.Length; i++)
                 roles.Add(roleIds[i]);
@@ -86,13 +86,13 @@ namespace Discord.Rest
         /// <inheritdoc />
         public override async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetGuildMemberAsync(GuildId, Id, options).ConfigureAwait(false);
+            Model model = await Discord.ApiClient.GetGuildMemberAsync(GuildId, Id, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />
         public async Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
         {
-            var args = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            GuildUserProperties args = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             if (args.Deaf.IsSpecified)
                 IsDeafened = args.Deaf.Value;
             if (args.Mute.IsSpecified)
@@ -124,7 +124,7 @@ namespace Discord.Rest
         /// <exception cref="InvalidOperationException">Resolving permissions requires the parent guild to be downloaded.</exception>
         public ChannelPermissions GetPermissions(IGuildChannel channel)
         {
-            var guildPerms = GuildPermissions;
+            GuildPermissions guildPerms = GuildPermissions;
             return new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, guildPerms.RawValue));
         }
 

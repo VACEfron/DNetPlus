@@ -20,7 +20,7 @@ namespace Discord.Rest
         }
         internal new static RestNewsChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestNewsChannel(discord, guild, model.Id);
+            RestNewsChannel entity = new RestNewsChannel(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }

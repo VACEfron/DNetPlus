@@ -36,7 +36,7 @@ namespace Discord
             if (embed.Type != EmbedType.Rich)
                 throw new InvalidOperationException($"Only {nameof(EmbedType.Rich)} embeds may be built.");
 
-            var builder = new EmbedBuilder
+            EmbedBuilder builder = new EmbedBuilder
             {
                 Author = new EmbedAuthorBuilder
                 {
@@ -58,7 +58,7 @@ namespace Discord
                 Url = embed.Url
             };
 
-            foreach (var field in embed.Fields)
+            foreach (EmbedField field in embed.Fields)
                 builder.AddField(field.Name, field.Value, field.Inline);
 
             return builder;
@@ -70,7 +70,7 @@ namespace Discord
         /// <exception cref="ArgumentException">Field count exceeds <see cref="EmbedBuilder.MaxFieldCount"/>.</exception>
         public static EmbedBuilder WithFields(this EmbedBuilder builder, IEnumerable<EmbedFieldBuilder> fields)
         {
-            foreach (var field in fields)
+            foreach (EmbedFieldBuilder field in fields)
                 builder.AddField(field);
 
             return builder;

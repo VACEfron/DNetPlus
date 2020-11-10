@@ -94,6 +94,7 @@ namespace Discord.WebSocket
         public string VoiceRegionId { get; private set; }
         /// <inheritdoc />
         public string IconId { get; private set; }
+
         public bool IsIconAnimated
         {
             get
@@ -180,7 +181,7 @@ namespace Discord.WebSocket
         {
             get
             {
-                var id = AFKChannelId;
+                ulong? id = AFKChannelId;
                 return id.HasValue ? GetVoiceChannel(id.Value) : null;
             }
         }
@@ -194,7 +195,7 @@ namespace Discord.WebSocket
         {
             get
             {
-                var id = WidgetChannelId;
+                ulong? id = WidgetChannelId;
                 return id.HasValue ? GetChannel(id.Value) : null;
             }
         }
@@ -208,7 +209,7 @@ namespace Discord.WebSocket
         {
             get
             {
-                var id = SystemChannelId;
+                ulong? id = SystemChannelId;
                 return id.HasValue ? GetTextChannel(id.Value) : null;
             }
         }
@@ -222,7 +223,7 @@ namespace Discord.WebSocket
         {
             get
             {
-                var id = RulesChannelId;
+                ulong? id = RulesChannelId;
                 return id.HasValue ? GetTextChannel(id.Value) : null;
             }
         }
@@ -238,7 +239,7 @@ namespace Discord.WebSocket
         {
             get
             {
-                var id = PublicUpdatesChannelId;
+                ulong? id = PublicUpdatesChannelId;
                 return id.HasValue ? GetTextChannel(id.Value) : null;
             }
         }
@@ -287,8 +288,8 @@ namespace Discord.WebSocket
         {
             get
             {
-                var channels = _channels;
-                var state = Discord.State;
+                ConcurrentHashSet<ulong> channels = _channels;
+                ClientState state = Discord.State;
                 return channels.Select(x => state.GetChannel(x) as SocketGuildChannel).Where(x => x != null).ToReadOnlyCollection(channels);
             }
         }
@@ -335,7 +336,7 @@ namespace Discord.WebSocket
         }
         internal static SocketGuild Create(DiscordSocketClient discord, ClientState state, ExtendedModel model)
         {
-            var entity = new SocketGuild(discord, model.Id);
+            SocketGuild entity = new SocketGuild(discord, model.Id);
             entity.Update(state, model);
             return entity;
         }
@@ -361,22 +362,22 @@ namespace Discord.WebSocket
 
             Update(state, model as Model);
 
-            var channels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Channels.Length * 1.05));
+            ConcurrentHashSet<ulong> channels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Channels.Length * 1.05));
             {
                 for (int i = 0; i < model.Channels.Length; i++)
                 {
-                    var channel = SocketGuildChannel.Create(this, state, model.Channels[i]);
+                    SocketGuildChannel channel = SocketGuildChannel.Create(this, state, model.Channels[i]);
                     state.AddChannel(channel);
                     channels.TryAdd(channel.Id);
                 }
             }
             _channels = channels;
 
-            var members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));
+            ConcurrentDictionary<ulong, SocketGuildUser> members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));
             {
                 for (int i = 0; i < model.Members.Length; i++)
                 {
-                    var member = SocketGuildUser.Create(this, state, model.Members[i]);
+                    SocketGuildUser member = SocketGuildUser.Create(this, state, model.Members[i]);
                     members.TryAdd(member.Id, member);
                 }
                 DownloadedMemberCount = members.Count;
@@ -390,14 +391,14 @@ namespace Discord.WebSocket
             _members = members;
             MemberCount = model.MemberCount;
 
-            var voiceStates = new ConcurrentDictionary<ulong, SocketVoiceState>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.VoiceStates.Length * 1.05));
+            ConcurrentDictionary<ulong, SocketVoiceState> voiceStates = new ConcurrentDictionary<ulong, SocketVoiceState>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.VoiceStates.Length * 1.05));
             {
                 for (int i = 0; i < model.VoiceStates.Length; i++)
                 {
                     SocketVoiceChannel channel = null;
                     if (model.VoiceStates[i].ChannelId.HasValue)
                         channel = state.GetChannel(model.VoiceStates[i].ChannelId.Value) as SocketVoiceChannel;
-                    var voiceState = SocketVoiceState.Create(channel, model.VoiceStates[i]);
+                    SocketVoiceState voiceState = SocketVoiceState.Create(channel, model.VoiceStates[i]);
                     voiceStates.TryAdd(model.VoiceStates[i].UserId, voiceState);
                 }
             }
@@ -405,7 +406,7 @@ namespace Discord.WebSocket
 
             _syncPromise = new TaskCompletionSource<bool>();
             _downloaderPromise = new TaskCompletionSource<bool>();
-            var _ = _syncPromise.TrySetResultAsync(true);
+            Task<bool> _ = _syncPromise.TrySetResultAsync(true);
             /*if (!model.Large)
                 _ = _downloaderPromise.TrySetResultAsync(true);*/
         }
@@ -448,7 +449,7 @@ namespace Discord.WebSocket
 
             if (model.Emojis != null)
             {
-                var emojis = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
+                ImmutableArray<GuildEmote>.Builder emojis = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
                     emojis.Add(model.Emojis[i].ToEntity());
                 _emotes = emojis.ToImmutable();
@@ -461,12 +462,12 @@ namespace Discord.WebSocket
             else
                 _features = ImmutableArray.Create<string>();
 
-            var roles = new ConcurrentDictionary<ulong, SocketRole>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Roles.Length * 1.05));
+            ConcurrentDictionary<ulong, SocketRole> roles = new ConcurrentDictionary<ulong, SocketRole>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Roles.Length * 1.05));
             if (model.Roles != null)
             {
                 for (int i = 0; i < model.Roles.Length; i++)
                 {
-                    var role = SocketRole.Create(this, state, model.Roles[i]);
+                    SocketRole role = SocketRole.Create(this, state, model.Roles[i]);
                     roles.TryAdd(role.Id, role);
                 }
             }
@@ -474,11 +475,11 @@ namespace Discord.WebSocket
         }
         internal void Update(ClientState state, GuildSyncModel model)
         {
-            var members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));
+            ConcurrentDictionary<ulong, SocketGuildUser> members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));
             {
                 for (int i = 0; i < model.Members.Length; i++)
                 {
-                    var member = SocketGuildUser.Create(this, state, model.Members[i]);
+                    SocketGuildUser member = SocketGuildUser.Create(this, state, model.Members[i]);
                     members.TryAdd(member.Id, member);
                 }
                 DownloadedMemberCount = members.Count;
@@ -491,14 +492,14 @@ namespace Discord.WebSocket
             }
             _members = members;
 
-            var _ = _syncPromise.TrySetResultAsync(true);
+            Task<bool> _ = _syncPromise.TrySetResultAsync(true);
             /*if (!model.Large)
                 _ = _downloaderPromise.TrySetResultAsync(true);*/
         }
 
         internal void Update(ClientState state, EmojiUpdateModel model)
         {
-            var emotes = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
+            ImmutableArray<GuildEmote>.Builder emotes = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
             for (int i = 0; i < model.Emojis.Length; i++)
                 emotes.Add(model.Emojis[i].ToEntity());
             _emotes = emotes.ToImmutable();
@@ -588,7 +589,7 @@ namespace Discord.WebSocket
         /// </returns>
         public SocketGuildChannel GetChannel(ulong id)
         {
-            var channel = Discord.State.GetChannel(id) as SocketGuildChannel;
+            SocketGuildChannel channel = Discord.State.GetChannel(id) as SocketGuildChannel;
             if (channel?.Guild.Id == Id)
                 return channel;
             return null;
@@ -675,7 +676,7 @@ namespace Discord.WebSocket
 
         internal SocketGuildChannel AddChannel(ClientState state, ChannelModel model)
         {
-            var channel = SocketGuildChannel.Create(this, state, model);
+            SocketGuildChannel channel = SocketGuildChannel.Create(this, state, model);
             _channels.TryAdd(model.Id);
             state.AddChannel(channel);
             return channel;
@@ -688,7 +689,7 @@ namespace Discord.WebSocket
         }
         internal void PurgeChannelCache(ClientState state)
         {
-            foreach (var channelId in _channels)
+            foreach (ulong channelId in _channels)
                 state.RemoveChannel(channelId);
 
             _channels.Clear();
@@ -707,8 +708,20 @@ namespace Discord.WebSocket
             => GuildHelper.GetVoiceRegionsAsync(this, Discord, options);
 
         //Integrations
+        /// <summary>
+        /// Get a list of the guild's integrations including bot roles, booster role, twitch/youtube subscription role and more.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>Returns a list of <see cref="RestGuildIntegration"/>.</returns>
         public Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null)
             => GuildHelper.GetIntegrationsAsync(this, Discord, options);
+        /// <summary>
+        /// Not tested atm sorry.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>Returns the created <see cref="RestGuildIntegration"/>.</returns>
         public Task<RestGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null)
             => GuildHelper.CreateIntegrationAsync(this, Discord, id, type, options);
 
@@ -772,7 +785,7 @@ namespace Discord.WebSocket
             => GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, isMentionable, options);
         internal SocketRole AddRole(RoleModel model)
         {
-            var role = SocketRole.Create(this, Discord.State, model);
+            SocketRole role = SocketRole.Create(this, Discord.State, model);
             _roles[model.Id] = role;
             return role;
         }
@@ -869,15 +882,15 @@ namespace Discord.WebSocket
         }
         internal void PurgeGuildUserCache()
         {
-            var members = Users;
-            var self = CurrentUser;
+            IReadOnlyCollection<SocketGuildUser> members = Users;
+            SocketGuildUser self = CurrentUser;
             _members.Clear();
             if (self != null)
                 _members.TryAdd(self.Id, self);
 
             DownloadedMemberCount = _members.Count;
 
-            foreach (var member in members)
+            foreach (SocketGuildUser member in members)
             {
                 if (member.Id != self?.Id)
                     member.GlobalUser.RemoveRef(Discord);
@@ -904,6 +917,9 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// Requires intent Guild Members otherwise it will fail.
+        /// </remarks>
         public async Task DownloadUsersAsync()
         {
             await Discord.DownloadUsersAsync(new[] { this }).ConfigureAwait(false);
@@ -1003,12 +1019,16 @@ namespace Discord.WebSocket
         public Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null)
             => GuildHelper.DeleteEmoteAsync(this, Discord, emote.Id, options);
 
+        /// <inheritdoc />
+        public Task<RestGuildDiscovery> GetDiscoveryMetadataAsync(RequestOptions options = null)
+           => GuildHelper.GetDiscoveryMetadataAsync(this, Discord, options);
+
         //Voice States
         internal async Task<SocketVoiceState> AddOrUpdateVoiceStateAsync(ClientState state, VoiceStateModel model)
         {
-            var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
-            var before = GetVoiceState(model.UserId) ?? SocketVoiceState.Default;
-            var after = SocketVoiceState.Create(voiceChannel, model);
+            SocketVoiceChannel voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
+            SocketVoiceState before = GetVoiceState(model.UserId) ?? SocketVoiceState.Default;
+            SocketVoiceState after = SocketVoiceState.Create(voiceChannel, model);
             _voiceStates[model.UserId] = after;
 
             if (_audioClient != null && before.VoiceChannel?.Id != after.VoiceChannel?.Id)
@@ -1067,7 +1087,7 @@ namespace Discord.WebSocket
                 if (external)
                 {
 #pragma warning disable IDISP001
-                    var _ = promise.TrySetResultAsync(null);
+                    Task<bool> _ = promise.TrySetResultAsync(null);
                     await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
                     return null;
 #pragma warning restore IDISP001
@@ -1075,7 +1095,7 @@ namespace Discord.WebSocket
 
                 if (_audioClient == null)
                 {
-                    var audioClient = new AudioClient(this, Discord.GetAudioId(), channelId);
+                    AudioClient audioClient = new AudioClient(this, Discord.GetAudioId(), channelId);
                     audioClient.Disconnected += async ex =>
                     {
                         if (!promise.Task.IsCompleted)
@@ -1094,7 +1114,7 @@ namespace Discord.WebSocket
                     audioClient.Connected += () =>
                     {
 #pragma warning disable IDISP001
-                        var _ = promise.TrySetResultAsync(_audioClient);
+                        Task<bool> _ = promise.TrySetResultAsync(_audioClient);
 #pragma warning restore IDISP001
                         return Task.Delay(0);
                     };
@@ -1117,7 +1137,7 @@ namespace Discord.WebSocket
 
             try
             {
-                var timeoutTask = Task.Delay(15000);
+                Task timeoutTask = Task.Delay(15000);
                 if (await Task.WhenAny(promise.Task, timeoutTask).ConfigureAwait(false) == timeoutTask)
                     throw new TimeoutException();
                 return await promise.Task.ConfigureAwait(false);
@@ -1154,7 +1174,7 @@ namespace Discord.WebSocket
         internal async Task FinishConnectAudio(string url, string token)
         {
             //TODO: Mem Leak: Disconnected/Connected handlers arent cleaned up
-            var voiceState = GetVoiceState(Discord.CurrentUser.Id).Value;
+            SocketVoiceState voiceState = GetVoiceState(Discord.CurrentUser.Id).Value;
 
             await _audioLock.WaitAsync().ConfigureAwait(false);
             try
@@ -1185,7 +1205,7 @@ namespace Discord.WebSocket
             await _audioClient.ClearInputStreamsAsync().ConfigureAwait(false); //We changed channels, end all current streams
             if (CurrentUser.VoiceChannel != null)
             {
-                foreach (var pair in _voiceStates)
+                foreach (KeyValuePair<ulong, SocketVoiceState> pair in _voiceStates)
                 {
                     if (pair.Value.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id && pair.Key != CurrentUser.Id)
                         await _audioClient.CreateInputStreamAsync(pair.Key).ConfigureAwait(false);
@@ -1390,5 +1410,8 @@ namespace Discord.WebSocket
 
         async Task<IGuildTemplate> IGuild.DeleteTemplateAsync(string code, bool withSnapshot, RequestOptions options)
         => await DeleteTemplateAsync(code, withSnapshot, options).ConfigureAwait(false);
+
+        async Task<RestGuildDiscovery> IGuild.GetDiscoveryMetadataAsync(RequestOptions options)
+            => await GetDiscoveryMetadataAsync(options).ConfigureAwait(false);
     }
 }

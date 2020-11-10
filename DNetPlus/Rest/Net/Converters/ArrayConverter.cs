@@ -19,7 +19,7 @@ namespace Discord.Net.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var result = new List<T>();
+            List<T> result = new List<T>();
             if (reader.TokenType == JsonToken.StartArray)
             {
                 reader.Read();
@@ -41,7 +41,7 @@ namespace Discord.Net.Converters
             if (value != null)
             {
                 writer.WriteStartArray();
-                var a = (T[])value;
+                T[] a = (T[])value;
                 for (int i = 0; i < a.Length; i++)
                 {
                     if (_innerConverter != null)

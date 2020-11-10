@@ -280,7 +280,7 @@ namespace Discord
         /// <returns>A <see cref="List{T}"/> containing <see cref="GuildPermission"/> flags. Empty if none are enabled.</returns>
         public List<GuildPermission> ToList()
         {
-            var perms = new List<GuildPermission>();
+            List<GuildPermission> perms = new List<GuildPermission>();
 
             // bitwise operations on raw value
             // each of the GuildPermissions increments by 2^i from 0 to MaxBits

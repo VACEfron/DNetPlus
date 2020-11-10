@@ -47,7 +47,7 @@ namespace Discord
             if (other == null) return false;
             if (other == this) return true;
 
-            var otherEmote = other as Emote;
+            Emote otherEmote = other as Emote;
             if (otherEmote == null) return false;
 
             return Id == otherEmote.Id;

@@ -45,7 +45,7 @@ namespace Discord.WebSocket
         }
         internal static SocketGroupChannel Create(DiscordSocketClient discord, ClientState state, Model model)
         {
-            var entity = new SocketGroupChannel(discord, model.Id);
+            SocketGroupChannel entity = new SocketGroupChannel(discord, model.Id);
             entity.Update(state, model);
             return entity;
         }
@@ -61,7 +61,7 @@ namespace Discord.WebSocket
         }
         private void UpdateUsers(ClientState state, UserModel[] models)
         {
-            var users = new ConcurrentDictionary<ulong, SocketGroupUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(models.Length * 1.05));
+            ConcurrentDictionary<ulong, SocketGroupUser> users = new ConcurrentDictionary<ulong, SocketGroupUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(models.Length * 1.05));
             for (int i = 0; i < models.Length; i++)
                 users[models[i].Id] = SocketGroupUser.Create(this, state, models[i]);
             _users = users;
@@ -212,7 +212,7 @@ namespace Discord.WebSocket
                 return user;
             else
             {
-                var privateUser = SocketGroupUser.Create(this, Discord.State, model);
+                SocketGroupUser privateUser = SocketGroupUser.Create(this, Discord.State, model);
                 privateUser.GlobalUser.AddRef();
                 _users[privateUser.Id] = privateUser;
                 return privateUser;
@@ -231,8 +231,8 @@ namespace Discord.WebSocket
         //Voice States
         internal SocketVoiceState AddOrUpdateVoiceState(ClientState state, VoiceStateModel model)
         {
-            var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
-            var voiceState = SocketVoiceState.Create(voiceChannel, model);
+            SocketVoiceChannel voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
+            SocketVoiceState voiceState = SocketVoiceState.Create(voiceChannel, model);
             _voiceStates[model.UserId] = voiceState;
             return voiceState;
         }

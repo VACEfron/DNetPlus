@@ -29,7 +29,7 @@ namespace TestBot
 
         private async Task HandleCommandAsync(SocketMessage messageParam)
         {
-            var message = messageParam as SocketUserMessage;
+            SocketUserMessage message = messageParam as SocketUserMessage;
             if (message == null || message.Author.IsBot) 
                 return;
 

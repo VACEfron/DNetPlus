@@ -9,7 +9,7 @@ namespace Discord.Commands
     {
         public static TypeReader Create(Type type, TypeReader reader)
         {
-            var constructor = typeof(NullableTypeReader<>).MakeGenericType(type).GetTypeInfo().DeclaredConstructors.First();
+            ConstructorInfo constructor = typeof(NullableTypeReader<>).MakeGenericType(type).GetTypeInfo().DeclaredConstructors.First();
             return (TypeReader)constructor.Invoke(new object[] { reader });
         }
     }

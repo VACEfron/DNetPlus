@@ -87,28 +87,28 @@ namespace Discord.Commands.Builders
         }
         public ModuleBuilder AddCommand(string primaryAlias, Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> callback, Action<CommandBuilder> createFunc)
         {
-            var builder = new CommandBuilder(this, primaryAlias, callback);
+            CommandBuilder builder = new CommandBuilder(this, primaryAlias, callback);
             createFunc(builder);
             _commands.Add(builder);
             return this;
         }
         internal ModuleBuilder AddCommand(Action<CommandBuilder> createFunc)
         {
-            var builder = new CommandBuilder(this);
+            CommandBuilder builder = new CommandBuilder(this);
             createFunc(builder);
             _commands.Add(builder);
             return this;
         }
         public ModuleBuilder AddModule(string primaryAlias, Action<ModuleBuilder> createFunc)
         {
-            var builder = new ModuleBuilder(Service, this, primaryAlias);
+            ModuleBuilder builder = new ModuleBuilder(Service, this, primaryAlias);
             createFunc(builder);
             _submodules.Add(builder);
             return this;
         }
         internal ModuleBuilder AddModule(Action<ModuleBuilder> createFunc)
         {
-            var builder = new ModuleBuilder(Service, this);
+            ModuleBuilder builder = new ModuleBuilder(Service, this);
             createFunc(builder);
             _submodules.Add(builder);
             return this;
@@ -122,7 +122,7 @@ namespace Discord.Commands.Builders
 
             if (TypeInfo != null && !TypeInfo.IsAbstract)
             {
-                var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, services);
+                IModuleBase moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, services);
                 moduleInstance.OnModuleBuilding(service, this);
             }
 

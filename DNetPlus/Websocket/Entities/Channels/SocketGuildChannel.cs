@@ -65,9 +65,9 @@ namespace Discord.WebSocket
         {
             Name = model.Name.Value;
             Position = model.Position.Value;
-            
-            var overwrites = model.PermissionOverwrites.Value;
-            var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
+
+            API.Overwrite[] overwrites = model.PermissionOverwrites.Value;
+            ImmutableArray<Overwrite>.Builder newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
             for (int i = 0; i < overwrites.Length; i++)
                 newOverwrites.Add(overwrites[i].ToEntity());
             _overwrites = newOverwrites.ToImmutable();

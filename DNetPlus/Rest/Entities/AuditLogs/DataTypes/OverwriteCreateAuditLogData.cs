@@ -18,18 +18,18 @@ namespace Discord.Rest
 
         internal static OverwriteCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes;
+            API.AuditLogChange[] changes = entry.Changes;
 
-            var denyModel = changes.FirstOrDefault(x => x.ChangedProperty == "deny");
-            var allowModel = changes.FirstOrDefault(x => x.ChangedProperty == "allow");
+            API.AuditLogChange denyModel = changes.FirstOrDefault(x => x.ChangedProperty == "deny");
+            API.AuditLogChange allowModel = changes.FirstOrDefault(x => x.ChangedProperty == "allow");
 
-            var deny = denyModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
-            var allow = allowModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
+            ulong deny = denyModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
+            ulong allow = allowModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
 
-            var permissions = new OverwritePermissions(allow, deny);
+            OverwritePermissions permissions = new OverwritePermissions(allow, deny);
 
-            var id = entry.Options.OverwriteTargetId.Value;
-            var type = entry.Options.OverwriteType;
+            ulong id = entry.Options.OverwriteTargetId.Value;
+            PermissionTarget type = entry.Options.OverwriteType;
 
             return new OverwriteCreateAuditLogData(entry.TargetId.Value, new Overwrite(id, type, permissions));
         }

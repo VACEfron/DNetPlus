@@ -104,7 +104,7 @@ namespace Discord.WebSocket
         }
         internal static SocketInvite Create(DiscordSocketClient discord, SocketGuild guild, SocketGuildChannel channel, SocketGuildUser inviter, SocketUser target, Model model)
         {
-            var entity = new SocketInvite(discord, guild, channel, inviter, target, model.Code);
+            SocketInvite entity = new SocketInvite(discord, guild, channel, inviter, target, model.Code);
             entity.Update(model);
             return entity;
         }

@@ -29,7 +29,7 @@ namespace Discord.Rest
             if (msg.Author.Id != client.CurrentUser.Id)
                 throw new InvalidOperationException("Only the author of a message may modify the message.");
 
-            var args = new MessageProperties();
+            MessageProperties args = new MessageProperties();
             func(args);
 
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(msg.Content);
@@ -37,7 +37,7 @@ namespace Discord.Rest
             if (!hasText && !hasEmbed)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
-            var apiArgs = new API.Rest.ModifyMessageParams
+            ModifyMessageParams apiArgs = new API.Rest.ModifyMessageParams
             {
                 Content = args.Content,
                 Embed = args.Embed.IsSpecified ? args.Embed.Value.ToModel() : Optional.Create<API.Embed>()
@@ -59,7 +59,7 @@ namespace Discord.Rest
 
         public static async Task SuppressEmbedsAsync(IMessage msg, BaseDiscordClient client, bool suppress, RequestOptions options)
         {
-            var apiArgs = new API.Rest.SuppressEmbedParams
+            SuppressEmbedParams apiArgs = new API.Rest.SuppressEmbedParams
             {
                 Suppressed = suppress
             };
@@ -90,13 +90,13 @@ namespace Discord.Rest
             int? limit, BaseDiscordClient client, RequestOptions options)
         {
             Preconditions.NotNull(emote, nameof(emote));
-            var emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
+            string emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
 
             return new PagedAsyncEnumerable<IUser>(
                 DiscordConfig.MaxUserReactionsPerBatch,
                 async (info, ct) =>
                 {
-                    var args = new GetReactionUsersParams
+                    GetReactionUsersParams args = new GetReactionUsersParams
                     {
                         Limit = info.PageSize
                     };
@@ -104,7 +104,7 @@ namespace Discord.Rest
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
 
-                    var models = await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false);
+                    IReadOnlyCollection<API.User> models = await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false);
                     return models.Select(x => RestUser.Create(client, x)).ToImmutableArray();
                 },
                 nextPage: (info, lastPage) =>
@@ -134,9 +134,9 @@ namespace Discord.Rest
 
         public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, IReadOnlyCollection<IUser> userMentions)
         {
-            var tags = ImmutableArray.CreateBuilder<ITag>();
+            ImmutableArray<ITag>.Builder tags = ImmutableArray.CreateBuilder<ITag>();
             int index = 0;
-            var codeIndex = 0;
+            int codeIndex = 0;
 
             // checks if the tag being parsed is wrapped in code blocks
             bool CheckWrappedCode()
@@ -148,7 +148,7 @@ namespace Discord.Rest
                 // loop through all code blocks that are before the start of the tag
                 while (codeIndex < index)
                 {
-                    var blockMatch = BlockCodeRegex.Match(text, codeIndex);
+                    Match blockMatch = BlockCodeRegex.Match(text, codeIndex);
                     if (blockMatch.Success)
                     {
                         if (EnclosedInBlock(blockMatch))
@@ -159,7 +159,7 @@ namespace Discord.Rest
                             continue;
                         return false;
                     }
-                    var inlineMatch = InlineCodeRegex.Match(text, codeIndex);
+                    Match inlineMatch = InlineCodeRegex.Match(text, codeIndex);
                     if (inlineMatch.Success)
                     {
                         if (EnclosedInBlock(inlineMatch))
@@ -187,7 +187,7 @@ namespace Discord.Rest
                 if (MentionUtils.TryParseUser(content, out ulong id))
                 {
                     IUser mentionedUser = null;
-                    foreach (var mention in userMentions)
+                    foreach (IUser mention in userMentions)
                     {
                         if (mention.Id == id)
                         {
@@ -213,7 +213,7 @@ namespace Discord.Rest
                         mentionedRole = guild.GetRole(id);
                     tags.Add(new Tag<IRole>(TagType.RoleMention, index, content.Length, id, mentionedRole));
                 }
-                else if (Emote.TryParse(content, out var emoji))
+                else if (Emote.TryParse(content, out Emote emoji))
                     tags.Add(new Tag<Emote>(TagType.Emoji, index, content.Length, emoji.Id, emoji));
                 else //Bad Tag
                 {
@@ -230,7 +230,7 @@ namespace Discord.Rest
                 index = text.IndexOf("@everyone", index);
                 if (index == -1) break;
                 if (CheckWrappedCode()) break;
-                var tagIndex = FindIndex(tags, index);
+                int? tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
                     tags.Insert(tagIndex.Value, new Tag<IRole>(TagType.EveryoneMention, index, "@everyone".Length, 0, guild?.EveryoneRole));
                 index++;
@@ -243,7 +243,7 @@ namespace Discord.Rest
                 index = text.IndexOf("@here", index);
                 if (index == -1) break;
                 if (CheckWrappedCode()) break;
-                var tagIndex = FindIndex(tags, index);
+                int? tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
                     tags.Insert(tagIndex.Value, new Tag<IRole>(TagType.HereMention, index, "@here".Length, 0, guild?.EveryoneRole));
                 index++;
@@ -257,7 +257,7 @@ namespace Discord.Rest
             int i = 0;
             for (; i < tags.Count; i++)
             {
-                var tag = tags[i];
+                ITag tag = tags[i];
                 if (index < tag.Index)
                     break; //Position before this tag
             }

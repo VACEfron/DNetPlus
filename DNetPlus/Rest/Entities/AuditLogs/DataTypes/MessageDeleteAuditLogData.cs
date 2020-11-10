@@ -19,7 +19,7 @@ namespace Discord.Rest
 
         internal static MessageDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
+            API.User userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
             return new MessageDeleteAuditLogData(entry.Options.ChannelId.Value, entry.Options.Count.Value, RestUser.Create(discord, userInfo));
         }
 

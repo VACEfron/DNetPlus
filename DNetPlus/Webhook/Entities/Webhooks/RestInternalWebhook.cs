@@ -31,7 +31,7 @@ namespace Discord.Webhook
         }
         internal static RestInternalWebhook Create(DiscordWebhookClient client, Model model)
         {
-            var entity = new RestInternalWebhook(client, model);
+            RestInternalWebhook entity = new RestInternalWebhook(client, model);
             entity.Update(model);
             return entity;
         }
@@ -64,7 +64,7 @@ namespace Discord.Webhook
 
         public async Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null)
         {
-            var model = await WebhookClientHelper.ModifyAsync(_client, func, options).ConfigureAwait(false);
+            Model model = await WebhookClientHelper.ModifyAsync(_client, func, options).ConfigureAwait(false);
             Update(model);
         }
 

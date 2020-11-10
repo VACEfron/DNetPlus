@@ -37,7 +37,7 @@ namespace Discord.WebSocket
         }
         internal static SocketUnknownUser Create(DiscordSocketClient discord, ClientState state, Model model)
         {
-            var entity = new SocketUnknownUser(discord, model.Id);
+            SocketUnknownUser entity = new SocketUnknownUser(discord, model.Id);
             entity.Update(state, model);
             return entity;
         }

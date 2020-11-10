@@ -16,7 +16,7 @@ namespace Discord
         /// </returns>
         public static string GetJumpUrl(this IMessage msg)
         {
-            var channel = msg.Channel;
+            IMessageChannel channel = msg.Channel;
             return $"https://discord.com/channels/{(channel is IDMChannel ? "@me" : $"{(channel as ITextChannel).GuildId}")}/{channel.Id}/{msg.Id}";
         }
 
@@ -43,7 +43,7 @@ namespace Discord
         /// <seealso cref="IEmote"/>
         public static async Task AddReactionsAsync(this IUserMessage msg, IEmote[] reactions, RequestOptions options = null)
         {
-            foreach (var rxn in reactions)
+            foreach (IEmote rxn in reactions)
                 await msg.AddReactionAsync(rxn, options).ConfigureAwait(false);
         }
         /// <summary>
@@ -68,7 +68,7 @@ namespace Discord
         /// <seealso cref="IEmote"/>
         public static async Task RemoveReactionsAsync(this IUserMessage msg, IUser user, IEmote[] reactions, RequestOptions options = null)
         {
-            foreach (var rxn in reactions)
+            foreach (IEmote rxn in reactions)
                 await msg.RemoveReactionAsync(rxn, user, options).ConfigureAwait(false);
         }
     }

@@ -14,7 +14,7 @@ namespace Discord.Commands
 
         static IReadOnlyDictionary<Type, Delegate> CreateParsers()
         {
-            var parserBuilder = ImmutableDictionary.CreateBuilder<Type, Delegate>();
+            ImmutableDictionary<Type, Delegate>.Builder parserBuilder = ImmutableDictionary.CreateBuilder<Type, Delegate>();
             parserBuilder[typeof(bool)] = (TryParseDelegate<bool>)bool.TryParse;
             parserBuilder[typeof(sbyte)] = (TryParseDelegate<sbyte>)sbyte.TryParse;
             parserBuilder[typeof(byte)] = (TryParseDelegate<byte>)byte.TryParse;

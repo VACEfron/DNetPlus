@@ -21,7 +21,7 @@ namespace Discord.Net.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var image = (Model)value;
+            Model image = (Model)value;
 
             if (image.Stream != null)
             {
@@ -34,7 +34,7 @@ namespace Discord.Net.Converters
                 }
                 else
                 {
-                    using (var cloneStream = new MemoryStream())
+                    using (MemoryStream cloneStream = new MemoryStream())
                     {
                         image.Stream.CopyTo(cloneStream);
                         bytes = new byte[cloneStream.Length];

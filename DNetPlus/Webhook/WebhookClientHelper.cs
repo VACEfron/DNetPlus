@@ -15,7 +15,7 @@ namespace Discord.Webhook
         /// <exception cref="InvalidOperationException">Could not find a webhook with the supplied credentials.</exception>
         public static async Task<RestInternalWebhook> GetWebhookAsync(DiscordWebhookClient client, ulong webhookId)
         {
-            var model = await client.ApiClient.GetWebhookAsync(webhookId).ConfigureAwait(false);
+            WebhookModel model = await client.ApiClient.GetWebhookAsync(webhookId).ConfigureAwait(false);
             if (model == null)
                 throw new InvalidOperationException("Could not find a webhook with the supplied credentials.");
             return RestInternalWebhook.Create(client, model);
@@ -23,7 +23,7 @@ namespace Discord.Webhook
         public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client, 
             string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl, RequestOptions options, AllowedMentions allowedMentions)
         {
-            var args = new CreateWebhookMessageParams(text) { IsTTS = isTTS };
+            CreateWebhookMessageParams args = new CreateWebhookMessageParams(text) { IsTTS = isTTS };
             if (embeds != null)
                 args.Embeds = embeds.Select(x => x.ToModel()).ToArray();
             if (username != null)
@@ -33,20 +33,20 @@ namespace Discord.Webhook
             if (allowedMentions != null)
                 args.AllowedMentions = allowedMentions.ToModel();
 
-            var model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options: options).ConfigureAwait(false);
+            API.Message model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options: options).ConfigureAwait(false);
             return model.Id;
         }
         public static async Task<ulong> SendFileAsync(DiscordWebhookClient client, string filePath, string text, bool isTTS, 
             IEnumerable<Embed> embeds, string username, string avatarUrl, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions)
         {
             string filename = Path.GetFileName(filePath);
-            using (var file = File.OpenRead(filePath))
+            using (FileStream file = File.OpenRead(filePath))
                 return await SendFileAsync(client, file, filename, text, isTTS, embeds, username, avatarUrl, options, isSpoiler, allowedMentions).ConfigureAwait(false);
         }
         public static async Task<ulong> SendFileAsync(DiscordWebhookClient client, Stream stream, string filename, string text, bool isTTS,
             IEnumerable<Embed> embeds, string username, string avatarUrl, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions)
         {
-            var args = new UploadWebhookFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS, IsSpoiler = isSpoiler };
+            UploadWebhookFileParams args = new UploadWebhookFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS, IsSpoiler = isSpoiler };
             if (username != null)
                 args.Username = username;
             if (avatarUrl != null)
@@ -56,16 +56,16 @@ namespace Discord.Webhook
             if (allowedMentions != null)
                 args.AllowedMentions = allowedMentions.ToModel();
 
-            var msg = await client.ApiClient.UploadWebhookFileAsync(client.Webhook.Id, args, options).ConfigureAwait(false);
+            API.Message msg = await client.ApiClient.UploadWebhookFileAsync(client.Webhook.Id, args, options).ConfigureAwait(false);
             return msg.Id;
         }
 
         public static async Task<WebhookModel> ModifyAsync(DiscordWebhookClient client,
             Action<WebhookProperties> func, RequestOptions options)
         {
-            var args = new WebhookProperties();
+            WebhookProperties args = new WebhookProperties();
             func(args);
-            var apiArgs = new ModifyWebhookParams
+            ModifyWebhookParams apiArgs = new ModifyWebhookParams
             {
                 Avatar = args.Image.IsSpecified ? args.Image.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 Name = args.Name

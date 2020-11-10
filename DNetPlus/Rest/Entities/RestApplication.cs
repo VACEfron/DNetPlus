@@ -42,7 +42,7 @@ namespace Discord.Rest
         }
         internal static RestApplication Create(BaseDiscordClient discord, Model model)
         {
-            var entity = new RestApplication(discord, model.Id);
+            RestApplication entity = new RestApplication(discord, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -65,7 +65,7 @@ namespace Discord.Rest
         /// <exception cref="InvalidOperationException">Unable to update this object from a different application token.</exception>
         public async Task UpdateAsync()
         {
-            var response = await Discord.ApiClient.GetMyApplicationAsync().ConfigureAwait(false);
+            Model response = await Discord.ApiClient.GetMyApplicationAsync().ConfigureAwait(false);
             if (response.Id != Id)
                 throw new InvalidOperationException("Unable to update this object from a different application token.");
             Update(response);

@@ -98,7 +98,7 @@ namespace Discord.WebSocket
                 int maxPos = 0;
                 for (int i = 0; i < _roleIds.Length; i++)
                 {
-                    var role = Guild.GetRole(_roleIds[i]);
+                    SocketRole role = Guild.GetRole(_roleIds[i]);
                     if (role != null && role.Position > maxPos)
                         maxPos = role.Position;
                 }
@@ -114,20 +114,20 @@ namespace Discord.WebSocket
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, UserModel model)
         {
-            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model));
+            SocketGuildUser entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model));
             entity.Update(state, model);
             entity.UpdateRoles(new ulong[0]);
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, MemberModel model)
         {
-            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
+            SocketGuildUser entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model);
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, PresenceModel model)
         {
-            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
+            SocketGuildUser entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model, false);
             return entity;
         }
@@ -159,7 +159,7 @@ namespace Discord.WebSocket
         }
         private void UpdateRoles(ulong[] roleIds)
         {
-            var roles = ImmutableArray.CreateBuilder<ulong>(roleIds.Length + 1);
+            ImmutableArray<ulong>.Builder roles = ImmutableArray.CreateBuilder<ulong>(roleIds.Length + 1);
             roles.Add(Guild.Id);
             for (int i = 0; i < roleIds.Length; i++)
                 roles.Add(roleIds[i]);

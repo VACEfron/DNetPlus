@@ -288,7 +288,7 @@ namespace Discord
         /// </returns>
         public EmbedBuilder WithAuthor(Action<EmbedAuthorBuilder> action)
         {
-            var author = new EmbedAuthorBuilder();
+            EmbedAuthorBuilder author = new EmbedAuthorBuilder();
             action(author);
             Author = author;
             return this;
@@ -304,7 +304,7 @@ namespace Discord
         /// </returns>
         public EmbedBuilder WithAuthor(string name, string iconUrl = null, string url = null)
         {
-            var author = new EmbedAuthorBuilder
+            EmbedAuthorBuilder author = new EmbedAuthorBuilder
             {
                 Name = name,
                 IconUrl = iconUrl,
@@ -334,7 +334,7 @@ namespace Discord
         /// </returns>
         public EmbedBuilder WithFooter(Action<EmbedFooterBuilder> action)
         {
-            var footer = new EmbedFooterBuilder();
+            EmbedFooterBuilder footer = new EmbedFooterBuilder();
             action(footer);
             Footer = footer;
             return this;
@@ -349,7 +349,7 @@ namespace Discord
         /// </returns>
         public EmbedBuilder WithFooter(string text, string iconUrl = null)
         {
-            var footer = new EmbedFooterBuilder
+            EmbedFooterBuilder footer = new EmbedFooterBuilder
             {
                 Text = text,
                 IconUrl = iconUrl
@@ -369,7 +369,7 @@ namespace Discord
         /// </returns>
         public EmbedBuilder AddField(string name, object value, bool inline = false)
         {
-            var field = new EmbedFieldBuilder()
+            EmbedFieldBuilder field = new EmbedFieldBuilder()
                 .WithIsInline(inline)
                 .WithName(name)
                 .WithValue(value);
@@ -405,7 +405,7 @@ namespace Discord
         /// </returns>
         public EmbedBuilder AddField(Action<EmbedFieldBuilder> action)
         {
-            var field = new EmbedFieldBuilder();
+            EmbedFieldBuilder field = new EmbedFieldBuilder();
             action(field);
             AddField(field);
             return this;
@@ -423,7 +423,7 @@ namespace Discord
             if (Length > MaxEmbedLength)
                 throw new InvalidOperationException($"Total embed length must be less than or equal to {MaxEmbedLength}.");
 
-            var fields = ImmutableArray.CreateBuilder<EmbedField>(Fields.Count);
+            ImmutableArray<EmbedField>.Builder fields = ImmutableArray.CreateBuilder<EmbedField>(Fields.Count);
             for (int i = 0; i < Fields.Count; i++)
                 fields.Add(Fields[i].Build());
 
@@ -485,7 +485,7 @@ namespace Discord
             get => _value;
             set
             {
-                var stringValue = value?.ToString();
+                string stringValue = value?.ToString();
                 if (string.IsNullOrWhiteSpace(stringValue)) throw new ArgumentException(message: "Field value must not be null or empty.", paramName: nameof(Value));
                 if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException(message: $"Field value length must be less than or equal to {MaxFieldValueLength}.", paramName: nameof(Value));
                 _value = stringValue;

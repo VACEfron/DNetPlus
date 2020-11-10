@@ -19,10 +19,10 @@ namespace Discord.Commands
             ParameterInfo curParam = null;
             StringBuilder argBuilder = new StringBuilder(input.Length);
             int endPos = input.Length;
-            var curPart = ParserPart.None;
+            ParserPart curPart = ParserPart.None;
             int lastArgEndPos = int.MinValue;
-            var argList = ImmutableArray.CreateBuilder<TypeReaderResult>();
-            var paramList = ImmutableArray.CreateBuilder<TypeReaderResult>();
+            ImmutableArray<TypeReaderResult>.Builder argList = ImmutableArray.CreateBuilder<TypeReaderResult>();
+            ImmutableArray<TypeReaderResult>.Builder paramList = ImmutableArray.CreateBuilder<TypeReaderResult>();
             bool isEscaping = false;
             char c, matchQuote = '\0';
 
@@ -40,7 +40,7 @@ namespace Discord.Commands
             {
                 // get the corresponding value for the key, if it exists
                 // and if the dictionary is populated
-                if (dict.Count != 0 && dict.TryGetValue(c, out var value))
+                if (dict.Count != 0 && dict.TryGetValue(c, out char value))
                     return value;
                 // or get the default pair of the default double quote
                 return '\"';
@@ -147,7 +147,7 @@ namespace Discord.Commands
                             return ParseResult.FromError(CommandError.BadArgCount, "The input text has too many parameters.");
                     }
 
-                    var typeReaderResult = await curParam.ParseAsync(context, argString, services).ConfigureAwait(false);
+                    TypeReaderResult typeReaderResult = await curParam.ParseAsync(context, argString, services).ConfigureAwait(false);
                     if (!typeReaderResult.IsSuccess && typeReaderResult.Error != CommandError.MultipleMatches)
                         return ParseResult.FromError(typeReaderResult, curParam);
 
@@ -170,7 +170,7 @@ namespace Discord.Commands
 
             if (curParam != null && curParam.IsRemainder)
             {
-                var typeReaderResult = await curParam.ParseAsync(context, argBuilder.ToString(), services).ConfigureAwait(false);
+                TypeReaderResult typeReaderResult = await curParam.ParseAsync(context, argBuilder.ToString(), services).ConfigureAwait(false);
                 if (!typeReaderResult.IsSuccess)
                     return ParseResult.FromError(typeReaderResult, curParam);
                 argList.Add(typeReaderResult);
@@ -184,7 +184,7 @@ namespace Discord.Commands
             //Add missing optionals
             for (int i = argList.Count; i < command.Parameters.Count; i++)
             {
-                var param = command.Parameters[i];
+                ParameterInfo param = command.Parameters[i];
                 if (param.IsMultiple)
                     continue;
                 if (!param.IsOptional)

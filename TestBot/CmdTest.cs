@@ -10,12 +10,19 @@ namespace TestBot
 {
     public class CmdTest : ModuleBase<SocketCommandContext>
     {
+        [Command("discovery")]
+        public async Task Discovery()
+        {
+            
+        }
+
+
         [Command("tget")]
         public async Task Test()
         {
             try
             {
-                var Temps = await Context.Guild.GetTemplatesAsync();
+                System.Collections.Generic.IReadOnlyCollection<Discord.Rest.RestGuildTemplate> Temps = await Context.Guild.GetTemplatesAsync();
                 await ReplyAsync(Temps.Count.ToString());
             }
             catch(Exception ex)
@@ -27,7 +34,7 @@ namespace TestBot
         [Command("tcreate")]
         public async Task Create()
         {
-            var ResGuildTemplate = await Context.Guild.CreateTemplateAsync("Test", "Test", true);
+            Discord.Rest.RestGuildTemplate ResGuildTemplate = await Context.Guild.CreateTemplateAsync("Test", "Test", true);
             if (ResGuildTemplate != null)
                 await ReplyAsync(ResGuildTemplate.Code);
         }
@@ -57,7 +64,7 @@ namespace TestBot
         public async Task TestEmote([Remainder] string emote)
         {
             Console.WriteLine($"Test - {emote}");
-            var e = Emoji.FromUnicode(emote);
+            Emoji e = Emoji.FromUnicode(emote);
             if (e == null)
                 await ReplyAsync("Not valid");
             else

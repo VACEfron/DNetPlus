@@ -18,13 +18,13 @@ namespace Discord.Rest
 
         internal static InviteUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes;
+            API.AuditLogChange[] changes = entry.Changes;
 
-            var maxAgeModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_age");
-            var codeModel = changes.FirstOrDefault(x => x.ChangedProperty == "code");
-            var temporaryModel = changes.FirstOrDefault(x => x.ChangedProperty == "temporary");
-            var channelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "channel_id");
-            var maxUsesModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_uses");
+            API.AuditLogChange maxAgeModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_age");
+            API.AuditLogChange codeModel = changes.FirstOrDefault(x => x.ChangedProperty == "code");
+            API.AuditLogChange temporaryModel = changes.FirstOrDefault(x => x.ChangedProperty == "temporary");
+            API.AuditLogChange channelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "channel_id");
+            API.AuditLogChange maxUsesModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_uses");
 
             int? oldMaxAge = maxAgeModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
                 newMaxAge = maxAgeModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
@@ -37,8 +37,8 @@ namespace Discord.Rest
             int? oldMaxUses = maxUsesModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
                 newMaxUses = maxUsesModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
 
-            var before = new InviteInfo(oldMaxAge, oldCode, oldTemporary, oldChannelId, oldMaxUses);
-            var after = new InviteInfo(newMaxAge, newCode, newTemporary, newChannelId, newMaxUses);
+            InviteInfo before = new InviteInfo(oldMaxAge, oldCode, oldTemporary, oldChannelId, oldMaxUses);
+            InviteInfo after = new InviteInfo(newMaxAge, newCode, newTemporary, newChannelId, newMaxUses);
 
             return new InviteUpdateAuditLogData(before, after);
         }

@@ -21,20 +21,20 @@ namespace Discord.Rest
 
         internal static OverwriteUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes;
+            API.AuditLogChange[] changes = entry.Changes;
 
-            var denyModel = changes.FirstOrDefault(x => x.ChangedProperty == "deny");
-            var allowModel = changes.FirstOrDefault(x => x.ChangedProperty == "allow");
+            API.AuditLogChange denyModel = changes.FirstOrDefault(x => x.ChangedProperty == "deny");
+            API.AuditLogChange allowModel = changes.FirstOrDefault(x => x.ChangedProperty == "allow");
 
-            var beforeAllow = allowModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
-            var afterAllow = allowModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
-            var beforeDeny = denyModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
-            var afterDeny = denyModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            ulong? beforeAllow = allowModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            ulong? afterAllow = allowModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            ulong? beforeDeny = denyModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            ulong? afterDeny = denyModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
 
-            var beforePermissions = new OverwritePermissions(beforeAllow ?? 0, beforeDeny ?? 0);
-            var afterPermissions = new OverwritePermissions(afterAllow ?? 0, afterDeny ?? 0);
+            OverwritePermissions beforePermissions = new OverwritePermissions(beforeAllow ?? 0, beforeDeny ?? 0);
+            OverwritePermissions afterPermissions = new OverwritePermissions(afterAllow ?? 0, afterDeny ?? 0);
 
-            var type = entry.Options.OverwriteType;
+            PermissionTarget type = entry.Options.OverwriteType;
 
             return new OverwriteUpdateAuditLogData(entry.TargetId.Value, beforePermissions, afterPermissions, entry.Options.OverwriteTargetId.Value, type);
         }

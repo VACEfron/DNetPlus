@@ -37,7 +37,7 @@ namespace Discord
             if (other == null) return false;
             if (other == this) return true;
 
-            var otherEmoji = other as Emoji;
+            Emoji otherEmoji = other as Emoji;
             if (otherEmoji == null) return false;
 
             return string.Equals(Name, otherEmoji.Name);

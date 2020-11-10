@@ -45,7 +45,7 @@ namespace Discord.Rest
         }
         internal static RestRole Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestRole(discord, guild, model.Id);
+            RestRole entity = new RestRole(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -63,8 +63,8 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public async Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
-        { 
-            var model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+        {
+            Model model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />

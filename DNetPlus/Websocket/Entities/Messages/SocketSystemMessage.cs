@@ -18,7 +18,7 @@ namespace Discord.WebSocket
         }
         internal new static SocketSystemMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
-            var entity = new SocketSystemMessage(discord, model.Id, channel, author);
+            SocketSystemMessage entity = new SocketSystemMessage(discord, model.Id, channel, author);
             entity.Update(state, model);
             return entity;
         }

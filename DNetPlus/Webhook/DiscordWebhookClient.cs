@@ -128,7 +128,7 @@ namespace Discord.Webhook
             ArgumentException ex(string reason = null)
                 => new ArgumentException(paramName: nameof(webhookUrl), message:
                 $"The given webhook Url was not in a valid format. {reason}");
-            var match = WebhookUrlRegex.Match(webhookUrl);
+            Match match = WebhookUrlRegex.Match(webhookUrl);
             if (match != null)
             {
                 // ensure that the first group is a ulong, set the _webhookId

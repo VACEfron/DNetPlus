@@ -46,7 +46,7 @@ namespace Discord
                 if (_info.Remaining == 0)
                     return false;
 
-                var data = await _source._getPage(_info, _token).ConfigureAwait(false);
+                IReadOnlyCollection<T> data = await _source._getPage(_info, _token).ConfigureAwait(false);
                 Current = new Page<T>(_info, data);
 
                 _info.Page++;

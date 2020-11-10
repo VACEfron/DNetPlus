@@ -28,7 +28,7 @@ namespace Discord.WebSocket
         }
         internal static SocketGlobalUser Create(DiscordSocketClient discord, ClientState state, Model model)
         {
-            var entity = new SocketGlobalUser(discord, model.Id);
+            SocketGlobalUser entity = new SocketGlobalUser(discord, model.Id);
             entity.Update(state, model);
             return entity;
         }

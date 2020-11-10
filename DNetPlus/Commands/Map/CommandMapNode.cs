@@ -45,7 +45,7 @@ namespace Discord.Commands
                         name = text.Substring(index, nextSegment - index);
 
                     string fullName = _name == "" ? name : _name + service._separatorChar + name;
-                    var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(fullName));
+                    CommandMapNode nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(fullName));
                     nextNode.AddCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
                 }
             }
@@ -66,7 +66,7 @@ namespace Discord.Commands
                     else
                         name = text.Substring(index, nextSegment - index);
 
-                    if (_nodes.TryGetValue(name, out var nextNode))
+                    if (_nodes.TryGetValue(name, out CommandMapNode nextNode))
                     {
                         nextNode.RemoveCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
                         if (nextNode.IsEmpty)
@@ -78,7 +78,7 @@ namespace Discord.Commands
 
         public IEnumerable<CommandMatch> GetCommands(CommandService service, string text, int index, bool visitChildren = true)
         {
-            var commands = _commands;
+            ImmutableArray<CommandInfo> commands = _commands;
             for (int i = 0; i < commands.Length; i++)
                 yield return new CommandMatch(_commands[i], _name);
 
@@ -95,7 +95,7 @@ namespace Discord.Commands
                     name = text.Substring(index, nextSegment - index);
                 if (_nodes.TryGetValue(name, out nextNode))
                 {
-                    foreach (var cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text, nextSegment + 1, true))
+                    foreach (CommandMatch cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text, nextSegment + 1, true))
                         yield return cmd;
                 }
 
@@ -106,7 +106,7 @@ namespace Discord.Commands
                     name = text.Substring(index, nextSegment - index);
                     if (_nodes.TryGetValue(name, out nextNode))
                     {
-                        foreach (var cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text, nextSegment + 1, false))
+                        foreach (CommandMatch cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text, nextSegment + 1, false))
                             yield return cmd;
                     }
                 }

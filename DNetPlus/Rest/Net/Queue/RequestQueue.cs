@@ -93,8 +93,8 @@ namespace Discord.Net.Queue
             else
                 request.Options.CancelToken = _requestCancelToken;
 
-            var bucket = GetOrCreateBucket(request.Options, request);
-            var result = await bucket.SendAsync(request).ConfigureAwait(false);
+            RequestBucket bucket = GetOrCreateBucket(request.Options, request);
+            Stream result = await bucket.SendAsync(request).ConfigureAwait(false);
             createdTokenSource?.Dispose();
             return result;
         }
@@ -109,7 +109,7 @@ namespace Discord.Net.Queue
             else
                 request.Options.CancelToken = _requestCancelToken;
 
-            var bucket = GetOrCreateBucket(request.Options, request);
+            RequestBucket bucket = GetOrCreateBucket(request.Options, request);
             await bucket.SendAsync(request).ConfigureAwait(false);
             createdTokenSource?.Dispose();
         }
@@ -129,7 +129,7 @@ namespace Discord.Net.Queue
         internal async Task EnterGlobalAsync(int id, WebSocketRequest request)
         {
             //If this is a global request (unbucketed), it'll be dealt in EnterAsync
-            var requestBucket = GatewayBucket.Get(request.Options.BucketId);
+            GatewayBucket requestBucket = GatewayBucket.Get(request.Options.BucketId);
             if (requestBucket.Type == GatewayBucketType.Unbucketed)
                 return;
 
@@ -155,11 +155,11 @@ namespace Discord.Net.Queue
             }
 
             //It's not a global request, so need to remove one from global (per-session)
-            var globalBucketType = GatewayBucket.Get(GatewayBucketType.Unbucketed);
-            var options = RequestOptions.CreateOrClone(request.Options);
+            GatewayBucket globalBucketType = GatewayBucket.Get(GatewayBucketType.Unbucketed);
+            RequestOptions options = RequestOptions.CreateOrClone(request.Options);
             options.BucketId = globalBucketType.Id;
-            var globalRequest = new WebSocketRequest(null, null, false, options);
-            var globalBucket = GetOrCreateBucket(options, globalRequest);
+            WebSocketRequest globalRequest = new WebSocketRequest(null, null, false, options);
+            RequestBucket globalBucket = GetOrCreateBucket(options, globalRequest);
             await globalBucket.TriggerAsync(id, globalRequest);
         }
         internal void ReleaseIdentifySemaphore(int id)
@@ -186,7 +186,7 @@ namespace Discord.Net.Queue
 
         private RequestBucket GetOrCreateBucket(RequestOptions options, IRequest request)
         {
-            var bucketId = options.BucketId;
+            BucketId bucketId = options.BucketId;
             object obj = _buckets.GetOrAdd(bucketId, x => new RequestBucket(this, request, x));
             if (obj is BucketId hashBucket)
             {
@@ -203,8 +203,8 @@ namespace Discord.Net.Queue
         {
             if (!id.IsHashBucket)
             {
-                var bucket = BucketId.Create(discordHash, id);
-                var hashReqQueue = (RequestBucket)_buckets.GetOrAdd(bucket, _buckets[id]);
+                BucketId bucket = BucketId.Create(discordHash, id);
+                RequestBucket hashReqQueue = (RequestBucket)_buckets.GetOrAdd(bucket, _buckets[id]);
                 _buckets.AddOrUpdate(id, bucket, (oldBucket, oldObj) => bucket);
                 return (hashReqQueue, bucket);
             }
@@ -217,13 +217,13 @@ namespace Discord.Net.Queue
             {
                 while (!_cancelTokenSource.IsCancellationRequested)
                 {
-                    var now = DateTimeOffset.UtcNow;
-                    foreach (var bucket in _buckets.Where(x => x.Value is RequestBucket).Select(x => (RequestBucket)x.Value))
+                    DateTimeOffset now = DateTimeOffset.UtcNow;
+                    foreach (RequestBucket bucket in _buckets.Where(x => x.Value is RequestBucket).Select(x => (RequestBucket)x.Value))
                     {
                         if ((now - bucket.LastAttemptAt).TotalMinutes > 1.0)
                         {
                             if (bucket.Id.IsHashBucket)
-                                foreach (var redirectBucket in _buckets.Where(x => x.Value == bucket.Id).Select(x => (BucketId)x.Value))
+                                foreach (BucketId redirectBucket in _buckets.Where(x => x.Value == bucket.Id).Select(x => (BucketId)x.Value))
                                     _buckets.TryRemove(redirectBucket, out _); //remove redirections if hash bucket
                             _buckets.TryRemove(bucket.Id, out _);
                         }

@@ -13,9 +13,9 @@ namespace Discord.Rest
         public static async Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<SelfUserProperties> func,
             RequestOptions options)
         {
-            var args = new SelfUserProperties();
+            SelfUserProperties args = new SelfUserProperties();
             func(args);
-            var apiArgs = new API.Rest.ModifyCurrentUserParams
+            ModifyCurrentUserParams apiArgs = new API.Rest.ModifyCurrentUserParams
             {
                 Avatar = args.Avatar.IsSpecified ? args.Avatar.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 Username = args.Username
@@ -29,9 +29,9 @@ namespace Discord.Rest
         public static async Task<GuildUserProperties> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<GuildUserProperties> func,
             RequestOptions options)
         {
-            var args = new GuildUserProperties();
+            GuildUserProperties args = new GuildUserProperties();
             func(args);
-            var apiArgs = new API.Rest.ModifyGuildMemberParams
+            ModifyGuildMemberParams apiArgs = new API.Rest.ModifyGuildMemberParams
             {
                 Deaf = args.Deaf,
                 Mute = args.Mute,
@@ -69,19 +69,19 @@ namespace Discord.Rest
         public static async Task<RestDMChannel> CreateDMChannelAsync(IUser user, BaseDiscordClient client,
             RequestOptions options)
         {
-            var args = new CreateDMChannelParams(user.Id);
+            CreateDMChannelParams args = new CreateDMChannelParams(user.Id);
             return RestDMChannel.Create(client, await client.ApiClient.CreateDMChannelAsync(args, options).ConfigureAwait(false));
         }
 
         public static async Task AddRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<IRole> roles, RequestOptions options)
         {
-            foreach (var role in roles)
+            foreach (IRole role in roles)
                 await client.ApiClient.AddRoleAsync(user.Guild.Id, user.Id, role.Id, options).ConfigureAwait(false);
         }
 
         public static async Task RemoveRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<IRole> roles, RequestOptions options)
         {
-            foreach (var role in roles)
+            foreach (IRole role in roles)
                 await client.ApiClient.RemoveRoleAsync(user.Guild.Id, user.Id, role.Id, options).ConfigureAwait(false);
         }
     }

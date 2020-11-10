@@ -18,7 +18,7 @@ namespace Discord.Rest
         }
         internal new static RestCategoryChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestCategoryChannel(discord, guild, model.Id);
+            RestCategoryChannel entity = new RestCategoryChannel(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }

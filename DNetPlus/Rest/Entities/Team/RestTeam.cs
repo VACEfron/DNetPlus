@@ -22,7 +22,7 @@ namespace Discord.Rest
         }
         internal static RestTeam Create(BaseDiscordClient discord, Model model)
         {
-            var entity = new RestTeam(discord, model.Id);
+            RestTeam entity = new RestTeam(discord, model.Id);
             entity.Update(model);
             return entity;
         }

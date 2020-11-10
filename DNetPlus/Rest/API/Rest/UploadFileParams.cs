@@ -29,13 +29,13 @@ namespace Discord.API.Rest
 
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
-            var d = new Dictionary<string, object>();
-            var filename = Filename.GetValueOrDefault("unknown.dat");
+            Dictionary<string, object> d = new Dictionary<string, object>();
+            string filename = Filename.GetValueOrDefault("unknown.dat");
             if (IsSpoiler && !filename.StartsWith(AttachmentExtensions.SpoilerPrefix))
                 filename = filename.Insert(0, AttachmentExtensions.SpoilerPrefix);
             d["file"] = new MultipartFile(File, filename);
 
-            var payload = new Dictionary<string, object>();
+            Dictionary<string, object> payload = new Dictionary<string, object>();
             if (Content.IsSpecified)
                 payload["content"] = Content.Value;
             if (IsTTS.IsSpecified)
@@ -49,9 +49,9 @@ namespace Discord.API.Rest
             if (IsSpoiler)
                 payload["hasSpoiler"] = IsSpoiler.ToString();
 
-            var json = new StringBuilder();
-            using (var text = new StringWriter(json))
-            using (var writer = new JsonTextWriter(text))
+            StringBuilder json = new StringBuilder();
+            using (StringWriter text = new StringWriter(json))
+            using (JsonTextWriter writer = new JsonTextWriter(text))
                 _serializer.Serialize(writer, payload);
 
             d["payload_json"] = json.ToString();

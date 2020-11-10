@@ -55,7 +55,7 @@ namespace Discord.Rest
 
         public static IAuditLogData CreateData(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            if (CreateMapping.TryGetValue(entry.Action, out var func))
+            if (CreateMapping.TryGetValue(entry.Action, out Func<BaseDiscordClient, Model, EntryModel, IAuditLogData> func))
                 return func(discord, log, entry);
 
             return null;

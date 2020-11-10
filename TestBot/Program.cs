@@ -22,8 +22,8 @@ namespace TestBot
             {
                 OwnerIds = new ulong[] { 190590364871032834 },
                 GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.GuildMembers,
-                AlwaysDownloadUsers = true,
-                LogLevel = Discord.LogSeverity.Verbose,
+                AlwaysDownloadUsers = false,
+                LogLevel = Discord.LogSeverity.Info,
                 Debug = new DiscordDebugConfig
                 {
                     VoiceFix = true

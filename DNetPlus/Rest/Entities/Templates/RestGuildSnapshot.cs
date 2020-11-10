@@ -49,7 +49,7 @@ namespace Discord.Rest
             if (model.SystemChannelId.HasValue)
                 entity.SystemChannelId = model.SystemChannelId.Value;
 
-            var roles = ImmutableDictionary.CreateBuilder<int, RestGuildSnapshotRole>();
+            ImmutableDictionary<int, RestGuildSnapshotRole>.Builder roles = ImmutableDictionary.CreateBuilder<int, RestGuildSnapshotRole>();
             if (model.Roles != null)
             {
                 for (int i = 0; i < model.Roles.Length; i++)
@@ -57,7 +57,7 @@ namespace Discord.Rest
             }
             entity._roles = roles.ToImmutable();
 
-            var channels = ImmutableDictionary.CreateBuilder<int, RestGuildSnapshotChannel>();
+            ImmutableDictionary<int, RestGuildSnapshotChannel>.Builder channels = ImmutableDictionary.CreateBuilder<int, RestGuildSnapshotChannel>();
             if (model.Channels != null)
             {
                 for (int i = 0; i < model.Channels.Length; i++)

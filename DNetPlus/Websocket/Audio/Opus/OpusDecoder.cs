@@ -16,7 +16,7 @@ namespace Discord.Audio
 
         public OpusDecoder()
         {
-            _ptr = CreateDecoder(SamplingRate, Channels, out var error);
+            _ptr = CreateDecoder(SamplingRate, Channels, out OpusError error);
             CheckError(error);
         }
         

@@ -29,8 +29,8 @@ namespace Discord.WebSocket
         }
         internal static SocketPresence Create(Model model)
         {
-            var clients = ConvertClientTypesDict(model.ClientStatus.GetValueOrDefault());
-            var activities = ConvertActivitiesList(model.Activities);
+            IImmutableSet<ClientType> clients = ConvertClientTypesDict(model.ClientStatus.GetValueOrDefault());
+            IImmutableList<IActivity> activities = ConvertActivitiesList(model.Activities);
             return new SocketPresence(model.Status, model.Game?.ToEntity(), clients, activities);
         }
         /// <summary>
@@ -48,8 +48,8 @@ namespace Discord.WebSocket
         {
             if (clientTypesDict == null || clientTypesDict.Count == 0)
                 return ImmutableHashSet<ClientType>.Empty;
-            var set = new HashSet<ClientType>();
-            foreach (var key in clientTypesDict.Keys)
+            HashSet<ClientType> set = new HashSet<ClientType>();
+            foreach (string key in clientTypesDict.Keys)
             {
                 if (Enum.TryParse(key, true, out ClientType type))
                     set.Add(type);
@@ -71,8 +71,8 @@ namespace Discord.WebSocket
         {
             if (activities == null || activities.Count == 0)
                 return ImmutableList<IActivity>.Empty;
-            var list = new List<IActivity>();
-            foreach (var activity in activities)
+            List<IActivity> list = new List<IActivity>();
+            foreach (API.Game activity in activities)
                 list.Add(activity.ToEntity());
             return list.ToImmutableList();
         }

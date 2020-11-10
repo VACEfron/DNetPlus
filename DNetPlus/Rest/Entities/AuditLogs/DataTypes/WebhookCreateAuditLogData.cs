@@ -21,18 +21,18 @@ namespace Discord.Rest
 
         internal static WebhookCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes;
+            API.AuditLogChange[] changes = entry.Changes;
 
-            var channelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "channel_id");
-            var typeModel = changes.FirstOrDefault(x => x.ChangedProperty == "type");
-            var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
+            API.AuditLogChange channelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "channel_id");
+            API.AuditLogChange typeModel = changes.FirstOrDefault(x => x.ChangedProperty == "type");
+            API.AuditLogChange nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
 
-            var channelId = channelIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
-            var type = typeModel.NewValue.ToObject<WebhookType>(discord.ApiClient.Serializer);
-            var name = nameModel.NewValue.ToObject<string>(discord.ApiClient.Serializer);
+            ulong channelId = channelIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
+            WebhookType type = typeModel.NewValue.ToObject<WebhookType>(discord.ApiClient.Serializer);
+            string name = nameModel.NewValue.ToObject<string>(discord.ApiClient.Serializer);
 
-            var webhookInfo = log.Webhooks?.FirstOrDefault(x => x.Id == entry.TargetId);
-            var webhook = webhookInfo == null ? null : RestWebhook.Create(discord, (IGuild)null, webhookInfo);
+            API.Webhook webhookInfo = log.Webhooks?.FirstOrDefault(x => x.Id == entry.TargetId);
+            RestWebhook webhook = webhookInfo == null ? null : RestWebhook.Create(discord, (IGuild)null, webhookInfo);
 
             return new WebhookCreateAuditLogData(webhook, entry.TargetId.Value, type, name, channelId);
         }

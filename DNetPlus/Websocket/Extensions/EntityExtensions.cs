@@ -25,10 +25,10 @@ namespace Discord.WebSocket
             // Spotify Game
             if (model.SyncId.IsSpecified)
             {
-                var assets = model.Assets.GetValueOrDefault()?.ToEntity();
+                GameAsset[] assets = model.Assets.GetValueOrDefault()?.ToEntity();
                 string albumText = assets?[1]?.Text;
                 string albumArtId = assets?[1]?.ImageId?.Replace("spotify:","");
-                var timestamps = model.Timestamps.IsSpecified ? model.Timestamps.Value.ToEntity() : null;
+                GameTimestamps timestamps = model.Timestamps.IsSpecified ? model.Timestamps.Value.ToEntity() : null;
                 return new SpotifyGame
                 {
                     Name = model.Name,
@@ -51,7 +51,7 @@ namespace Discord.WebSocket
             if (model.ApplicationId.IsSpecified)
             {
                 ulong appId = model.ApplicationId.Value;
-                var assets = model.Assets.GetValueOrDefault()?.ToEntity(appId);
+                GameAsset[] assets = model.Assets.GetValueOrDefault()?.ToEntity(appId);
                 return new RichGame
                 {
                     ApplicationId = appId,

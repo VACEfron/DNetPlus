@@ -129,10 +129,10 @@ namespace Discord.Rest
 
             if (model.Reactions.IsSpecified)
             {
-                var value = model.Reactions.Value;
+                Reaction[] value = model.Reactions.Value;
                 if (value.Length > 0)
                 {
-                    var reactions = ImmutableArray.CreateBuilder<RestReaction>(value.Length);
+                    ImmutableArray<RestReaction>.Builder reactions = ImmutableArray.CreateBuilder<RestReaction>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                         reactions.Add(RestReaction.Create(value[i]));
                     _reactions = reactions.ToImmutable();
@@ -147,7 +147,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetChannelMessageAsync(Channel.Id, Id, options).ConfigureAwait(false);
+            Model model = await Discord.ApiClient.GetChannelMessageAsync(Channel.Id, Id, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />

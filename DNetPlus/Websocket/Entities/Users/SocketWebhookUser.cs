@@ -42,7 +42,7 @@ namespace Discord.WebSocket
         }
         internal static SocketWebhookUser Create(SocketGuild guild, ClientState state, Model model, ulong webhookId)
         {
-            var entity = new SocketWebhookUser(guild, model.Id, webhookId);
+            SocketWebhookUser entity = new SocketWebhookUser(guild, model.Id, webhookId);
             entity.Update(state, model);
             return entity;
         }

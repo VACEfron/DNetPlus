@@ -29,7 +29,7 @@ namespace Discord.Rest
         }
         internal static RestWebhookUser Create(BaseDiscordClient discord, IGuild guild, Model model, ulong webhookId)
         {
-            var entity = new RestWebhookUser(discord, guild, model.Id, webhookId);
+            RestWebhookUser entity = new RestWebhookUser(discord, guild, model.Id, webhookId);
             entity.Update(model);
             return entity;
         }

@@ -45,7 +45,7 @@ namespace Discord.Audio
                     throw new ArgumentOutOfRangeException(nameof(application));
             }
 
-            _ptr = CreateEncoder(SamplingRate, Channels, (int)opusApplication, out var error);
+            _ptr = CreateEncoder(SamplingRate, Channels, (int)opusApplication, out OpusError error);
             CheckError(error);
             CheckError(EncoderCtl(_ptr, OpusCtl.SetSignal, (int)opusSignal));
             CheckError(EncoderCtl(_ptr, OpusCtl.SetPacketLossPercent, packetLoss)); //%

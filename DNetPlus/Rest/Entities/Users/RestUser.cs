@@ -70,7 +70,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetUserAsync(Id, options).ConfigureAwait(false);
+            Model model = await Discord.ApiClient.GetUserAsync(Id, options).ConfigureAwait(false);
             Update(model);
         }
 

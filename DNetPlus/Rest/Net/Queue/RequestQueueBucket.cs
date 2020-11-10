@@ -66,7 +66,7 @@ namespace Discord.Net.Queue
                 RateLimitInfo info = default(RateLimitInfo);
                 try
                 {
-                    var response = await request.SendAsync().ConfigureAwait(false);
+                    Rest.RestResponse response = await request.SendAsync().ConfigureAwait(false);
                     info = new RateLimitInfo(response.Headers);
 
                     if (response.StatusCode < (HttpStatusCode)200 || response.StatusCode >= (HttpStatusCode)300)
@@ -105,10 +105,10 @@ namespace Discord.Net.Queue
                                 {
                                     try
                                     {
-                                        using (var reader = new StreamReader(response.Stream))
-                                        using (var jsonReader = new JsonTextReader(reader))
+                                        using (StreamReader reader = new StreamReader(response.Stream))
+                                        using (JsonTextReader jsonReader = new JsonTextReader(reader))
                                         {
-                                            var json = JToken.Load(jsonReader);
+                                            JToken json = JToken.Load(jsonReader);
                                             try { code = json.Value<int>("code"); } catch { };
                                             try { reason = json.Value<string>("message"); } catch { };
                                         }
@@ -393,7 +393,7 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Reset in {(int)Math.Ceiling((resetTick - DateTimeOffset.UtcNow).Value.TotalMilliseconds)} ms");
 #endif
-                        var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds), request);
+                        Task _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds), request);
                     }
                     return;
                 }
@@ -417,7 +417,7 @@ namespace Discord.Net.Queue
 
                     if (!hasQueuedReset)
                     {
-                        var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds), request);
+                        Task _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds), request);
                     }
                 }
             }

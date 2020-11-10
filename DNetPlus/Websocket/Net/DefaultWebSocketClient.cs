@@ -84,7 +84,7 @@ namespace Discord.Net.WebSockets
             _client = new ClientWebSocket();
             _client.Options.Proxy = _proxy;
             _client.Options.KeepAliveInterval = TimeSpan.Zero;
-            foreach (var header in _headers)
+            foreach (KeyValuePair<string, string> header in _headers)
             {
                 if (header.Value != null)
                     _client.Options.SetRequestHeader(header.Key, header.Value);
@@ -117,7 +117,7 @@ namespace Discord.Net.WebSockets
             {
                 if (!isDisposing)
                 {
-                    var status = (WebSocketCloseStatus)closeCode;
+                    WebSocketCloseStatus status = (WebSocketCloseStatus)closeCode;
                     try { await _client.CloseOutputAsync(status, "", new CancellationToken()); }
                     catch { }
                 }
@@ -183,7 +183,7 @@ namespace Discord.Net.WebSockets
                     else
                         frameSize = SendChunkSize;
 
-                    var type = isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary;
+                    WebSocketMessageType type = isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary;
                     await _client.SendAsync(new ArraySegment<byte>(data, index, count), type, isLast, _cancelToken).ConfigureAwait(false);
                 }
             }
@@ -195,7 +195,7 @@ namespace Discord.Net.WebSockets
 
         private async Task RunAsync(CancellationToken cancelToken)
         {
-            var buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);
+            ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);
 
             try
             {
@@ -211,7 +211,7 @@ namespace Discord.Net.WebSockets
                     if (!socketResult.EndOfMessage)
                     {
                         //This is a large message (likely just READY), lets create a temporary expandable stream
-                        using (var stream = new MemoryStream())
+                        using (MemoryStream stream = new MemoryStream())
                         {
                             stream.Write(buffer.Array, 0, socketResult.Count);
                             do
@@ -225,7 +225,7 @@ namespace Discord.Net.WebSockets
                             //Use the internal buffer if we can get it
                             resultCount = (int)stream.Length;
 
-                            result = stream.TryGetBuffer(out var streamBuffer) ? streamBuffer.Array : stream.ToArray();
+                            result = stream.TryGetBuffer(out ArraySegment<byte> streamBuffer) ? streamBuffer.Array : stream.ToArray();
 
                         }
                     }
@@ -247,13 +247,13 @@ namespace Discord.Net.WebSockets
             }
             catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)
             {
-                var _ = OnClosed(new Exception("Connection timed out.", ex));
+                Task _ = OnClosed(new Exception("Connection timed out.", ex));
             }
             catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 //This cannot be awaited otherwise we'll deadlock when DiscordApiClient waits for this task to complete.
-                var _ = OnClosed(ex);
+                Task _ = OnClosed(ex);
             }
         }
     }

@@ -84,14 +84,14 @@ namespace Discord.WebSocket
         }
         internal void PurgeAllChannels()
         {
-            foreach (var guild in _guilds.Values)
+            foreach (SocketGuild guild in _guilds.Values)
                 guild.PurgeChannelCache(this);
 
             PurgeDMChannels();
         }
         internal void PurgeDMChannels()
         {
-            foreach (var channel in _dmChannels.Values)
+            foreach (SocketDMChannel channel in _dmChannels.Values)
                 _channels.TryRemove(channel.Id, out _);
 
             _dmChannels.Clear();
@@ -136,7 +136,7 @@ namespace Discord.WebSocket
         }
         internal void PurgeUsers()
         {
-            foreach (var guild in _guilds.Values)
+            foreach (SocketGuild guild in _guilds.Values)
                 guild.PurgeGuildUserCache();
         }
     }

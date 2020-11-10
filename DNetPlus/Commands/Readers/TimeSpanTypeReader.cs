@@ -30,13 +30,13 @@ namespace Discord.Commands
             if (string.IsNullOrEmpty(input))
                 throw new ArgumentException(message: $"{nameof(input)} must not be null or empty.", paramName: nameof(input));
 
-            var isNegative = input[0] == '-'; // Char for CultureInfo.InvariantCulture.NumberFormat.NegativeSign
+            bool isNegative = input[0] == '-'; // Char for CultureInfo.InvariantCulture.NumberFormat.NegativeSign
             if (isNegative)
             {
                 input = input.Substring(1);
             }
 
-            if (TimeSpan.TryParseExact(input.ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out var timeSpan))
+            if (TimeSpan.TryParseExact(input.ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out TimeSpan timeSpan))
             {
                 return isNegative
                     ? Task.FromResult(TypeReaderResult.FromSuccess(-timeSpan))

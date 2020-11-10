@@ -60,7 +60,7 @@ namespace Discord.WebSocket
         }
         internal static SocketRole Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketRole(guild, model.Id);
+            SocketRole entity = new SocketRole(guild, model.Id);
             entity.Update(state, model);
             return entity;
         }

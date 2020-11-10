@@ -276,8 +276,8 @@ namespace Discord
         /// <exception cref="ArgumentOutOfRangeException">Messages are younger than 2 weeks.</exception>
         public static void YoungerThanTwoWeeks(ulong[] collection, string name)
         {
-            var minimum = SnowflakeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
-            for (var i = 0; i < collection.Length; i++)
+            ulong minimum = SnowflakeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
+            for (int i = 0; i < collection.Length; i++)
             {
                 if (collection[i] == 0) continue;
                 if (collection[i] <= minimum)
@@ -287,7 +287,7 @@ namespace Discord
         /// <exception cref="ArgumentException">The everyone role cannot be assigned to a user.</exception>
         public static void NotEveryoneRole(ulong[] roles, ulong guildId, string name)
         {
-            for (var i = 0; i < roles.Length; i++)
+            for (int i = 0; i < roles.Length; i++)
             {
                 if (roles[i] == guildId)
                     throw new ArgumentException(message: "The everyone role cannot be assigned to a user.", paramName: name);

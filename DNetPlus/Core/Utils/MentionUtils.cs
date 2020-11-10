@@ -120,11 +120,11 @@ namespace Discord
 
         internal static string Resolve(IMessage msg, int startIndex, TagHandling userHandling, TagHandling channelHandling, TagHandling roleHandling, TagHandling everyoneHandling, TagHandling emojiHandling)
         {
-            var text = new StringBuilder(msg.Content.Substring(startIndex));
-            var tags = msg.Tags;
+            StringBuilder text = new StringBuilder(msg.Content.Substring(startIndex));
+            System.Collections.Generic.IReadOnlyCollection<ITag> tags = msg.Tags;
             int indexOffset = -startIndex;
 
-            foreach (var tag in tags)
+            foreach (ITag tag in tags)
             {
                 if (tag.Index < startIndex)
                     continue;
@@ -167,8 +167,8 @@ namespace Discord
         {
             if (mode != TagHandling.Remove)
             {
-                var user = tag.Value as IUser;
-                var guildUser = user as IGuildUser;
+                IUser user = tag.Value as IUser;
+                IGuildUser guildUser = user as IGuildUser;
                 switch (mode)
                 {
                     case TagHandling.Name:
@@ -204,7 +204,7 @@ namespace Discord
         {
             if (mode != TagHandling.Remove)
             {
-                var channel = tag.Value as IChannel;
+                IChannel channel = tag.Value as IChannel;
                 switch (mode)
                 {
                     case TagHandling.Name:
@@ -229,7 +229,7 @@ namespace Discord
         {
             if (mode != TagHandling.Remove)
             {
-                var role = tag.Value as IRole;
+                IRole role = tag.Value as IRole;
                 switch (mode)
                 {
                     case TagHandling.Name:

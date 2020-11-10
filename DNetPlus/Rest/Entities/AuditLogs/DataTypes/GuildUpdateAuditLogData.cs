@@ -18,21 +18,21 @@ namespace Discord.Rest
 
         internal static GuildUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes;
+            API.AuditLogChange[] changes = entry.Changes;
 
-            var afkTimeoutModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
-            var defaultMessageNotificationsModel = changes.FirstOrDefault(x => x.ChangedProperty == "default_message_notifications");
-            var afkChannelModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_channel_id");
-            var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
-            var regionIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "region");
-            var iconHashModel = changes.FirstOrDefault(x => x.ChangedProperty == "icon_hash");
-            var verificationLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "verification_level");
-            var ownerIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "owner_id");
-            var mfaLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "mfa_level");
-            var contentFilterModel = changes.FirstOrDefault(x => x.ChangedProperty == "explicit_content_filter");
-            var systemChannelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "system_channel_id");
-            var widgetChannelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "widget_channel_id");
-            var widgetEnabledModel = changes.FirstOrDefault(x => x.ChangedProperty == "widget_enabled");
+            API.AuditLogChange afkTimeoutModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            API.AuditLogChange defaultMessageNotificationsModel = changes.FirstOrDefault(x => x.ChangedProperty == "default_message_notifications");
+            API.AuditLogChange afkChannelModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_channel_id");
+            API.AuditLogChange nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
+            API.AuditLogChange regionIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "region");
+            API.AuditLogChange iconHashModel = changes.FirstOrDefault(x => x.ChangedProperty == "icon_hash");
+            API.AuditLogChange verificationLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "verification_level");
+            API.AuditLogChange ownerIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "owner_id");
+            API.AuditLogChange mfaLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "mfa_level");
+            API.AuditLogChange contentFilterModel = changes.FirstOrDefault(x => x.ChangedProperty == "explicit_content_filter");
+            API.AuditLogChange systemChannelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "system_channel_id");
+            API.AuditLogChange widgetChannelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "widget_channel_id");
+            API.AuditLogChange widgetEnabledModel = changes.FirstOrDefault(x => x.ChangedProperty == "widget_enabled");
 
             int? oldAfkTimeout = afkTimeoutModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
                 newAfkTimeout = afkTimeoutModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
@@ -64,21 +64,21 @@ namespace Discord.Rest
             IUser oldOwner = null;
             if (oldOwnerId != null)
             {
-                var oldOwnerInfo = log.Users.FirstOrDefault(x => x.Id == oldOwnerId.Value);
+                API.User oldOwnerInfo = log.Users.FirstOrDefault(x => x.Id == oldOwnerId.Value);
                 oldOwner = RestUser.Create(discord, oldOwnerInfo);
             }
 
             IUser newOwner = null;
             if (newOwnerId != null)
             {
-                var newOwnerInfo = log.Users.FirstOrDefault(x => x.Id == newOwnerId.Value);
+                API.User newOwnerInfo = log.Users.FirstOrDefault(x => x.Id == newOwnerId.Value);
                 newOwner = RestUser.Create(discord, newOwnerInfo);
             }
 
-            var before = new GuildInfo(oldAfkTimeout, oldDefaultMessageNotifications,
+            GuildInfo before = new GuildInfo(oldAfkTimeout, oldDefaultMessageNotifications,
                 oldAfkChannelId, oldName, oldRegionId, oldIconHash, oldVerificationLevel, oldOwner,
                 oldMfaLevel, oldContentFilter, oldSystemChannelId, oldWidgetChannelId, oldWidgetEnabled);
-            var after = new GuildInfo(newAfkTimeout, newDefaultMessageNotifications,
+            GuildInfo after = new GuildInfo(newAfkTimeout, newDefaultMessageNotifications,
                 newAfkChannelId, newName, newRegionId, newIconHash, newVerificationLevel, newOwner,
                 newMfaLevel, newContentFilter, newSystemChannelId, newWidgetChannelId, newWidgetEnabled);
 

@@ -52,7 +52,7 @@ namespace Discord.API
 
             WebSocketClient.BinaryMessage += async (data, index, count) =>
             {
-                using (var decompressed = new MemoryStream())
+                using (MemoryStream decompressed = new MemoryStream())
                 {
                     if (data[0] == 0x78)
                     {
@@ -72,10 +72,10 @@ namespace Discord.API
                     _compressed.Position = 0;
                     decompressed.Position = 0;
 
-                    using (var reader = new StreamReader(decompressed))
-                    using (var jsonReader = new JsonTextReader(reader))
+                    using (StreamReader reader = new StreamReader(decompressed))
+                    using (JsonTextReader jsonReader = new JsonTextReader(reader))
                     {
-                        var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
+                        SocketFrame msg = _serializer.Deserialize<SocketFrame>(jsonReader);
                         if (msg != null)
                             await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                     }
@@ -83,10 +83,10 @@ namespace Discord.API
             };
             WebSocketClient.TextMessage += async text =>
             {
-                using (var reader = new StringReader(text))
-                using (var jsonReader = new JsonTextReader(reader))
+                using (StringReader reader = new StringReader(text))
+                using (JsonTextReader jsonReader = new JsonTextReader(reader))
                 {
-                    var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
+                    SocketFrame msg = _serializer.Deserialize<SocketFrame>(jsonReader);
                     if (msg != null)
                         await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 }
@@ -149,7 +149,7 @@ namespace Discord.API
 
                 if (!_isExplicitUrl)
                 {
-                    var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
+                    Rest.GetGatewayResponse gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
                     _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordSocketConfig.GatewayEncoding}&compress=zlib-stream";
                 }
                 await WebSocketClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
@@ -216,11 +216,11 @@ namespace Discord.API
         public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, bool guildSubscriptions = true, GatewayIntents? gatewayIntents = null, Optional<StatusUpdateParams> presence = default, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var props = new Dictionary<string, string>
+            Dictionary<string, string> props = new Dictionary<string, string>
             {
                 ["$device"] = "Discord.Net"
             };
-            var msg = new IdentifyParams()
+            IdentifyParams msg = new IdentifyParams()
             {
                 Token = AuthToken,
                 Properties = props,
@@ -242,7 +242,7 @@ namespace Discord.API
         public async Task SendResumeAsync(string sessionId, int lastSeq, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var msg = new ResumeParams()
+            ResumeParams msg = new ResumeParams()
             {
                 Token = AuthToken,
                 SessionId = sessionId,
@@ -258,7 +258,7 @@ namespace Discord.API
         public async Task SendStatusUpdateAsync(UserStatus status, bool isAFK, long? since, Game game, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var args = new StatusUpdateParams
+            StatusUpdateParams args = new StatusUpdateParams
             {
                 Status = status,
                 IdleSince = since,
@@ -276,7 +276,7 @@ namespace Discord.API
         public async Task SendVoiceStateUpdateAsync(ulong guildId, ulong? channelId, bool selfDeaf, bool selfMute, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var payload = new VoiceStateUpdateParams
+            VoiceStateUpdateParams payload = new VoiceStateUpdateParams
             {
                 GuildId = guildId,
                 ChannelId = channelId,

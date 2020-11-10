@@ -39,7 +39,7 @@ namespace Discord.Net.Converters
                 writer.WriteNull();
             else
             {
-                var nullable = (T?)value;
+                T? nullable = (T?)value;
                 if (_innerConverter != null)
                     _innerConverter.WriteJson(writer, nullable.Value, serializer);
                 else

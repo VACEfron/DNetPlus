@@ -53,7 +53,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
-            var user = await ApiClient.GetMyUserAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
+            API.User user = await ApiClient.GetMyUserAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
             ApiClient.CurrentUserId = user.Id;
             base.CurrentUser = RestSelfUser.Create(this, user);
         }

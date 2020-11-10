@@ -23,6 +23,7 @@ namespace Discord.Rest
                 ImmutableArray.Create(model.Roles),
                 model.User.IsSpecified ? model.User.Value.Id : (ulong?)null);
 
+
         public static Embed ToEntity(this API.Embed model)
         {
             return new Embed(model.Type, model.Title, model.Description, model.Url, model.Timestamp,
@@ -38,7 +39,7 @@ namespace Discord.Rest
         public static API.Embed ToModel(this Embed entity)
         {
             if (entity == null) return null;
-            var model = new API.Embed
+            API.Embed model = new API.Embed
             {
                 Type = entity.Type,
                 Title = entity.Title,
