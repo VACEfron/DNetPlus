@@ -170,7 +170,7 @@ namespace Discord.WebSocket
         /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="SocketNewsChannel"/> channel.</exception>
         public async Task CrosspostAsync(RequestOptions options = null)
         {
-            if (!(Channel is SocketNewsChannel))
+            if (!(Channel is INewsChannel))
             {
                 throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
             }

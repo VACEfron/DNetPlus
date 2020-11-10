@@ -170,7 +170,7 @@ namespace Discord.Rest
         /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="RestNewsChannel"/> channel.</exception>
         public async Task CrosspostAsync(RequestOptions options = null)
         {
-            if (!(Channel is RestNewsChannel))
+            if (!(Channel is INewsChannel))
             {
                 throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
             }
