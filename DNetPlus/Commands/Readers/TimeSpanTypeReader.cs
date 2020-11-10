@@ -27,9 +27,25 @@ namespace Discord.Commands
         /// <inheritdoc />
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
-            return (TimeSpan.TryParseExact(input.ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out var timeSpan))
-                ? Task.FromResult(TypeReaderResult.FromSuccess(timeSpan))
-                : Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse TimeSpan"));
+            if (string.IsNullOrEmpty(input))
+                throw new ArgumentException(message: $"{nameof(input)} must not be null or empty.", paramName: nameof(input));
+
+            var isNegative = input[0] == '-'; // Char for CultureInfo.InvariantCulture.NumberFormat.NegativeSign
+            if (isNegative)
+            {
+                input = input.Substring(1);
+            }
+
+            if (TimeSpan.TryParseExact(input.ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out var timeSpan))
+            {
+                return isNegative
+                    ? Task.FromResult(TypeReaderResult.FromSuccess(-timeSpan))
+                    : Task.FromResult(TypeReaderResult.FromSuccess(timeSpan));
+            }
+            else
+            {
+                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse TimeSpan"));
+            }
         }
     }
 }
