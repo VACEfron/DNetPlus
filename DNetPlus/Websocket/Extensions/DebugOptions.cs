@@ -12,6 +12,6 @@ namespace Discord.WebSocket
     {
         public bool DisableTyping { get; set; }
         public bool DisableInviteCreate { get; set; }
-            public bool DisableInviteDelete { get; set; }
+        public bool DisableInviteDelete { get; set; }
     }
 }

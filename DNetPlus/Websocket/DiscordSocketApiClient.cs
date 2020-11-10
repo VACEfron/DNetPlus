@@ -38,10 +38,11 @@ namespace Discord.API
         public ConnectionState ConnectionState { get; private set; }
 
         public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
+            SemaphoreSlim identifyMasterSemaphore, SemaphoreSlim identifySemaphore, int identifyMaxConcurrency,
             string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
             RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second,
 			bool useSystemClock = true)
-            : base(restClientProvider, userAgent, defaultRetryMode, serializer, rateLimitPrecision, useSystemClock)
+            : base(restClientProvider, userAgent, new RequestQueue(identifyMasterSemaphore, identifySemaphore, identifyMaxConcurrency), defaultRetryMode, serializer, rateLimitPrecision, useSystemClock)
         {
             _gatewayUrl = url;
             if (url != null)
@@ -205,7 +206,10 @@ namespace Discord.API
             payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, bytes, true, options)).ConfigureAwait(false);
+            options.IsGatewayBucket = true;
+            if (options.BucketId == null)
+                options.BucketId = GatewayBucket.Get(GatewayBucketType.Unbucketed).Id;
+            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
@@ -225,6 +229,7 @@ namespace Discord.API
             if (totalShards > 1)
                 msg.ShardingParams = new int[] { shardID, totalShards };
 
+            options.BucketId = GatewayBucket.Get(GatewayBucketType.Identify).Id;
             if (gatewayIntents.HasValue)
                 msg.Intents = (int)gatewayIntents.Value;
             else
@@ -260,6 +265,7 @@ namespace Discord.API
                 IsAFK = isAFK,
                 Game = game
             };
+            options.BucketId = GatewayBucket.Get(GatewayBucketType.PresenceUpdate).Id;
             await SendGatewayAsync(GatewayOpCode.StatusUpdate, args, options: options).ConfigureAwait(false);
         }
         public async Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)

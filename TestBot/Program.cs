@@ -21,7 +21,7 @@ namespace TestBot
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 OwnerIds = new ulong[] { 190590364871032834 },
-                GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.GuildMembers | Discord.GatewayIntents.,
+                GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.GuildMembers,
                 AlwaysDownloadUsers = true,
                 LogLevel = Discord.LogSeverity.Verbose,
                 Debug = new DiscordDebugConfig
