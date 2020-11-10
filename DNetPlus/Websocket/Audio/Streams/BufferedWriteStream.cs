@@ -67,8 +67,10 @@ namespace Discord.Audio.Streams
             {
                 _disposeTokenSource?.Cancel();
                 _disposeTokenSource?.Dispose();
+                _cancelTokenSource?.Cancel();
                 _cancelTokenSource?.Dispose();
                 _queueLock?.Dispose();
+                _next.Dispose();
             }
             base.Dispose(disposing);
         }
