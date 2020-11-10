@@ -99,6 +99,11 @@ namespace Discord.Audio
             _token = token;
             await _connection.StartAsync().ConfigureAwait(false);
         }
+        public IReadOnlyDictionary<ulong, AudioInStream> GetStreams()
+        {
+            return _streams.ToDictionary(pair => pair.Key, pair => pair.Value.Reader);
+        }
+
         public async Task StopAsync()
         {
             await _connection.StopAsync().ConfigureAwait(false);
