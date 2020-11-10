@@ -127,6 +127,11 @@ namespace Discord.WebSocket
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)
             : base(config, client)
         {
+            if (config.Debug == null)
+                config.Debug = new DiscordDebugConfig();
+            if (config.Debug.Events == null)
+                config.Debug = new DiscordDebugConfig();
+
             ShardId = config.ShardId ?? 0;
             TotalShards = config.TotalShards ?? 1;
             MessageCacheSize = config.MessageCacheSize;
@@ -1765,56 +1770,60 @@ namespace Discord.WebSocket
                             case "INVITE_CREATE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_CREATE)").ConfigureAwait(false);
-
-                                    var data = (payload as JToken).ToObject<API.Gateway.InviteCreateEvent>(_serializer);
-                                    if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)
+                                    if (!BaseConfig.Debug.Events.DisableInviteCreate)
                                     {
-                                        var guild = channel.Guild;
-                                        if (!guild.IsSynced)
+                                        var data = (payload as JToken).ToObject<API.Gateway.InviteCreateEvent>(_serializer);
+                                        if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)
                                         {
-                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            var guild = channel.Guild;
+                                            if (!guild.IsSynced)
+                                            {
+                                                await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                                return;
+                                            }
+
+                                            SocketGuildUser inviter = data.Inviter.IsSpecified
+                                                ? (guild.GetUser(data.Inviter.Value.Id) ?? guild.AddOrUpdateUser(data.Inviter.Value))
+                                                : null;
+
+                                            SocketUser target = data.TargetUser.IsSpecified
+                                                ? (guild.GetUser(data.TargetUser.Value.Id) ?? (SocketUser)SocketUnknownUser.Create(this, State, data.TargetUser.Value))
+                                                : null;
+
+                                            var invite = SocketInvite.Create(this, guild, channel, inviter, target, data);
+
+                                            await TimedInvokeAsync(_inviteCreatedEvent, nameof(InviteCreated), invite).ConfigureAwait(false);
+                                        }
+                                        else
+                                        {
+                                            await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                             return;
                                         }
-
-                                        SocketGuildUser inviter = data.Inviter.IsSpecified
-                                            ? (guild.GetUser(data.Inviter.Value.Id) ?? guild.AddOrUpdateUser(data.Inviter.Value))
-                                            : null;
-
-                                        SocketUser target = data.TargetUser.IsSpecified
-                                            ? (guild.GetUser(data.TargetUser.Value.Id) ?? (SocketUser)SocketUnknownUser.Create(this, State, data.TargetUser.Value))
-                                            : null;
-
-                                        var invite = SocketInvite.Create(this, guild, channel, inviter, target, data);
-
-                                        await TimedInvokeAsync(_inviteCreatedEvent, nameof(InviteCreated), invite).ConfigureAwait(false);
-                                    }
-                                    else
-                                    {
-                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
-                                        return;
                                     }
                                 }
                                 break;
                             case "INVITE_DELETE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_DELETE)").ConfigureAwait(false);
-
-                                    var data = (payload as JToken).ToObject<API.Gateway.InviteDeleteEvent>(_serializer);
-                                    if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)
+                                    if (!BaseConfig.Debug.Events.DisableInviteDelete)
                                     {
-                                        var guild = channel.Guild;
-                                        if (!guild.IsSynced)
+                                        var data = (payload as JToken).ToObject<API.Gateway.InviteDeleteEvent>(_serializer);
+                                        if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)
                                         {
-                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            var guild = channel.Guild;
+                                            if (!guild.IsSynced)
+                                            {
+                                                await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                                return;
+                                            }
+
+                                            await TimedInvokeAsync(_inviteDeletedEvent, nameof(InviteDeleted), channel, data.Code).ConfigureAwait(false);
+                                        }
+                                        else
+                                        {
+                                            await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                             return;
                                         }
-
-                                        await TimedInvokeAsync(_inviteDeletedEvent, nameof(InviteDeleted), channel, data.Code).ConfigureAwait(false);
-                                    }
-                                    else
-                                    {
-                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
-                                        return;
                                     }
                                 }
                                 break;

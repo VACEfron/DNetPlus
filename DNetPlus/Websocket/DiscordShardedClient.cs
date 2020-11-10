@@ -64,6 +64,11 @@ namespace Discord.WebSocket
 
             _shardIdsToIndex = new Dictionary<int, int>();
             config.DisplayInitialLog = false;
+            if (config.Debug == null)
+                config.Debug = new DiscordDebugConfig();
+            if (config.Debug.Events == null)
+                config.Debug = new DiscordDebugConfig();
+
             _baseConfig = config;
             _connectionGroupLock = new SemaphoreSlim(1, 1);
 

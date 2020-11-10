@@ -165,7 +165,7 @@ namespace Discord.WebSocket
         /// </summary>
         public ulong[] OwnerIds { get; set; }
 
-        public DiscordDebugConfig Debug = new DiscordDebugConfig();
+        public DiscordDebugConfig Debug { get; set; }
 
         /// <summary>
         ///     Initializes a default configuration.
@@ -177,10 +177,5 @@ namespace Discord.WebSocket
         }
 
         internal DiscordSocketConfig Clone() => MemberwiseClone() as DiscordSocketConfig;
-    }
-    public class DiscordDebugConfig
-    {
-        public bool VoiceFix { get; set; }
-        public bool DisableTyping { get; set; }
     }
 }
