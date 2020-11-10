@@ -211,7 +211,7 @@ namespace Discord.WebSocket
         {
             if (_parentClient == null)
             {
-                if (this.BaseConfig.Debug.VoiceFix)
+                if (BaseConfig.Debug.VoiceFix)
                 {
                     if (!DownloadedVoice)
                     {
@@ -223,7 +223,6 @@ namespace Discord.WebSocket
                 else
                 {
                     var voiceRegions = await ApiClient.GetVoiceRegionsAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
-                    DownloadedVoice = true;
                     _voiceRegions = voiceRegions.Select(x => RestVoiceRegion.Create(this, x)).ToImmutableDictionary(x => x.Id);
                 }
             }
@@ -1596,10 +1595,9 @@ namespace Discord.WebSocket
                                 break;
                             case "TYPING_START":
                                 {
-                                    if (!_parentClient.BaseConfig.Debug.DisableTyping)
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (TYPING_START)").ConfigureAwait(false);
+                                    if (!_parentClient.BaseConfig.Debug.Events.DisableTyping)
                                     {
-                                        await _gatewayLogger.DebugAsync("Received Dispatch (TYPING_START)").ConfigureAwait(false);
-
                                         var data = (payload as JToken).ToObject<TypingStartEvent>(_serializer);
                                         if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                         {
@@ -1899,12 +1897,7 @@ namespace Discord.WebSocket
                 await _gatewayLogger.ErrorAsync("Heartbeat Errored", ex).ConfigureAwait(false);
             }
         }
-        /*public async Task WaitForGuildsAsync()
-        {
-            var downloadTask = _guildDownloadTask;
-            if (downloadTask != null)
-                await _guildDownloadTask.ConfigureAwait(false);
-        }*/
+
         private async Task WaitForGuildsAsync(CancellationToken cancelToken, Logger logger)
         {
             //Wait for GUILD_AVAILABLEs
@@ -1923,12 +1916,6 @@ namespace Discord.WebSocket
             {
                 await logger.ErrorAsync("GuildDownloader Errored", ex).ConfigureAwait(false);
             }
-        }
-        private async Task SyncGuildsAsync()
-        {
-            var guildIds = Guilds.Where(x => !x.IsSynced).Select(x => x.Id).ToImmutableArray();
-            if (guildIds.Length > 0)
-                await ApiClient.SendGuildSyncAsync(guildIds).ConfigureAwait(false);
         }
 
         internal SocketGuild AddGuild(ExtendedGuild model, ClientState state)
