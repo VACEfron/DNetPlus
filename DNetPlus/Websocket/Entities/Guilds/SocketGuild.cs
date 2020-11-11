@@ -712,7 +712,7 @@ namespace Discord.WebSocket
         /// Get a list of the guild's integrations including bot roles, booster role, twitch/youtube subscription role and more.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>Returns a list of <see cref="RestGuildIntegration"/>.</returns>
+        /// <returns>A list of <see cref="RestGuildIntegration"/>.</returns>
         public Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null)
             => GuildHelper.GetIntegrationsAsync(this, Discord, options);
         /// <summary>
@@ -721,7 +721,7 @@ namespace Discord.WebSocket
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>Returns the created <see cref="RestGuildIntegration"/>.</returns>
+        /// <returns>The created <see cref="RestGuildIntegration"/>.</returns>
         public Task<RestGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null)
             => GuildHelper.CreateIntegrationAsync(this, Discord, id, type, options);
 

@@ -913,7 +913,7 @@ namespace Discord
         /// <param name="code">The code for the template.</param>
         /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
         /// <param name="options">The option to be used when sending the request.</param>
-        /// <returns>Returns a <see cref="IGuildTemplate"/> or null if the code is invalid.</returns>
+        /// <returns>The <see cref="IGuildTemplate"/> or null if the code is invalid.</returns>
         Task<IGuildTemplate> GetTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null);
 
         /// <summary>
@@ -924,7 +924,7 @@ namespace Discord
         /// </remarks>
         /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
         /// <param name="options">The option to be used when sending the request.</param>
-        /// <returns>Returns a list of <see cref="IGuildTemplate"/>.</returns>
+        /// <returns>A list of <see cref="IGuildTemplate"/>.</returns>
         Task<IReadOnlyCollection<IGuildTemplate>> GetTemplatesAsync(bool withSnapshot = false, RequestOptions options = null);
 
         /// <summary>
@@ -937,7 +937,7 @@ namespace Discord
         /// <param name="description"></param>
         /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
         /// <param name="options">The option to be used when sending the request.</param>
-        /// <returns>Returns the created <see cref="IGuildTemplate"/>.</returns>
+        /// <returns>The created <see cref="IGuildTemplate"/>.</returns>
         Task<IGuildTemplate> CreateTemplateAsync(string name = "", Optional<string> description = default(Optional<string>), bool withSnapshot = false, RequestOptions options = null);
 
         /// <summary>
@@ -946,7 +946,7 @@ namespace Discord
         /// <param name="code">The code for the template.</param>
         /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
         /// <param name="options">The option to be used when sending the request.</param>
-        /// <returns>Returns the updated <see cref="IGuildTemplate"/>.</returns>
+        /// <returns>The updated <see cref="IGuildTemplate"/>.</returns>
         Task<IGuildTemplate> SyncTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null);
 
         /// <summary>
@@ -956,7 +956,7 @@ namespace Discord
         /// <param name="func"></param>
         /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
         /// <param name="options">The option to be used when sending the request.</param>
-        /// <returns>Returns the updated <see cref="IGuildTemplate"/>.</returns>
+        /// <returns>The updated <see cref="IGuildTemplate"/>.</returns>
         Task<IGuildTemplate> ModifyTemplateAsync(string code, Action<TemplateProperties> func, bool withSnapshot = false, RequestOptions options = null);
 
         /// <summary>
@@ -968,14 +968,14 @@ namespace Discord
         /// <param name="code">The code for the template.</param>
         /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
         /// <param name="options">The option to be used when sending the request.</param>
-        /// <returns>Returns the deleted <see cref="IGuildTemplate"/>.</returns>
+        /// <returns>The deleted <see cref="IGuildTemplate"/>.</returns>
         Task<IGuildTemplate> DeleteTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null);
 
         /// <summary>
         /// Get discovery metadata for the guild including category ids, keywords and partnership applied/given dates.
         /// </summary>
         /// <param name="options">The option to be used when sending the request.</param>
-        /// <returns>Returns a <see cref="RestGuildDiscovery"/>.</returns>
+        /// <returns>The <see cref="RestGuildDiscovery"/>.</returns>
         Task<RestGuildDiscovery> GetDiscoveryMetadataAsync(RequestOptions options = null);
     }
 }

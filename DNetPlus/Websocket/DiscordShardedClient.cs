@@ -189,18 +189,38 @@ namespace Discord.WebSocket
         public override async Task StopAsync()
             => await Task.WhenAll(_shards.Select(x => x.StopAsync())).ConfigureAwait(false);
 
-        public DiscordSocketClient GetShard(int id)
+        internal DiscordSocketClient GetShardIndex(int id)
         {
             if (_shardIdsToIndex.TryGetValue(id, out id))
                 return _shards[id];
             return null;
         }
+        /// <summary>
+        /// Get the shard id for a guild by id.
+        /// </summary>
+        /// <param name="guildId">Id of the guild.</param>
+        /// <returns>The shard id for the guild.</returns>
         public int GetShardIdFor(ulong guildId)
             => (int)((guildId >> 22) % (uint)_totalShards);
+        /// <summary>
+        /// Get the shard id for a guild.
+        /// </summary>
+        /// <param name="guild">The guild.</param>
+        /// <returns>The shard id for the guild.</returns>
         public int GetShardIdFor(IGuild guild)
             => GetShardIdFor(guild?.Id ?? 0);
-        private DiscordSocketClient GetShardFor(ulong guildId)
-            => GetShard(GetShardIdFor(guildId));
+        /// <summary>
+        /// Get a guild's shard by id.
+        /// </summary>
+        /// <param name="guildId">Id of the guild.</param>
+        /// <returns>The shard for the guild.</returns>
+        public DiscordSocketClient GetShardFor(ulong guildId)
+            => GetShardIndex(GetShardIdFor(guildId));
+        /// <summary>
+        /// Get a guild's shard.
+        /// </summary>
+        /// <param name="guild">The guild.</param>
+        /// <returns>The shard for the guild.</returns>
         public DiscordSocketClient GetShardFor(IGuild guild)
             => GetShardFor(guild?.Id ?? 0);
 
