@@ -21,6 +21,18 @@ namespace Discord.Rest
         public ushort DiscriminatorValue { get; private set; }
         /// <inheritdoc />
         public string AvatarId { get; private set; }
+        /// <inheritdoc />
+        public bool IsAvatarAnimated
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(AvatarId))
+                    return false;
+                if (AvatarId[0] == 'a' && AvatarId[1] == '_')
+                    return true;
+                return false;
+            }
+        }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -91,6 +103,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string GetDefaultAvatarUrl()
             => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
+
+        /// <inheritdoc />
+        public string GetAvatarUrlOrDefault(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+           => CDN.GetUserAvatarUrl(Id, AvatarId, size, format) ?? CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
 
         /// <summary>
         ///     Gets the Username#Discriminator of the user.

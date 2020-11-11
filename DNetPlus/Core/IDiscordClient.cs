@@ -24,7 +24,7 @@ namespace Discord
         TokenType TokenType { get; }
 
         /// <summary>
-        ///     Starts the connection between Discord and the client..
+        ///     Starts the connection between Discord and the client.
         /// </summary>
         /// <remarks>
         ///     This method will initialize the connection between the client and Discord.
@@ -37,6 +37,25 @@ namespace Discord
         ///     A task that represents the asynchronous start operation.
         /// </returns>
         Task StartAsync();
+        /// <summary>
+        ///  Starts the connection between Discord and the client.
+        /// </summary>
+        ///  /// <remarks>
+        ///     This method will initialize the connection between the client and Discord.
+        ///     <note type="important">
+        ///         This method will immediately return after it is called, as it will initialize the connection on
+        ///         another thread.
+        ///     </note>
+        /// </remarks>
+        /// <param name="status">The status of the bot being online, afk, dnd, invisible.</param>
+        /// <param name="name">The description of the status to shown on the bot user popup.</param>
+        /// <param name="streamUrl">If the bot is streaming on twitch.</param>
+        /// <param name="type">The type activity such as playing/listening/streaming.</param>
+        /// <returns></returns>
+        /// /// <returns>
+        ///     A task that represents the asynchronous start operation.
+        /// </returns>
+        Task StartAsync(UserStatus status, string name = null, string streamUrl = null, ActivityType type = ActivityType.Playing);
         /// <summary>
         ///     Stops the connection between Discord and the client.
         /// </summary>

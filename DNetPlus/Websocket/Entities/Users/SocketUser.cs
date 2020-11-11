@@ -24,7 +24,7 @@ namespace Discord.WebSocket
         public abstract ushort DiscriminatorValue { get; internal set; }
         /// <inheritdoc />
         public abstract string AvatarId { get; internal set; }
-
+        /// <inheritdoc />
         public bool IsAvatarAnimated
         {
             get

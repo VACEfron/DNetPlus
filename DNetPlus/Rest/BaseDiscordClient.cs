@@ -237,6 +237,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task IDiscordClient.StartAsync()
             => Task.Delay(0);
+
+        Task IDiscordClient.StartAsync(UserStatus status, string name = null, string streamUrl = null, ActivityType type = ActivityType.Playing)
+            => Task.Delay(0);
         /// <inheritdoc />
         Task IDiscordClient.StopAsync()
             => Task.Delay(0);
