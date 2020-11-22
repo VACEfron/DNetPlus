@@ -24,9 +24,8 @@ namespace TestBot
                 GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.GuildMembers,
                 AlwaysDownloadUsers = true
             });
-            string File = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/DiscordBots/Boaty/Config.json";
             Client.Log += Client_Log;
-            await Client.LoginAsync(Discord.TokenType.Bot, JObject.Parse(System.IO.File.ReadAllText(File))["Discord"].ToString());
+            await Client.LoginAsync(Discord.TokenType.Bot, "NTQ3NDQzODkxMDQ2MDU1OTUw.XGwk2g.gNQHZ2uc_JvGcAJbSrtQ49fr278");
             await Client.StartAsync();
             Commands = new CommandService();
             Handler = new CommandHandler(Client, Commands);

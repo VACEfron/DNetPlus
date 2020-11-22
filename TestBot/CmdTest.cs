@@ -11,11 +11,11 @@ namespace TestBot
     public class CmdTest : ModuleBase<SocketCommandContext>
     {
         [Command("test")]
-        public async Task Test(ulong id)
+        public async Task Test(SocketGuildUser user = null)
         {
-            Context.Guild
-            Console.Write(GU.AvatarId);
-            await ReplyAsync(Context.Client.CurrentUser.IsAvatarAnimated);
+            var avatar = user.GetAvatarUrlOrDefault(size: 1024);
+            Console.WriteLine(avatar);
+            await ReplyAsync(avatar);
         }
 
         [Command("testemote")]

@@ -34,7 +34,7 @@ namespace TestBot
                 return;
 
             int argPos = 0;
-            if (!message.HasStringPrefix("tb/", ref argPos))
+            if (!message.HasStringPrefix("t.", ref argPos))
                 return;
             SocketCommandContext context = new SocketCommandContext(_client, message);
 
