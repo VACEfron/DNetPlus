@@ -24,6 +24,10 @@ namespace Discord.Commands
         /// </summary>
         IUser User { get; }
         /// <summary>
+        ///     Gets the <see cref="IGuildUser" /> who executed the command.
+        /// </summary>
+        IGuildUser GuildUser { get; }
+        /// <summary>
         ///     Gets the <see cref="IUserMessage" /> that the command is interpreted from.
         /// </summary>
         IUserMessage Message { get; }

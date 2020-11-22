@@ -13,9 +13,7 @@ namespace TestBot
         [Command("test")]
         public async Task Test(SocketGuildUser user = null)
         {
-            var avatar = user.GetAvatarUrlOrDefault(size: 1024);
-            Console.WriteLine(avatar);
-            await ReplyAsync(avatar);
+            Console.WriteLine(Context.GuildUser is null);
         }
 
         [Command("testemote")]

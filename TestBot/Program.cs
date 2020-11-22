@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace TestBot
                 AlwaysDownloadUsers = true
             });
             Client.Log += Client_Log;
-            await Client.LoginAsync(Discord.TokenType.Bot, "NTQ3NDQzODkxMDQ2MDU1OTUw.XGwk2g.gNQHZ2uc_JvGcAJbSrtQ49fr278");
+            await Client.LoginAsync(Discord.TokenType.Bot, new StreamReader("token.txt").ReadToEnd());
             await Client.StartAsync();
             Commands = new CommandService();
             Handler = new CommandHandler(Client, Commands);
