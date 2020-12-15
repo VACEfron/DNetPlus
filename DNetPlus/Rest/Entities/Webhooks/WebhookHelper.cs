@@ -11,9 +11,9 @@ namespace Discord.Rest
         public static async Task<Model> ModifyAsync(IWebhook webhook, BaseDiscordClient client,
             Action<WebhookProperties> func, RequestOptions options)
         {
-            var args = new WebhookProperties();
+            WebhookProperties args = new WebhookProperties();
             func(args);
-            var apiArgs = new ModifyWebhookParams
+            ModifyWebhookParams apiArgs = new ModifyWebhookParams
             {
                 Avatar = args.Image.IsSpecified ? args.Image.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 Name = args.Name

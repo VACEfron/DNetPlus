@@ -32,7 +32,7 @@ namespace Discord.Rest
         }
         internal new static RestTextChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestTextChannel(discord, guild, model.Id);
+            RestTextChannel entity = new RestTextChannel(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -50,7 +50,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
         {
-            var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            Model model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
 

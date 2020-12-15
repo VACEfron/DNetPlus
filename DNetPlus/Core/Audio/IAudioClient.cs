@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Discord.Audio
 {
@@ -19,6 +20,9 @@ namespace Discord.Audio
         int Latency { get; }
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the voice UDP server. </summary>
         int UdpLatency { get; }
+
+        /// <summary>Gets the current audio streams.</summary>
+        IReadOnlyDictionary<ulong, AudioInStream> GetStreams();
 
         Task StopAsync();
         Task SetSpeakingAsync(bool value);

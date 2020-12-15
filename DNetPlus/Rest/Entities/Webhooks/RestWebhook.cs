@@ -45,13 +45,13 @@ namespace Discord.Rest
 
         internal static RestWebhook Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestWebhook(discord, guild, model.Id, model.Token, model.ChannelId);
+            RestWebhook entity = new RestWebhook(discord, guild, model.Id, model.Token, model.ChannelId);
             entity.Update(model);
             return entity;
         }
         internal static RestWebhook Create(BaseDiscordClient discord, ITextChannel channel, Model model)
         {
-            var entity = new RestWebhook(discord, channel, model.Id, model.Token, model.ChannelId);
+            RestWebhook entity = new RestWebhook(discord, channel, model.Id, model.Token, model.ChannelId);
             entity.Update(model);
             return entity;
         }
@@ -84,7 +84,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetWebhookAsync(Id, options).ConfigureAwait(false);
+            Model model = await Discord.ApiClient.GetWebhookAsync(Id, options).ConfigureAwait(false);
             Update(model);
         }
 
@@ -94,7 +94,7 @@ namespace Discord.Rest
 
         public async Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null)
         {
-            var model = await WebhookHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            Model model = await WebhookHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
 

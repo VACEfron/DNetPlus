@@ -22,7 +22,7 @@ namespace Discord.Rest
         {
             try
             {
-                var token = _cancelToken.Token;
+                CancellationToken token = _cancelToken.Token;
                 while (!_cancelToken.IsCancellationRequested)
                 {
                     try

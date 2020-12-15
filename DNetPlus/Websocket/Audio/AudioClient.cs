@@ -63,7 +63,7 @@ namespace Discord.Audio
             ChannelId = channelId;
             _audioLogger = Discord.LogManager.CreateLogger($"Audio #{clientId}");
 
-            ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
+            ApiClient = new DiscordVoiceAPIClient(Discord.BaseConfig, guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
             ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync("Sent Discovery").ConfigureAwait(false);
             //ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
@@ -99,6 +99,11 @@ namespace Discord.Audio
             _token = token;
             await _connection.StartAsync().ConfigureAwait(false);
         }
+        public IReadOnlyDictionary<ulong, AudioInStream> GetStreams()
+        {
+            return _streams.ToDictionary(pair => pair.Key, pair => pair.Value.Reader);
+        }
+
         public async Task StopAsync()
         {
             await _connection.StopAsync().ConfigureAwait(false);
@@ -122,11 +127,11 @@ namespace Discord.Audio
 
             //Wait for tasks to complete
             await _audioLogger.DebugAsync("Waiting for heartbeater").ConfigureAwait(false);
-            var heartbeatTask = _heartbeatTask;
+            Task heartbeatTask = _heartbeatTask;
             if (heartbeatTask != null)
                 await heartbeatTask.ConfigureAwait(false);
             _heartbeatTask = null;
-            var keepaliveTask = _keepaliveTask;
+            Task keepaliveTask = _keepaliveTask;
             if (keepaliveTask != null)
                 await keepaliveTask.ConfigureAwait(false);
             _keepaliveTask = null;
@@ -142,30 +147,30 @@ namespace Discord.Audio
 
         public AudioOutStream CreateOpusStream(int bufferMillis)
         {
-            var outputStream = new OutputStream(ApiClient); //Ignores header
-            var sodiumEncrypter = new SodiumEncryptStream( outputStream, this); //Passes header
-            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
+            OutputStream outputStream = new OutputStream(ApiClient); //Ignores header
+            SodiumEncryptStream sodiumEncrypter = new SodiumEncryptStream( outputStream, this); //Passes header
+            RTPWriteStream rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
             return new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger); //Generates header
         }
         public AudioOutStream CreateDirectOpusStream()
         {
-            var outputStream = new OutputStream(ApiClient); //Ignores header
-            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
+            OutputStream outputStream = new OutputStream(ApiClient); //Ignores header
+            SodiumEncryptStream sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
             return new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header (external input), passes
         }
         public AudioOutStream CreatePCMStream(AudioApplication application, int? bitrate, int bufferMillis, int packetLoss)
         {
-            var outputStream = new OutputStream(ApiClient); //Ignores header
-            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
-            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
-            var bufferedStream = new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger); //Ignores header, generates header
+            OutputStream outputStream = new OutputStream(ApiClient); //Ignores header
+            SodiumEncryptStream sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
+            RTPWriteStream rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
+            BufferedWriteStream bufferedStream = new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger); //Ignores header, generates header
             return new OpusEncodeStream(bufferedStream, bitrate ?? (96 * 1024), application, packetLoss); //Generates header
         }
         public AudioOutStream CreateDirectPCMStream(AudioApplication application, int? bitrate, int packetLoss)
         {
-            var outputStream = new OutputStream(ApiClient); //Ignores header
-            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
-            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
+            OutputStream outputStream = new OutputStream(ApiClient); //Ignores header
+            SodiumEncryptStream sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
+            RTPWriteStream rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
             return new OpusEncodeStream(rtpWriter, bitrate ?? (96 * 1024), application, packetLoss); //Generates header
         }
 
@@ -174,11 +179,11 @@ namespace Discord.Audio
             //Assume Thread-safe
             if (!_streams.ContainsKey(userId))
             {
-                var readerStream = new InputStream(); //Consumes header
-                var opusDecoder = new OpusDecodeStream(readerStream); //Passes header
+                InputStream readerStream = new InputStream(); //Consumes header
+                OpusDecodeStream opusDecoder = new OpusDecodeStream(readerStream); //Passes header
                 //var jitterBuffer = new JitterBuffer(opusDecoder, _audioLogger);
-                var rtpReader = new RTPReadStream(opusDecoder); //Generates header
-                var decryptStream = new SodiumDecryptStream(rtpReader, this); //No header
+                RTPReadStream rtpReader = new RTPReadStream(opusDecoder); //Generates header
+                SodiumDecryptStream decryptStream = new SodiumDecryptStream(rtpReader, this); //No header
                 _streams.TryAdd(userId, new StreamPair(readerStream, decryptStream));
                 await _streamCreatedEvent.InvokeAsync(userId, readerStream);
             }
@@ -191,7 +196,7 @@ namespace Discord.Audio
         }
         internal async Task RemoveInputStreamAsync(ulong userId)
         {
-            if (_streams.TryRemove(userId, out var pair))
+            if (_streams.TryRemove(userId, out StreamPair pair))
             {
                 await _streamDestroyedEvent.InvokeAsync(userId).ConfigureAwait(false);
                 pair.Reader.Dispose();
@@ -199,7 +204,7 @@ namespace Discord.Audio
         }
         internal async Task ClearInputStreamsAsync()
         {
-            foreach (var pair in _streams)
+            foreach (KeyValuePair<ulong, StreamPair> pair in _streams)
             {
                 await _streamDestroyedEvent.InvokeAsync(pair.Key).ConfigureAwait(false);
                 pair.Value.Reader.Dispose();
@@ -219,7 +224,7 @@ namespace Discord.Audio
                     case VoiceOpCode.Ready:
                         {
                             await _audioLogger.DebugAsync("Received Ready").ConfigureAwait(false);
-                            var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
+                            ReadyEvent data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
 
                             _ssrc = data.SSRC;
 
@@ -236,7 +241,7 @@ namespace Discord.Audio
                     case VoiceOpCode.SessionDescription:
                         {
                             await _audioLogger.DebugAsync("Received SessionDescription").ConfigureAwait(false);
-                            var data = (payload as JToken).ToObject<SessionDescriptionEvent>(_serializer);
+                            SessionDescriptionEvent data = (payload as JToken).ToObject<SessionDescriptionEvent>(_serializer);
 
                             if (data.Mode != DiscordVoiceAPIClient.Mode)
                                 throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
@@ -246,7 +251,7 @@ namespace Discord.Audio
                             await ApiClient.SendSetSpeaking(false).ConfigureAwait(false);
                             _keepaliveTask = RunKeepaliveAsync(5000, _connection.CancelToken);
 
-                            var _ = _connection.CompleteAsync();
+                            Task _ = _connection.CompleteAsync();
                         }
                         break;
                     case VoiceOpCode.HeartbeatAck:
@@ -267,7 +272,7 @@ namespace Discord.Audio
                         {
                             await _audioLogger.DebugAsync("Received Speaking").ConfigureAwait(false);
 
-                            var data = (payload as JToken).ToObject<SpeakingEvent>(_serializer);
+                            SpeakingEvent data = (payload as JToken).ToObject<SpeakingEvent>(_serializer);
                             _ssrcMap[data.Ssrc] = data.UserId; //TODO: Memory Leak: SSRCs are never cleaned up
 
                             await _speakingUpdatedEvent.InvokeAsync(data.UserId, data.Speaking);
@@ -327,7 +332,7 @@ namespace Discord.Audio
                             ((ulong)packet[6] >> 48) |
                             ((ulong)packet[7] >> 56);
 
-                        while (_keepaliveTimes.TryDequeue(out var pair))
+                        while (_keepaliveTimes.TryDequeue(out KeyValuePair<ulong, int> pair))
                         {
                             if (pair.Key == value)
                             {
@@ -342,17 +347,17 @@ namespace Discord.Audio
                     }
                     else
                     {
-                        if (!RTPReadStream.TryReadSsrc(packet, 0, out var ssrc))
+                        if (!RTPReadStream.TryReadSsrc(packet, 0, out uint ssrc))
                         {
                             await _audioLogger.DebugAsync("Malformed Frame").ConfigureAwait(false);
                             return;
                         }
-                        if (!_ssrcMap.TryGetValue(ssrc, out var userId))
+                        if (!_ssrcMap.TryGetValue(ssrc, out ulong userId))
                         {
                             await _audioLogger.DebugAsync($"Unknown SSRC {ssrc}").ConfigureAwait(false);
                             return;
                         }
-                        if (!_streams.TryGetValue(userId, out var pair))
+                        if (!_streams.TryGetValue(userId, out StreamPair pair))
                         {
                             await _audioLogger.DebugAsync($"Unknown User {userId}").ConfigureAwait(false);
                             return;
@@ -385,7 +390,7 @@ namespace Discord.Audio
                 await _audioLogger.DebugAsync("Heartbeat Started").ConfigureAwait(false);
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    var now = Environment.TickCount;
+                    int now = Environment.TickCount;
 
                     //Did server respond to our last heartbeat?
                     if (_heartbeatTimes.Count != 0 && (now - _lastMessageTime) > intervalMillis &&
@@ -425,7 +430,7 @@ namespace Discord.Audio
                 await _audioLogger.DebugAsync("Keepalive Started").ConfigureAwait(false);
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    var now = Environment.TickCount;
+                    int now = Environment.TickCount;
 
                     try
                     {

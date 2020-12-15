@@ -22,6 +22,9 @@ namespace Discord.Net.Queue
         private CancellationTokenSource _requestCancelTokenSource;
         private CancellationToken _requestCancelToken; //Parent token + Clear token
         private DateTimeOffset _waitUntil;
+        private readonly SemaphoreSlim _masterIdentifySemaphore;
+        private readonly SemaphoreSlim _identifySemaphore;
+        private readonly int _identifySemaphoreMaxConcurrency;
 
         private Task _cleanupTask;
 
@@ -37,6 +40,14 @@ namespace Discord.Net.Queue
             _buckets = new ConcurrentDictionary<BucketId, object>();
 
             _cleanupTask = RunCleanup();
+        }
+
+        public RequestQueue(SemaphoreSlim masterIdentifySemaphore, SemaphoreSlim slaveIdentifySemaphore, int slaveIdentifySemaphoreMaxConcurrency)
+            : this()
+        {
+            _masterIdentifySemaphore = masterIdentifySemaphore;
+            _identifySemaphore = slaveIdentifySemaphore;
+            _identifySemaphoreMaxConcurrency = slaveIdentifySemaphoreMaxConcurrency;
         }
 
         public async Task SetCancelTokenAsync(CancellationToken cancelToken)
@@ -82,16 +93,25 @@ namespace Discord.Net.Queue
             else
                 request.Options.CancelToken = _requestCancelToken;
 
-            var bucket = GetOrCreateBucket(request.Options, request);
-            var result = await bucket.SendAsync(request).ConfigureAwait(false);
+            RequestBucket bucket = GetOrCreateBucket(request.Options, request);
+            Stream result = await bucket.SendAsync(request).ConfigureAwait(false);
             createdTokenSource?.Dispose();
             return result;
         }
         public async Task SendAsync(WebSocketRequest request)
         {
-            //TODO: Re-impl websocket buckets
-            request.CancelToken = _requestCancelToken;
-            await request.SendAsync().ConfigureAwait(false);
+            CancellationTokenSource createdTokenSource = null;
+            if (request.Options.CancelToken.CanBeCanceled)
+            {
+                createdTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_requestCancelToken, request.Options.CancelToken);
+                request.Options.CancelToken = createdTokenSource.Token;
+            }
+            else
+                request.Options.CancelToken = _requestCancelToken;
+
+            RequestBucket bucket = GetOrCreateBucket(request.Options, request);
+            await bucket.SendAsync(request).ConfigureAwait(false);
+            createdTokenSource?.Dispose();
         }
 
         internal async Task EnterGlobalAsync(int id, RestRequest request)
@@ -105,14 +125,68 @@ namespace Discord.Net.Queue
                 await Task.Delay(millis).ConfigureAwait(false);
             }
         }
+
+        internal async Task EnterGlobalAsync(int id, WebSocketRequest request)
+        {
+            //If this is a global request (unbucketed), it'll be dealt in EnterAsync
+            GatewayBucket requestBucket = GatewayBucket.Get(request.Options.BucketId);
+            if (requestBucket.Type == GatewayBucketType.Unbucketed)
+                return;
+
+            //Identify is per-account so we won't trigger global until we can actually go for it
+            if (requestBucket.Type == GatewayBucketType.Identify)
+            {
+                if (_masterIdentifySemaphore == null)
+                    throw new InvalidOperationException("Not a RequestQueue with WebSocket data.");
+
+                if (_identifySemaphore == null)
+                    await _masterIdentifySemaphore.WaitAsync(request.CancelToken);
+                else
+                {
+                    bool master;
+                    while (!(master = _masterIdentifySemaphore.Wait(0)) && !_identifySemaphore.Wait(0)) //To not block the thread
+                        await Task.Delay(100, request.CancelToken);
+                    if (master && _identifySemaphoreMaxConcurrency > 1)
+                        _identifySemaphore.Release(_identifySemaphoreMaxConcurrency - 1);
+                }
+#if DEBUG_LIMITS
+                Debug.WriteLine($"[{id}] Acquired identify ticket");
+#endif
+            }
+
+            //It's not a global request, so need to remove one from global (per-session)
+            GatewayBucket globalBucketType = GatewayBucket.Get(GatewayBucketType.Unbucketed);
+            RequestOptions options = RequestOptions.CreateOrClone(request.Options);
+            options.BucketId = globalBucketType.Id;
+            WebSocketRequest globalRequest = new WebSocketRequest(null, null, false, options);
+            RequestBucket globalBucket = GetOrCreateBucket(options, globalRequest);
+            await globalBucket.TriggerAsync(id, globalRequest);
+        }
+        internal void ReleaseIdentifySemaphore(int id)
+        {
+            if (_masterIdentifySemaphore == null)
+                throw new InvalidOperationException("Not a RequestQueue with WebSocket data.");
+
+            while (_identifySemaphore?.Wait(0) == true) //exhaust all tickets before releasing master
+            { }
+            _masterIdentifySemaphore.Release();
+#if DEBUG_LIMITS
+            Debug.WriteLine($"[{id}] Released identify master semaphore");
+#endif
+        }
+
+
+
+
+
         internal void PauseGlobal(RateLimitInfo info)
         {
             _waitUntil = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value + (info.Lag?.TotalMilliseconds ?? 0.0));
         }
 
-        private RequestBucket GetOrCreateBucket(RequestOptions options, RestRequest request)
+        private RequestBucket GetOrCreateBucket(RequestOptions options, IRequest request)
         {
-            var bucketId = options.BucketId;
+            BucketId bucketId = options.BucketId;
             object obj = _buckets.GetOrAdd(bucketId, x => new RequestBucket(this, request, x));
             if (obj is BucketId hashBucket)
             {
@@ -129,8 +203,8 @@ namespace Discord.Net.Queue
         {
             if (!id.IsHashBucket)
             {
-                var bucket = BucketId.Create(discordHash, id);
-                var hashReqQueue = (RequestBucket)_buckets.GetOrAdd(bucket, _buckets[id]);
+                BucketId bucket = BucketId.Create(discordHash, id);
+                RequestBucket hashReqQueue = (RequestBucket)_buckets.GetOrAdd(bucket, _buckets[id]);
                 _buckets.AddOrUpdate(id, bucket, (oldBucket, oldObj) => bucket);
                 return (hashReqQueue, bucket);
             }
@@ -143,13 +217,13 @@ namespace Discord.Net.Queue
             {
                 while (!_cancelTokenSource.IsCancellationRequested)
                 {
-                    var now = DateTimeOffset.UtcNow;
-                    foreach (var bucket in _buckets.Where(x => x.Value is RequestBucket).Select(x => (RequestBucket)x.Value))
+                    DateTimeOffset now = DateTimeOffset.UtcNow;
+                    foreach (RequestBucket bucket in _buckets.Where(x => x.Value is RequestBucket).Select(x => (RequestBucket)x.Value))
                     {
                         if ((now - bucket.LastAttemptAt).TotalMinutes > 1.0)
                         {
                             if (bucket.Id.IsHashBucket)
-                                foreach (var redirectBucket in _buckets.Where(x => x.Value == bucket.Id).Select(x => (BucketId)x.Value))
+                                foreach (BucketId redirectBucket in _buckets.Where(x => x.Value == bucket.Id).Select(x => (BucketId)x.Value))
                                     _buckets.TryRemove(redirectBucket, out _); //remove redirections if hash bucket
                             _buckets.TryRemove(bucket.Id, out _);
                         }

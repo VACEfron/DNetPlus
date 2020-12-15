@@ -24,24 +24,24 @@ namespace Discord.Rest
 
         internal static ChannelDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes;
+            API.AuditLogChange[] changes = entry.Changes;
 
-            var overwritesModel = changes.FirstOrDefault(x => x.ChangedProperty == "permission_overwrites");
-            var typeModel = changes.FirstOrDefault(x => x.ChangedProperty == "type");
-            var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
-            var rateLimitPerUserModel = changes.FirstOrDefault(x => x.ChangedProperty == "rate_limit_per_user");
-            var nsfwModel = changes.FirstOrDefault(x => x.ChangedProperty == "nsfw");
-            var bitrateModel = changes.FirstOrDefault(x => x.ChangedProperty == "bitrate");
+            API.AuditLogChange overwritesModel = changes.FirstOrDefault(x => x.ChangedProperty == "permission_overwrites");
+            API.AuditLogChange typeModel = changes.FirstOrDefault(x => x.ChangedProperty == "type");
+            API.AuditLogChange nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
+            API.AuditLogChange rateLimitPerUserModel = changes.FirstOrDefault(x => x.ChangedProperty == "rate_limit_per_user");
+            API.AuditLogChange nsfwModel = changes.FirstOrDefault(x => x.ChangedProperty == "nsfw");
+            API.AuditLogChange bitrateModel = changes.FirstOrDefault(x => x.ChangedProperty == "bitrate");
 
-            var overwrites = overwritesModel.OldValue.ToObject<API.Overwrite[]>(discord.ApiClient.Serializer)
+            List<Overwrite> overwrites = overwritesModel.OldValue.ToObject<API.Overwrite[]>(discord.ApiClient.Serializer)
                 .Select(x => new Overwrite(x.TargetId, x.TargetType, new OverwritePermissions(x.Allow, x.Deny)))
                 .ToList();
-            var type = typeModel.OldValue.ToObject<ChannelType>(discord.ApiClient.Serializer);
-            var name = nameModel.OldValue.ToObject<string>(discord.ApiClient.Serializer);
+            ChannelType type = typeModel.OldValue.ToObject<ChannelType>(discord.ApiClient.Serializer);
+            string name = nameModel.OldValue.ToObject<string>(discord.ApiClient.Serializer);
             int? rateLimitPerUser = rateLimitPerUserModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer);
             bool? nsfw = nsfwModel?.OldValue?.ToObject<bool>(discord.ApiClient.Serializer);
             int? bitrate = bitrateModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer);
-            var id = entry.TargetId.Value;
+            ulong id = entry.TargetId.Value;
 
             return new ChannelDeleteAuditLogData(id, name, type, rateLimitPerUser, nsfw, bitrate, overwrites.ToReadOnlyCollection());
         }

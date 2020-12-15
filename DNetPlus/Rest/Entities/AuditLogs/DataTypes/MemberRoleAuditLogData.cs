@@ -19,15 +19,15 @@ namespace Discord.Rest
 
         internal static MemberRoleAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes;
+            API.AuditLogChange[] changes = entry.Changes;
 
-            var roleInfos = changes.SelectMany(x => x.NewValue.ToObject<API.Role[]>(discord.ApiClient.Serializer),
+            List<MemberRoleEditInfo> roleInfos = changes.SelectMany(x => x.NewValue.ToObject<API.Role[]>(discord.ApiClient.Serializer),
                 (model, role) => new { model.ChangedProperty, Role = role })
                 .Select(x => new MemberRoleEditInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add"))
                 .ToList();
 
-            var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-            var user = RestUser.Create(discord, userInfo);
+            API.User userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
+            RestUser user = RestUser.Create(discord, userInfo);
 
             return new MemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), user);
         }

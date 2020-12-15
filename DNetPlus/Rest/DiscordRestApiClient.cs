@@ -5,6 +5,7 @@ using Discord.Net;
 using Discord.Net.Converters;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
+using Discord.Rest;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -51,7 +52,7 @@ namespace Discord.API
         internal JsonSerializer Serializer => _serializer;
 
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
-        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry,
+        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RequestQueue requestQueue, RetryMode defaultRetryMode = RetryMode.AlwaysRetry,
             JsonSerializer serializer = null, RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second, bool useSystemClock = true)
         {
             _restClientProvider = restClientProvider;
@@ -61,7 +62,7 @@ namespace Discord.API
             RateLimitPrecision = rateLimitPrecision;
 			UseSystemClock = useSystemClock;
 
-            RequestQueue = new RequestQueue();
+            RequestQueue = requestQueue ?? new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
 
             SetBaseUrl(DiscordConfig.APIUrl);
@@ -86,7 +87,7 @@ namespace Discord.API
                 TokenType.Bot => $"Bot {token}",
                 TokenType.Bearer => $"Bearer {token}",
                 _ => throw new ArgumentException(message: "Unknown OAuth token type.", paramName: nameof(tokenType)),
-            };
+            }; ;
         }
         internal virtual void Dispose(bool disposing)
         {
@@ -205,7 +206,7 @@ namespace Discord.API
             options.HeaderOnly = true;
             options.BucketId = bucketId;
 
-            var request = new RestRequest(RestClient, method, endpoint, options);
+            RestRequest request = new RestRequest(RestClient, method, endpoint, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
@@ -220,7 +221,7 @@ namespace Discord.API
             options.BucketId = bucketId;
 
             string json = payload != null ? SerializeJson(payload) : null;
-            var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
+            JsonRestRequest request = new JsonRestRequest(RestClient, method, endpoint, json, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
@@ -234,7 +235,7 @@ namespace Discord.API
             options.HeaderOnly = true;
             options.BucketId = bucketId;
 
-            var request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
+            MultipartRestRequest request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
 
@@ -247,7 +248,7 @@ namespace Discord.API
             options = options ?? new RequestOptions();
             options.BucketId = bucketId;
 
-            var request = new RestRequest(RestClient, method, endpoint, options);
+            RestRequest request = new RestRequest(RestClient, method, endpoint, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
@@ -261,7 +262,7 @@ namespace Discord.API
             options.BucketId = bucketId;
 
             string json = payload != null ? SerializeJson(payload) : null;
-            var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
+            JsonRestRequest request = new JsonRestRequest(RestClient, method, endpoint, json, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
@@ -274,7 +275,7 @@ namespace Discord.API
             options = options ?? new RequestOptions();
             options.BucketId = bucketId;
 
-            var request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
+            MultipartRestRequest request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
@@ -287,8 +288,8 @@ namespace Discord.API
 			if (request.Options.UseSystemClock == null)
 				request.Options.UseSystemClock = UseSystemClock;
 
-            var stopwatch = Stopwatch.StartNew();
-            var responseStream = await RequestQueue.SendAsync(request).ConfigureAwait(false);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            Stream responseStream = await RequestQueue.SendAsync(request).ConfigureAwait(false);
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
@@ -324,7 +325,7 @@ namespace Discord.API
 
             try
             {
-                var ids = new BucketIds(channelId: channelId);
+                BucketIds ids = new BucketIds(channelId: channelId);
                 return await SendAsync<Channel>("GET", () => $"channels/{channelId}", ids, options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
@@ -337,8 +338,8 @@ namespace Discord.API
 
             try
             {
-                var ids = new BucketIds(channelId: channelId);
-                var model = await SendAsync<Channel>("GET", () => $"channels/{channelId}", ids, options: options).ConfigureAwait(false);
+                BucketIds ids = new BucketIds(channelId: channelId);
+                Channel model = await SendAsync<Channel>("GET", () => $"channels/{channelId}", ids, options: options).ConfigureAwait(false);
                 if (!model.GuildId.IsSpecified || model.GuildId.Value != guildId)
                     return null;
                 return model;
@@ -350,7 +351,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Channel>>("GET", () => $"guilds/{guildId}/channels", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Channel> CreateGuildChannelAsync(ulong guildId, CreateGuildChannelParams args, RequestOptions options = null)
@@ -361,7 +362,7 @@ namespace Discord.API
             Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<Channel>("POST", () => $"guilds/{guildId}/channels", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task<Channel> DeleteChannelAsync(ulong channelId, RequestOptions options = null)
@@ -369,7 +370,7 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendAsync<Channel>("DELETE", () => $"channels/{channelId}", ids, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentException">
@@ -390,7 +391,7 @@ namespace Discord.API
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task<Channel> ModifyGuildChannelAsync(ulong channelId, Rest.ModifyTextChannelParams args, RequestOptions options = null)
@@ -403,7 +404,7 @@ namespace Discord.API
             Preconditions.AtMost(args.SlowModeInterval, 21600, nameof(args.SlowModeInterval));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task<Channel> ModifyGuildChannelAsync(ulong channelId, Rest.ModifyVoiceChannelParams args, RequestOptions options = null)
@@ -416,7 +417,7 @@ namespace Discord.API
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task ModifyGuildChannelsAsync(ulong guildId, IEnumerable<Rest.ModifyGuildChannelsParams> args, RequestOptions options = null)
@@ -425,7 +426,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
-            var channels = args.ToArray();
+            ModifyGuildChannelsParams[] channels = args.ToArray();
             switch (channels.Length)
             {
                 case 0:
@@ -434,7 +435,7 @@ namespace Discord.API
                     await ModifyGuildChannelAsync(channels[0].Id, new Rest.ModifyGuildChannelParams { Position = channels[0].Position }).ConfigureAwait(false);
                     break;
                 default:
-                    var ids = new BucketIds(guildId: guildId);
+                    BucketIds ids = new BucketIds(guildId: guildId);
                     await SendJsonAsync("PATCH", () => $"guilds/{guildId}/channels", channels, ids, options: options).ConfigureAwait(false);
                     break;
             }
@@ -447,7 +448,7 @@ namespace Discord.API
             Preconditions.NotEqual(roleId, guildId, nameof(roleId), "The Everyone role cannot be added to a user.");
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             await SendAsync("PUT", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options).ConfigureAwait(false);
         }
         public async Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
@@ -458,7 +459,7 @@ namespace Discord.API
             Preconditions.NotEqual(roleId, guildId, nameof(roleId), "The Everyone role cannot be removed from a user.");
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             await SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options).ConfigureAwait(false);
         }
 
@@ -471,7 +472,7 @@ namespace Discord.API
 
             try
             {
-                var ids = new BucketIds(channelId: channelId);
+                BucketIds ids = new BucketIds(channelId: channelId);
                 return await SendAsync<Message>("GET", () => $"channels/{channelId}/messages/{messageId}", ids, options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
@@ -502,7 +503,7 @@ namespace Discord.API
                     break;
             }
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             Expression<Func<string>> endpoint;
             if (relativeId != null)
                 endpoint = () => $"channels/{channelId}/messages?limit={limit}&{relativeDir}={relativeId}";
@@ -522,7 +523,7 @@ namespace Discord.API
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Message>("POST", () => $"channels/{channelId}/messages", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -541,7 +542,7 @@ namespace Discord.API
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(webhookId: webhookId);
+            BucketIds ids = new BucketIds(webhookId: webhookId);
             return await SendJsonAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?wait=true", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -556,7 +557,7 @@ namespace Discord.API
             else if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendMultipartAsync<Message>("POST", () => $"channels/{channelId}/messages", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
 
@@ -581,7 +582,7 @@ namespace Discord.API
                     throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             }
 
-            var ids = new BucketIds(webhookId: webhookId);
+            BucketIds ids = new BucketIds(webhookId: webhookId);
             return await SendMultipartAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?wait=true", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
         public async Task DeleteMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
@@ -590,7 +591,7 @@ namespace Discord.API
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}", ids, options: options).ConfigureAwait(false);
         }
         public async Task DeleteMessagesAsync(ulong channelId, DeleteMessagesParams args, RequestOptions options = null)
@@ -610,7 +611,7 @@ namespace Discord.API
                     await DeleteMessageAsync(channelId, args.MessageIds[0]).ConfigureAwait(false);
                     break;
                 default:
-                    var ids = new BucketIds(channelId: channelId);
+                    BucketIds ids = new BucketIds(channelId: channelId);
                     await SendJsonAsync("POST", () => $"channels/{channelId}/messages/bulk-delete", args, ids, options: options).ConfigureAwait(false);
                     break;
             }
@@ -625,7 +626,7 @@ namespace Discord.API
                 throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
 
@@ -635,7 +636,7 @@ namespace Discord.API
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendJsonAsync("POST", () => $"channels/{channelId}/messages/{messageId}/suppress-embeds", args, ids, options: options).ConfigureAwait(false);
         }
 
@@ -648,10 +649,10 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             options.IsReactionBucket = true;
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
 
             // @me is non-const to fool the ratelimiter, otherwise it will put add/remove in separate buckets
-            var me = "@me";
+            string me = "@me";
             await SendAsync("PUT", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}/{me}", ids, options: options).ConfigureAwait(false);
         }
         public async Task RemoveReactionAsync(ulong channelId, ulong messageId, ulong userId, string emoji, RequestOptions options = null)
@@ -663,9 +664,9 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             options.IsReactionBucket = true;
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
 
-            var user = CurrentUserId.HasValue ? (userId == CurrentUserId.Value ? "@me" : userId.ToString()) : userId.ToString();
+            string user = CurrentUserId.HasValue ? (userId == CurrentUserId.Value ? "@me" : userId.ToString()) : userId.ToString();
             await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}/{user}", ids, options: options).ConfigureAwait(false);
         }
         public async Task RemoveAllReactionsAsync(ulong channelId, ulong messageId, RequestOptions options = null)
@@ -675,7 +676,7 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
 
             await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions", ids, options: options).ConfigureAwait(false);
         }
@@ -687,7 +688,7 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
 
             await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}", ids, options: options).ConfigureAwait(false);
         }
@@ -705,7 +706,7 @@ namespace Discord.API
             int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUserReactionsPerBatch);
             ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}?limit={limit}&after={afterUserId}";
             return await SendAsync<IReadOnlyCollection<User>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
@@ -715,7 +716,7 @@ namespace Discord.API
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendAsync("POST", () => $"channels/{channelId}/messages/{messageId}/ack", ids, options: options).ConfigureAwait(false);
         }
         public async Task TriggerTypingIndicatorAsync(ulong channelId, RequestOptions options = null)
@@ -723,7 +724,7 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendAsync("POST", () => $"channels/{channelId}/typing", ids, options: options).ConfigureAwait(false);
         }
         public async Task CrosspostAsync(ulong channelId, ulong messageId, RequestOptions options = null)
@@ -732,7 +733,7 @@ namespace Discord.API
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendAsync("POST", () => $"channels/{channelId}/messages/{messageId}/crosspost", ids, options: options).ConfigureAwait(false);
         }
 
@@ -744,7 +745,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendJsonAsync("PUT", () => $"channels/{channelId}/permissions/{targetId}", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task DeleteChannelPermissionAsync(ulong channelId, ulong targetId, RequestOptions options = null)
@@ -753,7 +754,7 @@ namespace Discord.API
             Preconditions.NotEqual(targetId, 0, nameof(targetId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendAsync("DELETE", () => $"channels/{channelId}/permissions/{targetId}", ids, options: options).ConfigureAwait(false);
         }
 
@@ -764,7 +765,7 @@ namespace Discord.API
             Preconditions.GreaterThan(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendAsync("PUT", () => $"channels/{channelId}/pins/{messageId}", ids, options: options).ConfigureAwait(false);
 
         }
@@ -774,7 +775,7 @@ namespace Discord.API
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendAsync("DELETE", () => $"channels/{channelId}/pins/{messageId}", ids, options: options).ConfigureAwait(false);
         }
         public async Task<IReadOnlyCollection<Message>> GetPinsAsync(ulong channelId, RequestOptions options = null)
@@ -782,7 +783,7 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendAsync<IReadOnlyCollection<Message>>("GET", () => $"channels/{channelId}/pins", ids, options: options).ConfigureAwait(false);
         }
 
@@ -793,7 +794,7 @@ namespace Discord.API
             Preconditions.GreaterThan(userId, 0, nameof(userId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendAsync("PUT", () => $"channels/{channelId}/recipients/{userId}", ids, options: options).ConfigureAwait(false);
 
         }
@@ -803,7 +804,7 @@ namespace Discord.API
             Preconditions.NotEqual(userId, 0, nameof(userId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             await SendAsync("DELETE", () => $"channels/{channelId}/recipients/{userId}", ids, options: options).ConfigureAwait(false);
         }
 
@@ -815,7 +816,7 @@ namespace Discord.API
 
             try
             {
-                var ids = new BucketIds(guildId: guildId);
+                BucketIds ids = new BucketIds(guildId: guildId);
                 return await SendAsync<Guild>("GET", () => $"guilds/{guildId}?with_counts={(withCounts ? "true" : "false")}", ids, options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
@@ -834,7 +835,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<Guild>("DELETE", () => $"guilds/{guildId}", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Guild> LeaveGuildAsync(ulong guildId, RequestOptions options = null)
@@ -842,7 +843,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<Guild>("DELETE", () => $"users/@me/guilds/{guildId}", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Guild> ModifyGuildAsync(ulong guildId, Rest.ModifyGuildParams args, RequestOptions options = null)
@@ -858,7 +859,7 @@ namespace Discord.API
             Preconditions.NotNull(args.RegionId, nameof(args.RegionId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<Guild>("PATCH", () => $"guilds/{guildId}", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task<GetGuildPruneCountResponse> BeginGuildPruneAsync(ulong guildId, GuildPruneParams args, RequestOptions options = null)
@@ -868,7 +869,7 @@ namespace Discord.API
             Preconditions.AtLeast(args.Days, 1, nameof(args.Days));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<GetGuildPruneCountResponse>("POST", () => $"guilds/{guildId}/prune", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task<GetGuildPruneCountResponse> GetGuildPruneCountAsync(ulong guildId, GuildPruneParams args, RequestOptions options = null)
@@ -879,7 +880,7 @@ namespace Discord.API
             string endpointRoleIds = args.IncludeRoleIds?.Length > 0 ? $"&include_roles={string.Join(",", args.IncludeRoleIds)}" : "";
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune?days={args.Days}{endpointRoleIds}", ids, options: options).ConfigureAwait(false);
         }
 
@@ -889,7 +890,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Ban>>("GET", () => $"guilds/{guildId}/bans", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Ban> GetGuildBanAsync(ulong guildId, ulong userId, RequestOptions options)
@@ -898,7 +899,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<Ban>("GET", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentException">
@@ -916,7 +917,7 @@ namespace Discord.API
             Preconditions.AtMost(args.DeleteMessageDays, 7, nameof(args.DeleteMessageDays), "Prune length must be within [0, 7]");
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             string reason = string.IsNullOrWhiteSpace(args.Reason) ? "" : $"&reason={Uri.EscapeDataString(args.Reason)}";
             await SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete-message-days={args.DeleteMessageDays}{reason}", ids, options: options).ConfigureAwait(false);
         }
@@ -927,7 +928,7 @@ namespace Discord.API
             Preconditions.NotEqual(userId, 0, nameof(userId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             await SendAsync("DELETE", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
         }
 
@@ -940,7 +941,7 @@ namespace Discord.API
 
             try
             {
-                var ids = new BucketIds(guildId: guildId);
+                BucketIds ids = new BucketIds(guildId: guildId);
                 return await SendAsync<GuildWidget>("GET", () => $"guilds/{guildId}/widget", ids, options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
@@ -953,7 +954,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<GuildWidget>("PATCH", () => $"guilds/{guildId}/widget", args, ids, options: options).ConfigureAwait(false);
         }
 
@@ -964,7 +965,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Integration>>("GET", () => $"guilds/{guildId}/integrations", ids, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentException"><paramref name="guildId"/> and <paramref name="args.Id"/> must not be equal to zero.</exception>
@@ -976,7 +977,7 @@ namespace Discord.API
             Preconditions.NotEqual(args.Id, 0, nameof(args.Id));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<Integration>("POST", () => $"guilds/{guildId}/integrations", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Integration> DeleteGuildIntegrationAsync(ulong guildId, ulong integrationId, RequestOptions options = null)
@@ -985,7 +986,7 @@ namespace Discord.API
             Preconditions.NotEqual(integrationId, 0, nameof(integrationId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<Integration>("DELETE", () => $"guilds/{guildId}/integrations/{integrationId}", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Integration> ModifyGuildIntegrationAsync(ulong guildId, ulong integrationId, Rest.ModifyGuildIntegrationParams args, RequestOptions options = null)
@@ -997,7 +998,7 @@ namespace Discord.API
             Preconditions.AtLeast(args.ExpireGracePeriod, 0, nameof(args.ExpireGracePeriod));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<Integration>("PATCH", () => $"guilds/{guildId}/integrations/{integrationId}", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task<Integration> SyncGuildIntegrationAsync(ulong guildId, ulong integrationId, RequestOptions options = null)
@@ -1006,7 +1007,7 @@ namespace Discord.API
             Preconditions.NotEqual(integrationId, 0, nameof(integrationId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<Integration>("POST", () => $"guilds/{guildId}/integrations/{integrationId}/sync", ids, options: options).ConfigureAwait(false);
         }
 
@@ -1038,7 +1039,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<InviteVanity>("GET", () => $"guilds/{guildId}/vanity-url", ids, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentException"><paramref name="guildId"/> may not be equal to zero.</exception>
@@ -1047,7 +1048,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<InviteMetadata>>("GET", () => $"guilds/{guildId}/invites", ids, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentException"><paramref name="channelId"/> may not be equal to zero.</exception>
@@ -1056,7 +1057,7 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendAsync<IReadOnlyCollection<InviteMetadata>>("GET", () => $"channels/{channelId}/invites", ids, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentException">
@@ -1077,7 +1078,7 @@ namespace Discord.API
                 "The maximum age of an invite must be less than or equal to a day (86400 seconds).");
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<InviteMetadata>("POST", () => $"channels/{channelId}/invites", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task<Invite> DeleteInviteAsync(string inviteId, RequestOptions options = null)
@@ -1098,13 +1099,13 @@ namespace Discord.API
 
             if (args.RoleIds.IsSpecified)
             {
-                foreach (var roleId in args.RoleIds.Value)
+                foreach (ulong roleId in args.RoleIds.Value)
                     Preconditions.NotEqual(roleId, 0, nameof(roleId));
             }
 
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
 
             return await SendJsonAsync<GuildMember>("PUT", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options);
         }
@@ -1116,7 +1117,7 @@ namespace Discord.API
 
             try
             {
-                var ids = new BucketIds(guildId: guildId);
+                BucketIds ids = new BucketIds(guildId: guildId);
                 return await SendAsync<GuildMember>("GET", () => $"guilds/{guildId}/members/{userId}", ids, options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
@@ -1133,7 +1134,7 @@ namespace Discord.API
             int limit = args.Limit.GetValueOrDefault(int.MaxValue);
             ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/members?limit={limit}&after={afterUserId}";
             return await SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
@@ -1143,7 +1144,7 @@ namespace Discord.API
             Preconditions.NotEqual(userId, 0, nameof(userId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             reason = string.IsNullOrWhiteSpace(reason) ? "" : $"?reason={Uri.EscapeDataString(reason)}";
             await SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}{reason}", ids, options: options).ConfigureAwait(false);
         }
@@ -1160,13 +1161,13 @@ namespace Discord.API
                 Preconditions.NotEveryoneRole(args.RoleIds.Value, guildId, nameof(args.RoleIds));
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
-                var nickArgs = new Rest.ModifyCurrentUserNickParams(args.Nickname.Value ?? "");
+                ModifyCurrentUserNickParams nickArgs = new Rest.ModifyCurrentUserNickParams(args.Nickname.Value ?? "");
                 await ModifyMyNickAsync(guildId, nickArgs).ConfigureAwait(false);
                 args.Nickname = Optional.Create<string>(); //Remove
             }
             if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.RoleIds.IsSpecified)
             {
-                var ids = new BucketIds(guildId: guildId);
+                BucketIds ids = new BucketIds(guildId: guildId);
                 await SendJsonAsync("PATCH", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options).ConfigureAwait(false);
             }
         }
@@ -1182,7 +1183,7 @@ namespace Discord.API
             int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUsersPerBatch);
             string query = args.Query;
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/members/search?limit={limit}&query={query}";
             return await SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
@@ -1193,7 +1194,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Role>>("GET", () => $"guilds/{guildId}/roles", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Role> CreateGuildRoleAsync(ulong guildId, Rest.ModifyGuildRoleParams args, RequestOptions options = null)
@@ -1201,7 +1202,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<Role>("POST", () => $"guilds/{guildId}/roles", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task DeleteGuildRoleAsync(ulong guildId, ulong roleId, RequestOptions options = null)
@@ -1210,7 +1211,7 @@ namespace Discord.API
             Preconditions.NotEqual(roleId, 0, nameof(roleId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             await SendAsync("DELETE", () => $"guilds/{guildId}/roles/{roleId}", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Role> ModifyGuildRoleAsync(ulong guildId, ulong roleId, Rest.ModifyGuildRoleParams args, RequestOptions options = null)
@@ -1222,7 +1223,7 @@ namespace Discord.API
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<Role>("PATCH", () => $"guilds/{guildId}/roles/{roleId}", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task<IReadOnlyCollection<Role>> ModifyGuildRolesAsync(ulong guildId, IEnumerable<Rest.ModifyGuildRolesParams> args, RequestOptions options = null)
@@ -1231,7 +1232,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<IReadOnlyCollection<Role>>("PATCH", () => $"guilds/{guildId}/roles", args, ids, options: options).ConfigureAwait(false);
         }
 
@@ -1242,7 +1243,7 @@ namespace Discord.API
             Preconditions.NotEqual(emoteId, 0, nameof(emoteId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<Emoji>("GET", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options).ConfigureAwait(false);
         }
 
@@ -1254,7 +1255,7 @@ namespace Discord.API
             Preconditions.NotNull(args.Image.Stream, nameof(args.Image));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<Emoji>("POST", () => $"guilds/{guildId}/emojis", args, ids, options: options).ConfigureAwait(false);
         }
 
@@ -1265,7 +1266,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<Emoji>("PATCH", () => $"guilds/{guildId}/emojis/{emoteId}", args, ids, options: options).ConfigureAwait(false);
         }
 
@@ -1275,8 +1276,17 @@ namespace Discord.API
             Preconditions.NotEqual(emoteId, 0, nameof(emoteId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             await SendAsync("DELETE", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options).ConfigureAwait(false);
+        }
+
+        public async Task<GuildDiscovery> GetDiscoveryMetadataAsync(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            BucketIds ids = new BucketIds(guildId: guildId);
+            return await SendAsync<GuildDiscovery>("GET", () => $"guilds/{guildId}/discovery-metadata", ids, options: options).ConfigureAwait(false);
         }
 
         //Users
@@ -1340,7 +1350,7 @@ namespace Discord.API
             Preconditions.NotNull(args.Nickname, nameof(args.Nickname));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             await SendJsonAsync("PATCH", () => $"guilds/{guildId}/members/@me/nick", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task<Channel> CreateDMChannelAsync(CreateDMChannelParams args, RequestOptions options = null)
@@ -1363,7 +1373,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<VoiceRegion>>("GET", () => $"guilds/{guildId}/regions", ids, options: options).ConfigureAwait(false);
         }
 
@@ -1376,10 +1386,10 @@ namespace Discord.API
 
             int limit = args.Limit.GetValueOrDefault(int.MaxValue);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint;
 
-            var queryArgs = new StringBuilder();
+            StringBuilder queryArgs = new StringBuilder();
             if (args.BeforeEntryId.IsSpecified)
             {
                 queryArgs.Append("&before=")
@@ -1408,7 +1418,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotNull(args.Name, nameof(args.Name));
             options = RequestOptions.CreateOrClone(options);
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
 
             return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/webhooks", args, ids, options: options).ConfigureAwait(false);
         }
@@ -1419,8 +1429,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(args.targetChannelId, 0, nameof(args.targetChannelId));
             options = RequestOptions.CreateOrClone(options);
-            var ids = new BucketIds(channelId: channelId);
-
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/followers", args, ids, options: options).ConfigureAwait(false);
         }
 
@@ -1438,6 +1447,43 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
+        public async Task<TValue> GetTemplateAsync<TValue>(string templateCode, RequestOptions options = null) where TValue : GuildTemplate
+        {
+            options = RequestOptions.CreateOrClone(options);
+            try
+            {
+                return await SendAsync<TValue>("GET", () => $"guilds/templates/{templateCode}", new BucketIds(), options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return default; }
+        }
+
+        public async Task<TValue> CreateTemplateAsync<TValue>(ulong guildId, CreateTemplateParams args, RequestOptions options = null) where TValue : GuildTemplate
+        {
+            options = RequestOptions.CreateOrClone(options);
+            options.IgnoreState = true;
+            BucketIds ids = new BucketIds(guildId: guildId);
+            Console.WriteLine(guildId.ToString());
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(args, Formatting.Indented));
+            return await SendJsonAsync<TValue>("POST", () => $"guilds/{guildId}/templates", args, ids, options: options).ConfigureAwait(false);
+
+        }
+        public async Task<TValue> SyncTemplateAsync<TValue>(ulong guildId, string templateCode, RequestOptions options = null) where TValue : GuildTemplate
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<TValue>("PUT", () => $"guilds/{guildId}/templates/{templateCode}", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task<TValue> ModifyTemplateAsync<TValue>(ulong guildId, string templateCode, CreateTemplateParams args, RequestOptions options = null) where TValue : GuildTemplate
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendJsonAsync<TValue>("PATCH", () => $"guilds/{guildId}/templates/{templateCode}", args, new BucketIds(), options: options).ConfigureAwait(false);
+
+        }
+        public async Task<TValue> DeleteTemplateAsync<TValue>(ulong guildId, string templateCode, RequestOptions options = null) where TValue : GuildTemplate
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<TValue>("DELETE", () => $"guilds/{guildId}/templates/{templateCode}", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
         public async Task<Webhook> ModifyWebhookAsync(ulong webhookId, ModifyWebhookParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
@@ -1465,15 +1511,23 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
+            BucketIds ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Webhook>>("GET", () => $"guilds/{guildId}/webhooks", ids, options: options).ConfigureAwait(false);
+        }
+        public async Task<IReadOnlyCollection<TValue>> GetGuildTemplatesAsync<TValue>(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            BucketIds ids = new BucketIds(guildId: guildId);
+            return await SendAsync<IReadOnlyCollection<TValue>>("GET", () => $"guilds/{guildId}/templates", ids, options: options).ConfigureAwait(false);
         }
         public async Task<IReadOnlyCollection<Webhook>> GetChannelWebhooksAsync(ulong channelId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            BucketIds ids = new BucketIds(channelId: channelId);
             return await SendAsync<IReadOnlyCollection<Webhook>>("GET", () => $"channels/{channelId}/webhooks", ids, options: options).ConfigureAwait(false);
         }
 
@@ -1487,7 +1541,7 @@ namespace Discord.API
         protected static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
         protected string SerializeJson(object value)
         {
-            var sb = new StringBuilder(256);
+            StringBuilder sb = new StringBuilder(256);
             using (TextWriter text = new StringWriter(sb, CultureInfo.InvariantCulture))
             using (JsonWriter writer = new JsonTextWriter(text))
                 _serializer.Serialize(writer, value);
@@ -1519,7 +1573,7 @@ namespace Discord.API
 
             internal Dictionary<string, string> ToMajorParametersDictionary()
             {
-                var dict = new Dictionary<string, string>();
+                Dictionary<string, string> dict = new Dictionary<string, string>();
                 if (GuildId != 0)
                     dict["GuildId"] = GuildId.ToString();
                 if (ChannelId != 0)
@@ -1561,16 +1615,16 @@ namespace Discord.API
                 if (endpoint.Body.NodeType == ExpressionType.Constant)
                     return x => BucketId.Create(x.HttpMethod, (endpoint.Body as ConstantExpression).Value.ToString(), x.ToMajorParametersDictionary());
 
-                var builder = new StringBuilder();
-                var methodCall = endpoint.Body as MethodCallExpression;
-                var methodArgs = methodCall.Arguments.ToArray();
+                StringBuilder builder = new StringBuilder();
+                MethodCallExpression methodCall = endpoint.Body as MethodCallExpression;
+                Expression[] methodArgs = methodCall.Arguments.ToArray();
                 string format = (methodArgs[0] as ConstantExpression).Value as string;
 
                 //Unpack the array, if one exists (happens with 4+ parameters)
                 if (methodArgs.Length > 1 && methodArgs[1].NodeType == ExpressionType.NewArrayInit)
                 {
-                    var arrayExpr = methodArgs[1] as NewArrayExpression;
-                    var elements = arrayExpr.Expressions.ToArray();
+                    NewArrayExpression arrayExpr = methodArgs[1] as NewArrayExpression;
+                    Expression[] elements = arrayExpr.Expressions.ToArray();
                     Array.Resize(ref methodArgs, elements.Length + 1);
                     Array.Copy(elements, 0, methodArgs, 1, elements.Length);
                 }
@@ -1594,7 +1648,7 @@ namespace Discord.API
                     int argId = int.Parse(format.Substring(leftIndex + 1, rightIndex - leftIndex - 1), NumberStyles.None, CultureInfo.InvariantCulture);
                     string fieldName = GetFieldName(methodArgs[argId + 1]);
 
-                    var mappedId = BucketIds.GetIndex(fieldName);
+                    int? mappedId = BucketIds.GetIndex(fieldName);
 
                     if (!mappedId.HasValue && rightIndex != endIndex && format.Length > rightIndex + 1 && format[rightIndex + 1] == '/') //Ignore the next slash
                         rightIndex++;

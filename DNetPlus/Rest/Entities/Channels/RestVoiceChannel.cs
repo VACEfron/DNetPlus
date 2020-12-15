@@ -27,7 +27,7 @@ namespace Discord.Rest
         }
         internal new static RestVoiceChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestVoiceChannel(discord, guild, model.Id);
+            RestVoiceChannel entity = new RestVoiceChannel(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -43,7 +43,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
         {
-            var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            Model model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
 

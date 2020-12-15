@@ -10,17 +10,11 @@ namespace TestBot
 {
     public class CmdTest : ModuleBase<SocketCommandContext>
     {
-        [Command("test")]
-        public async Task Test(SocketGuildUser user = null)
-        {
-            Console.WriteLine(Context.GuildUser is null);
-        }
-
         [Command("testemote")]
         public async Task TestEmote([Remainder] string emote)
         {
             Console.WriteLine($"Test - {emote}");
-            var e = Emoji.FromUnicode(emote);
+            Emoji e = Emoji.FromUnicode(emote);
             if (e == null)
                 await ReplyAsync("Not valid");
             else

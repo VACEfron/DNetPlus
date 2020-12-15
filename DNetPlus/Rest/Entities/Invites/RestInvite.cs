@@ -37,7 +37,7 @@ namespace Discord.Rest
         }
         internal static RestInvite Create(BaseDiscordClient discord, IGuild guild, IChannel channel, Model model)
         {
-            var entity = new RestInvite(discord, guild, channel, model.Code);
+            RestInvite entity = new RestInvite(discord, guild, channel, model.Code);
             entity.Update(model);
             return entity;
         }
@@ -55,7 +55,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetInviteAsync(Code, options).ConfigureAwait(false);
+            API.InviteMetadata model = await Discord.ApiClient.GetInviteAsync(Code, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />

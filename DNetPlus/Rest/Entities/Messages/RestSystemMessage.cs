@@ -18,7 +18,7 @@ namespace Discord.Rest
         }
         internal new static RestSystemMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
         {
-            var entity = new RestSystemMessage(discord, model.Id, channel, author);
+            RestSystemMessage entity = new RestSystemMessage(discord, model.Id, channel, author);
             entity.Update(model);
             return entity;
         }

@@ -38,7 +38,7 @@ namespace Discord.Rest
         }
         internal new static RestDMChannel Create(BaseDiscordClient discord, Model model)
         {
-            var entity = new RestDMChannel(discord, model.Id, model.Recipients.Value[0].Id);
+            RestDMChannel entity = new RestDMChannel(discord, model.Id, model.Recipients.Value[0].Id);
             entity.Update(model);
             return entity;
         }
@@ -50,7 +50,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public override async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetChannelAsync(Id, options).ConfigureAwait(false);
+            Model model = await Discord.ApiClient.GetChannelAsync(Id, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />

@@ -41,7 +41,7 @@ namespace Discord
             {
                 if (ex != null)
                 {
-                    var ex2 = ex as WebSocketClosedException;
+                    WebSocketClosedException ex2 = ex as WebSocketClosedException;
                     if (ex2?.CloseCode == 4006)
                         CriticalError(new Exception("WebSocket session expired", ex));
                     else if (ex2?.CloseCode == 4014)
@@ -58,7 +58,7 @@ namespace Discord
         public virtual async Task StartAsync()
         {
             await AcquireConnectionLock().ConfigureAwait(false);
-            var reconnectCancelToken = new CancellationTokenSource();
+            CancellationTokenSource reconnectCancelToken = new CancellationTokenSource();
             _reconnectCancelToken?.Dispose();
             _reconnectCancelToken = reconnectCancelToken;
             _task = Task.Run(async () =>
@@ -128,12 +128,12 @@ namespace Discord
 
             try
             {
-                var readyPromise = new TaskCompletionSource<bool>();
+                TaskCompletionSource<bool> readyPromise = new TaskCompletionSource<bool>();
                 _readyPromise = readyPromise;
 
                 //Abort connection on timeout
-                var cancelToken = CancelToken;
-                var _ = Task.Run(async () =>
+                CancellationToken cancelToken = CancelToken;
+                Task _ = Task.Run(async () =>
                 {
                     try
                     {

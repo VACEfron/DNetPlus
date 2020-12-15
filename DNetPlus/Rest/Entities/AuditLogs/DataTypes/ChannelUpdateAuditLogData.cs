@@ -19,13 +19,13 @@ namespace Discord.Rest
 
         internal static ChannelUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes;
+            API.AuditLogChange[] changes = entry.Changes;
 
-            var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
-            var topicModel = changes.FirstOrDefault(x => x.ChangedProperty == "topic");
-            var rateLimitPerUserModel = changes.FirstOrDefault(x => x.ChangedProperty == "rate_limit_per_user");
-            var nsfwModel = changes.FirstOrDefault(x => x.ChangedProperty == "nsfw");
-            var bitrateModel = changes.FirstOrDefault(x => x.ChangedProperty == "bitrate");
+            API.AuditLogChange nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
+            API.AuditLogChange topicModel = changes.FirstOrDefault(x => x.ChangedProperty == "topic");
+            API.AuditLogChange rateLimitPerUserModel = changes.FirstOrDefault(x => x.ChangedProperty == "rate_limit_per_user");
+            API.AuditLogChange nsfwModel = changes.FirstOrDefault(x => x.ChangedProperty == "nsfw");
+            API.AuditLogChange bitrateModel = changes.FirstOrDefault(x => x.ChangedProperty == "bitrate");
 
             string oldName = nameModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
                 newName = nameModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
@@ -38,8 +38,8 @@ namespace Discord.Rest
             int? oldBitrate = bitrateModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
                 newBitrate = bitrateModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
 
-            var before = new ChannelInfo(oldName, oldTopic, oldRateLimitPerUser, oldNsfw, oldBitrate);
-            var after = new ChannelInfo(newName, newTopic, newRateLimitPerUser, newNsfw, newBitrate);
+            ChannelInfo before = new ChannelInfo(oldName, oldTopic, oldRateLimitPerUser, oldNsfw, oldBitrate);
+            ChannelInfo after = new ChannelInfo(newName, newTopic, newRateLimitPerUser, newNsfw, newBitrate);
 
             return new ChannelUpdateAuditLogData(entry.TargetId.Value, before, after);
         }

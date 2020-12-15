@@ -23,7 +23,12 @@ namespace TestBot
             {
                 OwnerIds = new ulong[] { 190590364871032834 },
                 GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.GuildMembers,
-                AlwaysDownloadUsers = true
+                AlwaysDownloadUsers = false,
+                LogLevel = Discord.LogSeverity.Info,
+                Debug = new DiscordDebugConfig
+                {
+                    VoiceFix = true
+                }
             });
             Client.Log += Client_Log;
             await Client.LoginAsync(Discord.TokenType.Bot, new StreamReader("token.txt").ReadToEnd());

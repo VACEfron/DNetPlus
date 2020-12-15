@@ -18,13 +18,13 @@ namespace Discord.Rest
 
         internal static RoleDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes;
+            API.AuditLogChange[] changes = entry.Changes;
 
-            var colorModel = changes.FirstOrDefault(x => x.ChangedProperty == "color");
-            var mentionableModel = changes.FirstOrDefault(x => x.ChangedProperty == "mentionable");
-            var hoistModel = changes.FirstOrDefault(x => x.ChangedProperty == "hoist");
-            var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
-            var permissionsModel = changes.FirstOrDefault(x => x.ChangedProperty == "permissions");
+            API.AuditLogChange colorModel = changes.FirstOrDefault(x => x.ChangedProperty == "color");
+            API.AuditLogChange mentionableModel = changes.FirstOrDefault(x => x.ChangedProperty == "mentionable");
+            API.AuditLogChange hoistModel = changes.FirstOrDefault(x => x.ChangedProperty == "hoist");
+            API.AuditLogChange nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
+            API.AuditLogChange permissionsModel = changes.FirstOrDefault(x => x.ChangedProperty == "permissions");
 
             uint? colorRaw = colorModel?.OldValue?.ToObject<uint>(discord.ApiClient.Serializer);
             bool? mentionable = mentionableModel?.OldValue?.ToObject<bool>(discord.ApiClient.Serializer);

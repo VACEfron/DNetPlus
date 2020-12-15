@@ -98,7 +98,7 @@ namespace Discord
                 resolvedPermissions = GuildPermissions.Webhook.RawValue;
             else
             {
-                foreach (var roleId in user.RoleIds)
+                foreach (ulong roleId in user.RoleIds)
                     resolvedPermissions |= guild.GetRole(roleId)?.Permissions.RawValue ?? 0;
                 if (GetValue(resolvedPermissions, GuildPermission.Administrator))
                     resolvedPermissions = GuildPermissions.All.RawValue; //Administrators always have all permissions
@@ -123,13 +123,13 @@ namespace Discord
                 resolvedPermissions = guildPermissions;
 
                 //Give/Take Everyone permissions
-                var perms = channel.GetPermissionOverwrite(guild.EveryoneRole);
+                OverwritePermissions? perms = channel.GetPermissionOverwrite(guild.EveryoneRole);
                 if (perms != null)
                     resolvedPermissions = (resolvedPermissions & ~perms.Value.DenyValue) | perms.Value.AllowValue;
 
                 //Give/Take Role permissions
                 ulong deniedPermissions = 0UL, allowedPermissions = 0UL;
-                foreach (var roleId in user.RoleIds)
+                foreach (ulong roleId in user.RoleIds)
                 {
                     IRole role;
                     if (roleId != guild.EveryoneRole.Id && (role = guild.GetRole(roleId)) != null)

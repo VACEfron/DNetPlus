@@ -102,7 +102,7 @@ namespace Discord.Commands
         //IModuleBase
         void IModuleBase.SetContext(ICommandContext context)
         {
-            var newValue = context as T;
+            T newValue = context as T;
             Context = newValue ?? throw new InvalidOperationException($"Invalid context type. Expected {typeof(T).Name}, got {context.GetType().Name}.");
         }
         void IModuleBase.BeforeExecute(CommandInfo command) => BeforeExecute(command);

@@ -14,8 +14,8 @@ namespace Discord.WebSocket
             if (dir == Direction.After && fromMessageId == null)
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
 
-            var cachedMessages = GetCachedMessages(channel, discord, messages, fromMessageId, dir, limit);
-            var result = ImmutableArray.Create(cachedMessages).ToAsyncEnumerable<IReadOnlyCollection<IMessage>>();
+            IReadOnlyCollection<SocketMessage> cachedMessages = GetCachedMessages(channel, discord, messages, fromMessageId, dir, limit);
+            IAsyncEnumerable<IReadOnlyCollection<IMessage>> result = ImmutableArray.Create(cachedMessages).ToAsyncEnumerable<IReadOnlyCollection<IMessage>>();
 
             if (dir == Direction.Before)
             {
@@ -25,7 +25,7 @@ namespace Discord.WebSocket
 
                 //Download remaining messages
                 ulong? minId = cachedMessages.Count > 0 ? cachedMessages.Min(x => x.Id) : fromMessageId;
-                var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, minId, dir, limit, options);
+                IAsyncEnumerable<IReadOnlyCollection<RestMessage>> downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, minId, dir, limit, options);
                 if (cachedMessages.Count != 0)
                     return result.Concat(downloadedMessages);
                 else
@@ -39,7 +39,7 @@ namespace Discord.WebSocket
 
                 //Download remaining messages
                 ulong maxId = cachedMessages.Count > 0 ? cachedMessages.Max(x => x.Id) : fromMessageId.Value;
-                var downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, maxId, dir, limit, options);
+                IAsyncEnumerable<IReadOnlyCollection<RestMessage>> downloadedMessages = ChannelHelper.GetMessagesAsync(channel, discord, maxId, dir, limit, options);
                 if (cachedMessages.Count != 0)
                     return result.Concat(downloadedMessages);
                 else

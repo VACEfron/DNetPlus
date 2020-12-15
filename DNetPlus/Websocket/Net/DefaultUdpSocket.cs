@@ -117,7 +117,7 @@ namespace Discord.Net.Udp
         {
             if (index != 0) //Should never happen?
             {
-                var newData = new byte[count];
+                byte[] newData = new byte[count];
                 Buffer.BlockCopy(data, index, newData, 0, count);
                 data = newData;
             }
@@ -126,10 +126,10 @@ namespace Discord.Net.Udp
 
         private async Task RunAsync(CancellationToken cancelToken)
         {
-            var closeTask = Task.Delay(-1, cancelToken);
+            Task closeTask = Task.Delay(-1, cancelToken);
             while (!cancelToken.IsCancellationRequested)
             {
-                var receiveTask = _udp.ReceiveAsync();
+                Task<UdpReceiveResult> receiveTask = _udp.ReceiveAsync();
 
                 _ = receiveTask.ContinueWith((receiveResult) =>
                 {
@@ -138,11 +138,11 @@ namespace Discord.Net.Udp
 
                 }, TaskContinuationOptions.OnlyOnFaulted);
 
-                var task = await Task.WhenAny(closeTask, receiveTask).ConfigureAwait(false);
+                Task task = await Task.WhenAny(closeTask, receiveTask).ConfigureAwait(false);
                 if (task == closeTask)
                     break;
 
-                var result = receiveTask.Result;
+                UdpReceiveResult result = receiveTask.Result;
                 await ReceivedDatagram(result.Buffer, 0, result.Buffer.Length).ConfigureAwait(false);
             }
         }

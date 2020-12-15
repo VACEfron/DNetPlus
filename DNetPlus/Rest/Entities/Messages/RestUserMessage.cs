@@ -50,7 +50,7 @@ namespace Discord.Rest
         }
         internal new static RestUserMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
         {
-            var entity = new RestUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
+            RestUserMessage entity = new RestUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
             entity.Update(model);
             return entity;
         }
@@ -74,10 +74,10 @@ namespace Discord.Rest
 
             if (model.Attachments.IsSpecified)
             {
-                var value = model.Attachments.Value;
+                API.Attachment[] value = model.Attachments.Value;
                 if (value.Length > 0)
                 {
-                    var attachments = ImmutableArray.CreateBuilder<Attachment>(value.Length);
+                    ImmutableArray<Attachment>.Builder attachments = ImmutableArray.CreateBuilder<Attachment>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                         attachments.Add(Attachment.Create(value[i]));
                     _attachments = attachments.ToImmutable();
@@ -88,10 +88,10 @@ namespace Discord.Rest
 
             if (model.Embeds.IsSpecified)
             {
-                var value = model.Embeds.Value;
+                API.Embed[] value = model.Embeds.Value;
                 if (value.Length > 0)
                 {
-                    var embeds = ImmutableArray.CreateBuilder<Embed>(value.Length);
+                    ImmutableArray<Embed>.Builder embeds = ImmutableArray.CreateBuilder<Embed>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                         embeds.Add(value[i].ToEntity());
                     _embeds = embeds.ToImmutable();
@@ -102,10 +102,10 @@ namespace Discord.Rest
 
             if (model.Stickers.IsSpecified)
             {
-                var value = model.Stickers.Value;
+                Sticker[] value = model.Stickers.Value;
                 if (value.Length > 0)
                 {
-                    var stickers = ImmutableArray.CreateBuilder<MessageSticker>(value.Length);
+                    ImmutableArray<MessageSticker>.Builder stickers = ImmutableArray.CreateBuilder<MessageSticker>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                         stickers.Add(value[i].ToEntity());
                     _stickers = stickers.ToImmutable();
@@ -117,13 +117,13 @@ namespace Discord.Rest
             ImmutableArray<IUser> mentions = ImmutableArray.Create<IUser>();
             if (model.UserMentions.IsSpecified)
             {
-                var value = model.UserMentions.Value;
+                EntityOrId<User>[] value = model.UserMentions.Value;
                 if (value.Length > 0)
                 {
-                    var newMentions = ImmutableArray.CreateBuilder<IUser>(value.Length);
+                    ImmutableArray<IUser>.Builder newMentions = ImmutableArray.CreateBuilder<IUser>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                     {
-                        var val = value[i];
+                        EntityOrId<User> val = value[i];
                         if (val.Object != null)
                             newMentions.Add(RestUser.Create(Discord, val.Object));
                     }
@@ -133,9 +133,9 @@ namespace Discord.Rest
 
             if (model.Content.IsSpecified)
             {
-                var text = model.Content.Value;
-                var guildId = (Channel as IGuildChannel)?.GuildId;
-                var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
+                string text = model.Content.Value;
+                ulong? guildId = (Channel as IGuildChannel)?.GuildId;
+                IGuild guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
                 _tags = MessageHelper.ParseTags(text, null, guild, mentions);
                 model.Content = text;
             }
@@ -144,7 +144,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null, AllowedMentions allowedMentions = null)
         {
-            var model = await MessageHelper.ModifyAsync(this, Discord, func, options, allowedMentions).ConfigureAwait(false);
+            Model model = await MessageHelper.ModifyAsync(this, Discord, func, options, allowedMentions).ConfigureAwait(false);
             Update(model);
         }
 
@@ -170,7 +170,7 @@ namespace Discord.Rest
         /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="RestNewsChannel"/> channel.</exception>
         public async Task CrosspostAsync(RequestOptions options = null)
         {
-            if (!(Channel is RestNewsChannel))
+            if (!(Channel is INewsChannel))
             {
                 throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
             }

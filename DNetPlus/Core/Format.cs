@@ -63,13 +63,13 @@ namespace Discord
                 if (newLineIndex == -1)
                 {
                     // read the rest of the string
-                    var str = text.Substring(startIndex);
+                    string str = text.Substring(startIndex);
                     result.Append($"> {str}");
                 }
                 else
                 {
                     // read until the next newline
-                    var str = text.Substring(startIndex, newLineIndex - startIndex);
+                    string str = text.Substring(startIndex, newLineIndex - startIndex);
                     result.Append($"> {str}\n");
                 }
                 startIndex = newLineIndex + 1;

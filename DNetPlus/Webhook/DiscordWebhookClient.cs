@@ -84,7 +84,7 @@ namespace Discord.Webhook
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
-            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
+            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, null);
         /// <summary> Sends a message to the channel for this webhook. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendMessageAsync(string text = null, bool isTTS = false, IEnumerable<Embed> embeds = null,
@@ -128,7 +128,7 @@ namespace Discord.Webhook
             ArgumentException ex(string reason = null)
                 => new ArgumentException(paramName: nameof(webhookUrl), message:
                 $"The given webhook Url was not in a valid format. {reason}");
-            var match = WebhookUrlRegex.Match(webhookUrl);
+            Match match = WebhookUrlRegex.Match(webhookUrl);
             if (match != null)
             {
                 // ensure that the first group is a ulong, set the _webhookId

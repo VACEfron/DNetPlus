@@ -89,7 +89,7 @@ namespace Discord.WebSocket
             if (other == null) return false;
             if (other == this) return true;
 
-            var otherReaction = other as SocketReaction;
+            SocketReaction otherReaction = other as SocketReaction;
             if (otherReaction == null) return false;
 
             return UserId == otherReaction.UserId && MessageId == otherReaction.MessageId && Emote.Equals(otherReaction.Emote);
@@ -100,7 +100,7 @@ namespace Discord.WebSocket
         {
             unchecked
             {
-                var hashCode = UserId.GetHashCode();
+                int hashCode = UserId.GetHashCode();
                 hashCode = (hashCode * 397) ^ MessageId.GetHashCode();
                 hashCode = (hashCode * 397) ^ Emote.GetHashCode();
                 return hashCode;

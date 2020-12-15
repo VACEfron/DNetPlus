@@ -37,7 +37,7 @@ namespace Discord
             if (other == null) return false;
             if (other == this) return true;
 
-            var otherEmoji = other as Emoji;
+            Emoji otherEmoji = other as Emoji;
             if (otherEmoji == null) return false;
 
             return string.Equals(Name, otherEmoji.Name);
@@ -51,7 +51,7 @@ namespace Discord
         /// </summary>
         /// <param name="client"><see cref="BaseDiscordClient"/> to attach to the object.</param>
         /// <param name="name">Name of the emote to find, including colons (eg. :thinking:).</param>
-        /// <returns>Returns a <see cref="Emoji"/> object or null if the unicode is invalid.</returns>
+        /// <returns>The <see cref="Emoji"/> object or null if the unicode is invalid.</returns>
         public static Emoji FromName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -67,7 +67,7 @@ namespace Discord
         /// Creates an emoji object from a unicode entity.
         /// </summary>
         /// <param name="unicode_entity">Unicode entity to create the object from.</param>
-        /// <returns>Returns a <see cref="Emoji"/> object or null if the unicode is invalid.</returns>
+        /// <returns>The <see cref="Emoji"/> object or null if the unicode is invalid.</returns>
         public static Emoji FromUnicode(string unicode)
         {
             if (string.IsNullOrWhiteSpace(unicode))

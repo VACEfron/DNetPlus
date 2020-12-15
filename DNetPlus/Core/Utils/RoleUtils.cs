@@ -8,7 +8,7 @@ namespace Discord
                 return -1;
             if (right == null)
                 return 1;
-            var result = left.Position.CompareTo(right.Position);
+            int result = left.Position.CompareTo(right.Position);
             // As per Discord's documentation, a tie is broken by ID
             if (result != 0)
                 return result;

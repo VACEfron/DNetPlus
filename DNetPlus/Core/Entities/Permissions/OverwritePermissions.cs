@@ -30,11 +30,11 @@ namespace Discord
         /// <summary>
         ///     Gets a packed value representing all the allowed permissions in this <see cref="OverwritePermissions"/>.
         /// </summary>
-        public ulong AllowValue { get; }
+        public ulong AllowValue { get; internal set; }
         /// <summary>
         ///     Gets a packed value representing all the denied permissions in this <see cref="OverwritePermissions"/>.
         /// </summary>
-        public ulong DenyValue { get; }
+        public ulong DenyValue { get; internal set; }
 
         /// <summary> If Allowed, a user may create invites. </summary>
         public PermValue CreateInstantInvite => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.CreateInstantInvite);
@@ -211,7 +211,7 @@ namespace Discord
         /// <returns>A <see cref="List{T}"/> of all allowed <see cref="ChannelPermission"/> flags. If none, the list will be empty.</returns>
         public List<ChannelPermission> ToAllowList()
         {
-            var perms = new List<ChannelPermission>();
+            List<ChannelPermission> perms = new List<ChannelPermission>();
             for (byte i = 0; i < Permissions.MaxBits; i++)
             {
                 // first operand must be long or ulong to shift >31 bits
@@ -228,7 +228,7 @@ namespace Discord
         /// <returns>A <see cref="List{T}"/> of all denied <see cref="ChannelPermission"/> flags. If none, the list will be empty.</returns>
         public List<ChannelPermission> ToDenyList()
         {
-            var perms = new List<ChannelPermission>();
+            List<ChannelPermission> perms = new List<ChannelPermission>();
             for (byte i = 0; i < Permissions.MaxBits; i++)
             {
                 ulong flag = ((ulong)1 << i);

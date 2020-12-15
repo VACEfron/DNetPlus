@@ -13,18 +13,18 @@ namespace Discord.Commands
             => CreateBuilder<T>(typeInfo, commands)(services);
         internal static Func<IServiceProvider, T> CreateBuilder<T>(TypeInfo typeInfo, CommandService commands)
         {
-            var constructor = GetConstructor(typeInfo);
-            var parameters = constructor.GetParameters();
-            var properties = GetProperties(typeInfo);
+            ConstructorInfo constructor = GetConstructor(typeInfo);
+            System.Reflection.ParameterInfo[] parameters = constructor.GetParameters();
+            PropertyInfo[] properties = GetProperties(typeInfo);
 
             return (services) =>
             {
-                var args = new object[parameters.Length];
+                object[] args = new object[parameters.Length];
                 for (int i = 0; i < parameters.Length; i++)
                     args[i] = GetMember(commands, services, parameters[i].ParameterType, typeInfo);
-                var obj = InvokeConstructor<T>(constructor, args, typeInfo);
+                T obj = InvokeConstructor<T>(constructor, args, typeInfo);
 
-                foreach(var property in properties)
+                foreach(PropertyInfo property in properties)
                     property.SetValue(obj, GetMember(commands, services, property.PropertyType, typeInfo));
                 return obj;
             };
@@ -43,7 +43,7 @@ namespace Discord.Commands
 
         private static ConstructorInfo GetConstructor(TypeInfo ownerType)
         {
-            var constructors = ownerType.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
+            ConstructorInfo[] constructors = ownerType.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
             if (constructors.Length == 0)
                 throw new InvalidOperationException($"No constructor found for \"{ownerType.FullName}\".");
             else if (constructors.Length > 1)
@@ -52,10 +52,10 @@ namespace Discord.Commands
         }
         private static PropertyInfo[] GetProperties(TypeInfo ownerType)
         {
-            var result = new List<System.Reflection.PropertyInfo>();
+            List<PropertyInfo> result = new List<System.Reflection.PropertyInfo>();
             while (ownerType != ObjectTypeInfo)
             {
-                foreach (var prop in ownerType.DeclaredProperties)
+                foreach (PropertyInfo prop in ownerType.DeclaredProperties)
                 {
                     if (prop.SetMethod?.IsStatic == false && prop.SetMethod?.IsPublic == true && prop.GetCustomAttribute<DontInjectAttribute>() == null)
                         result.Add(prop);
@@ -70,7 +70,7 @@ namespace Discord.Commands
                 return commands;
             if (memberType == typeof(IServiceProvider) || memberType == services.GetType())
                 return services;
-            var service = services.GetService(memberType);
+            object service = services.GetService(memberType);
             if (service != null)
                 return service;
             throw new InvalidOperationException($"Failed to create \"{ownerType.FullName}\", dependency \"{memberType.Name}\" was not found.");

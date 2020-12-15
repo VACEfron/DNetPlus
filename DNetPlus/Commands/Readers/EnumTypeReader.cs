@@ -12,7 +12,7 @@ namespace Discord.Commands
         public static TypeReader GetReader(Type type)
         {
             Type baseType = Enum.GetUnderlyingType(type);
-            var constructor = typeof(EnumTypeReader<>).MakeGenericType(baseType).GetTypeInfo().DeclaredConstructors.First();
+            ConstructorInfo constructor = typeof(EnumTypeReader<>).MakeGenericType(baseType).GetTypeInfo().DeclaredConstructors.First();
             return (TypeReader)constructor.Invoke(new object[] { type, PrimitiveParsers.Get(baseType) });
         }
     }
@@ -29,12 +29,12 @@ namespace Discord.Commands
             _enumType = type;
             _tryParse = parser;
 
-            var byNameBuilder = ImmutableDictionary.CreateBuilder<string, object>();
-            var byValueBuilder = ImmutableDictionary.CreateBuilder<T, object>();
+            ImmutableDictionary<string, object>.Builder byNameBuilder = ImmutableDictionary.CreateBuilder<string, object>();
+            ImmutableDictionary<T, object>.Builder byValueBuilder = ImmutableDictionary.CreateBuilder<T, object>();
 
-            foreach (var v in Enum.GetNames(_enumType))
-            {      
-                var parsedValue = Enum.Parse(_enumType, v);
+            foreach (string v in Enum.GetNames(_enumType))
+            {
+                object parsedValue = Enum.Parse(_enumType, v);
                 byNameBuilder.Add(v.ToLower(), parsedValue);
                 if (!byValueBuilder.ContainsKey((T)parsedValue))
                     byValueBuilder.Add((T)parsedValue, parsedValue);

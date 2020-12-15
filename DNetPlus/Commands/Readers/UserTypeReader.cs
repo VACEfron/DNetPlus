@@ -17,7 +17,7 @@ namespace Discord.Commands
         /// <inheritdoc />
         public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
-            var results = new Dictionary<ulong, TypeReaderValue>();
+            Dictionary<ulong, TypeReaderValue> results = new Dictionary<ulong, TypeReaderValue>();
             IAsyncEnumerable<IUser> channelUsers = context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten(); // it's better
             IReadOnlyCollection<IGuildUser> guildUsers = ImmutableArray.Create<IGuildUser>();
 
@@ -25,7 +25,7 @@ namespace Discord.Commands
                 guildUsers = await context.Guild.GetUsersAsync(CacheMode.CacheOnly).ConfigureAwait(false);
 
             //By Mention (1.0)
-            if (MentionUtils.TryParseUser(input, out var id))
+            if (MentionUtils.TryParseUser(input, out ulong id))
             {
                 if (context.Guild != null)
                     AddResult(results, await context.Guild.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
@@ -49,11 +49,11 @@ namespace Discord.Commands
                 string username = input.Substring(0, index);
                 if (ushort.TryParse(input.Substring(index + 1), out ushort discriminator))
                 {
-                    var channelUser = await channelUsers.FirstOrDefaultAsync(x => x.DiscriminatorValue == discriminator &&
+                    IUser channelUser = await channelUsers.FirstOrDefaultAsync(x => x.DiscriminatorValue == discriminator &&
                         string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase)).ConfigureAwait(false);
                     AddResult(results, channelUser as T, channelUser?.Username == username ? 0.85f : 0.75f);
 
-                    var guildUser = guildUsers.FirstOrDefault(x => x.DiscriminatorValue == discriminator &&
+                    IGuildUser guildUser = guildUsers.FirstOrDefault(x => x.DiscriminatorValue == discriminator &&
                         string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase));
                     AddResult(results, guildUser as T, guildUser?.Username == username ? 0.80f : 0.70f);
                 }
@@ -66,7 +66,7 @@ namespace Discord.Commands
                     .ForEachAsync(channelUser => AddResult(results, channelUser as T, channelUser.Username == input ? 0.65f : 0.55f))
                     .ConfigureAwait(false);
                 
-                foreach (var guildUser in guildUsers.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)))
+                foreach (IGuildUser guildUser in guildUsers.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, guildUser as T, guildUser.Username == input ? 0.60f : 0.50f);
             }
 
@@ -77,7 +77,7 @@ namespace Discord.Commands
                     .ForEachAsync(channelUser => AddResult(results, channelUser as T, (channelUser as IGuildUser).Nickname == input ? 0.65f : 0.55f))
                     .ConfigureAwait(false);
 
-                foreach (var guildUser in guildUsers.Where(x => string.Equals(input, x.Nickname, StringComparison.OrdinalIgnoreCase)))
+                foreach (IGuildUser guildUser in guildUsers.Where(x => string.Equals(input, x.Nickname, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, guildUser as T, guildUser.Nickname == input ? 0.60f : 0.50f);
             }
 

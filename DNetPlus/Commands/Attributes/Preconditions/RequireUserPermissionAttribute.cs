@@ -56,7 +56,7 @@ namespace Discord.Commands
         /// <inheritdoc />
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
-            var guildUser = context.User as IGuildUser;
+            IGuildUser guildUser = context.User as IGuildUser;
 
             if (GuildPermission.HasValue)
             {

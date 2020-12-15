@@ -50,7 +50,7 @@ namespace Discord
                 return encodedBase64;
 
             // based from https://stackoverflow.com/a/1228744
-            var padding = (4 - (encodedBase64.Length % 4)) % 4;
+            int padding = (4 - (encodedBase64.Length % 4)) % 4;
             if (padding == 3)
                 // can never have 3 characters of padding
                 throw new FormatException("The provided base64 string is corrupt, as it requires an invalid amount of padding.");
@@ -74,10 +74,10 @@ namespace Discord
                 // re-add base64 padding if missing
                 encoded = PadBase64String(encoded);
                 // decode the base64 string
-                var bytes = Convert.FromBase64String(encoded);
-                var idStr = Encoding.UTF8.GetString(bytes);
+                byte[] bytes = Convert.FromBase64String(encoded);
+                string idStr = Encoding.UTF8.GetString(bytes);
                 // try to parse a ulong from the resulting string
-                if (ulong.TryParse(idStr, NumberStyles.None, CultureInfo.InvariantCulture, out var id))
+                if (ulong.TryParse(idStr, NumberStyles.None, CultureInfo.InvariantCulture, out ulong id))
                     return id;
             }
             catch (DecoderFallbackException)
@@ -111,7 +111,7 @@ namespace Discord
                 return false;
 
             // split each component of the JWT
-            var segments = message.Split('.');
+            string[] segments = message.Split('.');
 
             // ensure that there are three parts
             if (segments.Length != 3)

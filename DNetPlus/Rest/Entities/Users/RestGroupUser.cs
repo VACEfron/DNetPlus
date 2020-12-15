@@ -15,7 +15,7 @@ namespace Discord.Rest
         }
         internal new static RestGroupUser Create(BaseDiscordClient discord, Model model)
         {
-            var entity = new RestGroupUser(discord, model.Id);
+            RestGroupUser entity = new RestGroupUser(discord, model.Id);
             entity.Update(model);
             return entity;
         }

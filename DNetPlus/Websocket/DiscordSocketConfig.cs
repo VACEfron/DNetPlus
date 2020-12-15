@@ -126,6 +126,14 @@ namespace Discord.WebSocket
         public bool GuildSubscriptions { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets the maximum identify concurrency.
+        /// </summary>
+        /// <remarks>
+        ///     This information is provided by Discord.
+        /// </remarks>
+        public int IdentifyMaxConcurrency { get; set; } = 1;
+
+        /// <summary>
         ///     Gets or sets the maximum wait time in milliseconds between GUILD_AVAILABLE events before firing READY.
         ///
         ///     If zero, READY will fire as soon as it is received and all guilds will be unavailable.
@@ -164,6 +172,8 @@ namespace Discord.WebSocket
         /// Allows you to add or override owners of the bot for cases such as team/external users and will also be used in the RequireOwner attribute.
         /// </summary>
         public ulong[] OwnerIds { get; set; }
+
+        public DiscordDebugConfig Debug { get; set; }
 
         /// <summary>
         ///     Initializes a default configuration.

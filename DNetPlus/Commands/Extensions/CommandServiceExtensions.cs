@@ -21,11 +21,11 @@ namespace Discord.Commands
         /// </returns>
         public static async Task<IReadOnlyCollection<CommandInfo>> GetExecutableCommandsAsync(this ICollection<CommandInfo> commands, ICommandContext context, IServiceProvider provider)
         {
-            var executableCommands = new List<CommandInfo>();
+            List<CommandInfo> executableCommands = new List<CommandInfo>();
 
             var tasks = commands.Select(async c =>
             {
-                var result = await c.CheckPreconditionsAsync(context, provider).ConfigureAwait(false);
+                PreconditionResult result = await c.CheckPreconditionsAsync(context, provider).ConfigureAwait(false);
                 return new { Command = c, PreconditionResult = result };
             });
 
@@ -61,12 +61,12 @@ namespace Discord.Commands
         /// </returns>
         public static async Task<IReadOnlyCollection<CommandInfo>> GetExecutableCommandsAsync(this ModuleInfo module, ICommandContext context, IServiceProvider provider)
         {
-            var executableCommands = new List<CommandInfo>();
+            List<CommandInfo> executableCommands = new List<CommandInfo>();
 
             executableCommands.AddRange(await module.Commands.ToArray().GetExecutableCommandsAsync(context, provider).ConfigureAwait(false));
 
-            var tasks = module.Submodules.Select(async s => await s.GetExecutableCommandsAsync(context, provider).ConfigureAwait(false));
-            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
+            IEnumerable<Task<IReadOnlyCollection<CommandInfo>>> tasks = module.Submodules.Select(async s => await s.GetExecutableCommandsAsync(context, provider).ConfigureAwait(false));
+            IReadOnlyCollection<CommandInfo>[] results = await Task.WhenAll(tasks).ConfigureAwait(false);
 
             executableCommands.AddRange(results.SelectMany(c => c));
 

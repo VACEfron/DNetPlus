@@ -24,7 +24,7 @@ namespace Discord.WebSocket
         public abstract ushort DiscriminatorValue { get; internal set; }
         /// <inheritdoc />
         public abstract string AvatarId { get; internal set; }
-
+        /// <inheritdoc />
         public bool IsAvatarAnimated
         {
             get
@@ -78,7 +78,7 @@ namespace Discord.WebSocket
             }
             if (model.Discriminator.IsSpecified)
             {
-                var newVal = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
+                ushort newVal = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
                 if (newVal != DiscriminatorValue)
                 {
                     DiscriminatorValue = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);

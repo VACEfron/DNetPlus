@@ -20,9 +20,9 @@ namespace Discord.Commands
                     info.GetCustomAttribute<DontAutoLoadAttribute>() == null;
             }
 
-            var result = new List<TypeInfo>();
+            List<TypeInfo> result = new List<TypeInfo>();
 
-            foreach (var typeInfo in assembly.DefinedTypes)
+            foreach (TypeInfo typeInfo in assembly.DefinedTypes)
             {
                 if (typeInfo.IsPublic || typeInfo.IsNestedPublic)
                 {
@@ -48,19 +48,19 @@ namespace Discord.Commands
             /*if (!validTypes.Any())
                 throw new InvalidOperationException("Could not find any valid modules from the given selection");*/
 
-            var topLevelGroups = validTypes.Where(x => x.DeclaringType == null || !IsValidModuleDefinition(x.DeclaringType.GetTypeInfo()));
+            IEnumerable<TypeInfo> topLevelGroups = validTypes.Where(x => x.DeclaringType == null || !IsValidModuleDefinition(x.DeclaringType.GetTypeInfo()));
 
-            var builtTypes = new List<TypeInfo>();
+            List<TypeInfo> builtTypes = new List<TypeInfo>();
 
-            var result = new Dictionary<Type, ModuleInfo>();
+            Dictionary<Type, ModuleInfo> result = new Dictionary<Type, ModuleInfo>();
 
-            foreach (var typeInfo in topLevelGroups)
+            foreach (TypeInfo typeInfo in topLevelGroups)
             {
                 // TODO: This shouldn't be the case; may be safe to remove?
                 if (result.ContainsKey(typeInfo.AsType()))
                     continue;
 
-                var module = new ModuleBuilder(service, null);
+                ModuleBuilder module = new ModuleBuilder(service, null);
 
                 BuildModule(module, typeInfo, service, services);
                 BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service, services);
@@ -76,7 +76,7 @@ namespace Discord.Commands
 
         private static void BuildSubTypes(ModuleBuilder builder, IEnumerable<TypeInfo> subTypes, List<TypeInfo> builtTypes, CommandService service, IServiceProvider services)
         {
-            foreach (var typeInfo in subTypes)
+            foreach (TypeInfo typeInfo in subTypes)
             {
                 if (!IsValidModuleDefinition(typeInfo))
                     continue;
@@ -96,10 +96,10 @@ namespace Discord.Commands
 
         private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, CommandService service, IServiceProvider services)
         {
-            var attributes = typeInfo.GetCustomAttributes();
+            IEnumerable<Attribute> attributes = typeInfo.GetCustomAttributes();
             builder.TypeInfo = typeInfo;
 
-            foreach (var attribute in attributes)
+            foreach (Attribute attribute in attributes)
             {
                 switch (attribute)
                 {
@@ -136,9 +136,9 @@ namespace Discord.Commands
                 builder.Name = typeInfo.Name;
 
             // Get all methods (including from inherited members), that are valid commands
-            var validCommands = typeInfo.GetMethods().Where(IsValidCommandDefinition);
+            IEnumerable<MethodInfo> validCommands = typeInfo.GetMethods().Where(IsValidCommandDefinition);
 
-            foreach (var method in validCommands)
+            foreach (MethodInfo method in validCommands)
             {
                 builder.AddCommand((command) => 
                 {
@@ -149,9 +149,9 @@ namespace Discord.Commands
 
         private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service, IServiceProvider serviceprovider)
         {
-            var attributes = method.GetCustomAttributes();
+            IEnumerable<Attribute> attributes = method.GetCustomAttributes();
             
-            foreach (var attribute in attributes)
+            foreach (Attribute attribute in attributes)
             {
                 switch (attribute)
                 {
@@ -188,9 +188,9 @@ namespace Discord.Commands
             if (builder.Name == null)
                 builder.Name = method.Name;
 
-            var parameters = method.GetParameters();
+            System.Reflection.ParameterInfo[] parameters = method.GetParameters();
             int pos = 0, count = parameters.Length;
-            foreach (var paramInfo in parameters)
+            foreach (System.Reflection.ParameterInfo paramInfo in parameters)
             {
                 builder.AddParameter((parameter) => 
                 {
@@ -198,18 +198,18 @@ namespace Discord.Commands
                 });
             }
 
-            var createInstance = ReflectionUtils.CreateBuilder<IModuleBase>(typeInfo, service);
+            Func<IServiceProvider, IModuleBase> createInstance = ReflectionUtils.CreateBuilder<IModuleBase>(typeInfo, service);
 
             async Task<IResult> ExecuteCallback(ICommandContext context, object[] args, IServiceProvider services, CommandInfo cmd)
             {
-                var instance = createInstance(services);
+                IModuleBase instance = createInstance(services);
                 instance.SetContext(context);
 
                 try
                 {
                     instance.BeforeExecute(cmd);
 
-                    var task = method.Invoke(instance, args) as Task ?? Task.Delay(0);
+                    Task task = method.Invoke(instance, args) as Task ?? Task.Delay(0);
                     if (task is Task<RuntimeResult> resultTask)
                     {
                         return await resultTask.ConfigureAwait(false);
@@ -232,15 +232,15 @@ namespace Discord.Commands
 
         private static void BuildParameter(ParameterBuilder builder, System.Reflection.ParameterInfo paramInfo, int position, int count, CommandService service, IServiceProvider services)
         {
-            var attributes = paramInfo.GetCustomAttributes();
-            var paramType = paramInfo.ParameterType;
+            IEnumerable<Attribute> attributes = paramInfo.GetCustomAttributes();
+            Type paramType = paramInfo.ParameterType;
 
             builder.Name = paramInfo.Name;
 
             builder.IsOptional = paramInfo.IsOptional;
             builder.DefaultValue = paramInfo.HasDefaultValue ? paramInfo.DefaultValue : null;
 
-            foreach (var attribute in attributes)
+            foreach (Attribute attribute in attributes)
             {
                 switch (attribute)
                 {
@@ -283,7 +283,7 @@ namespace Discord.Commands
 
         internal static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType, IServiceProvider services)
         {
-            var readers = service.GetTypeReaders(paramType);
+            IDictionary<Type, TypeReader> readers = service.GetTypeReaders(paramType);
             TypeReader reader = null;
             if (readers != null)
             {

@@ -23,28 +23,28 @@ namespace Discord.Rest
 
         internal static InviteCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes;
+            API.AuditLogChange[] changes = entry.Changes;
 
-            var maxAgeModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_age");
-            var codeModel = changes.FirstOrDefault(x => x.ChangedProperty == "code");
-            var temporaryModel = changes.FirstOrDefault(x => x.ChangedProperty == "temporary");
-            var inviterIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "inviter_id");
-            var channelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "channel_id");
-            var usesModel = changes.FirstOrDefault(x => x.ChangedProperty == "uses");
-            var maxUsesModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_uses");
+            API.AuditLogChange maxAgeModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_age");
+            API.AuditLogChange codeModel = changes.FirstOrDefault(x => x.ChangedProperty == "code");
+            API.AuditLogChange temporaryModel = changes.FirstOrDefault(x => x.ChangedProperty == "temporary");
+            API.AuditLogChange inviterIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "inviter_id");
+            API.AuditLogChange channelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "channel_id");
+            API.AuditLogChange usesModel = changes.FirstOrDefault(x => x.ChangedProperty == "uses");
+            API.AuditLogChange maxUsesModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_uses");
 
-            var maxAge = maxAgeModel.NewValue.ToObject<int>(discord.ApiClient.Serializer);
-            var code = codeModel.NewValue.ToObject<string>(discord.ApiClient.Serializer);
-            var temporary = temporaryModel.NewValue.ToObject<bool>(discord.ApiClient.Serializer);
-            var channelId = channelIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
-            var uses = usesModel.NewValue.ToObject<int>(discord.ApiClient.Serializer);
-            var maxUses = maxUsesModel.NewValue.ToObject<int>(discord.ApiClient.Serializer);
+            int maxAge = maxAgeModel.NewValue.ToObject<int>(discord.ApiClient.Serializer);
+            string code = codeModel.NewValue.ToObject<string>(discord.ApiClient.Serializer);
+            bool temporary = temporaryModel.NewValue.ToObject<bool>(discord.ApiClient.Serializer);
+            ulong channelId = channelIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
+            int uses = usesModel.NewValue.ToObject<int>(discord.ApiClient.Serializer);
+            int maxUses = maxUsesModel.NewValue.ToObject<int>(discord.ApiClient.Serializer);
 
             RestUser inviter = null;
             if (inviterIdModel != null)
             {
-                var inviterId = inviterIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
-                var inviterInfo = log.Users.FirstOrDefault(x => x.Id == inviterId);
+                ulong inviterId = inviterIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
+                API.User inviterInfo = log.Users.FirstOrDefault(x => x.Id == inviterId);
                 inviter = RestUser.Create(discord, inviterInfo);
             }
 

@@ -68,7 +68,7 @@ namespace Discord.Net.Rest
         public async Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
-            using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
+            using (HttpRequestMessage restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
                 if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
                 return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
@@ -77,7 +77,7 @@ namespace Discord.Net.Rest
         public async Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
-            using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
+            using (HttpRequestMessage restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
                 if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
                 restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -89,14 +89,14 @@ namespace Discord.Net.Rest
         public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
-            using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
+            using (HttpRequestMessage restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
                 if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
-                var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
+                MultipartFormDataContent content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
                 MemoryStream memoryStream = null;
                 if (multipartParams != null)
                 {
-                    foreach (var p in multipartParams)
+                    foreach (KeyValuePair<string, object> p in multipartParams)
                     {
                         switch (p.Value)
                         {
@@ -106,7 +106,7 @@ namespace Discord.Net.Rest
                             case Stream streamValue: { content.Add(new StreamContent(streamValue), p.Key); continue; }
                             case MultipartFile fileValue:
                             {
-                                var stream = fileValue.Stream;
+                                    Stream stream = fileValue.Stream;
                                 if (!stream.CanSeek)
                                 {
                                     memoryStream = new MemoryStream();
@@ -125,7 +125,7 @@ namespace Discord.Net.Rest
                     }
                 }
                 restRequest.Content = content;
-                var result = await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
+                RestResponse result = await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
                 memoryStream?.Dispose();
                 return result;
             }
@@ -133,13 +133,14 @@ namespace Discord.Net.Rest
 
         private async Task<RestResponse> SendInternalAsync(HttpRequestMessage request, CancellationToken cancelToken, bool headerOnly)
         {
-            using (var cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, cancelToken))
+            using (CancellationTokenSource cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, cancelToken))
             {
                 cancelToken = cancelTokenSource.Token;
                 HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
 
-                var headers = response.Headers.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault(), StringComparer.OrdinalIgnoreCase);
-                var stream = !headerOnly ? await response.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
+                Dictionary<string, string> headers = response.Headers.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault(), StringComparer.OrdinalIgnoreCase);
+
+                Stream stream = !headerOnly ? await response.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
 
                 return new RestResponse(response.StatusCode, headers, stream);
             }

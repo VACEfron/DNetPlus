@@ -18,9 +18,9 @@ namespace Discord.Rest
 
         internal static EmoteDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var change = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "name");
+            API.AuditLogChange change = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "name");
 
-            var emoteName = change.OldValue?.ToObject<string>(discord.ApiClient.Serializer);
+            string emoteName = change.OldValue?.ToObject<string>(discord.ApiClient.Serializer);
 
             return new EmoteDeleteAuditLogData(entry.TargetId.Value, emoteName);
         }

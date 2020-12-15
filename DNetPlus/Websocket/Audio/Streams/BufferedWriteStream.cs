@@ -67,8 +67,10 @@ namespace Discord.Audio.Streams
             {
                 _disposeTokenSource?.Cancel();
                 _disposeTokenSource?.Dispose();
+                _cancelTokenSource?.Cancel();
                 _cancelTokenSource?.Dispose();
                 _queueLock?.Dispose();
+                _next.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -103,7 +105,7 @@ namespace Discord.Audio.Streams
                                 timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 _silenceFrames = 0;
 #if DEBUG
-                                var _ = _logger?.DebugAsync($"Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
+                                Task _ = _logger?.DebugAsync($"Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
 #endif
                             }
                             else
@@ -122,7 +124,7 @@ namespace Discord.Audio.Streams
                                     timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 }
 #if DEBUG
-                                var _ = _logger?.DebugAsync("Buffer underrun");
+                                Task _ = _logger?.DebugAsync("Buffer underrun");
 #endif
                             }
                         }
@@ -150,7 +152,7 @@ namespace Discord.Audio.Streams
             if (!_bufferPool.TryDequeue(out byte[] buffer))
             {
 #if DEBUG
-                var _ = _logger?.DebugAsync("Buffer overflow"); //Should never happen because of the queueLock
+                Task _ = _logger?.DebugAsync("Buffer overflow"); //Should never happen because of the queueLock
 #endif
 #pragma warning disable IDISP016
                 writeCancelToken?.Dispose();
@@ -162,7 +164,7 @@ namespace Discord.Audio.Streams
             if (!_isPreloaded && _queuedFrames.Count == _queueLength)
             {
 #if DEBUG
-                var _ = _logger?.DebugAsync("Preloaded");
+                Task _ = _logger?.DebugAsync("Preloaded");
 #endif
                 _isPreloaded = true;
             }

@@ -52,7 +52,7 @@ namespace Discord.WebSocket
         }
         internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
-            var entity = new SocketUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
+            SocketUserMessage entity = new SocketUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
             entity.Update(state, model);
             return entity;
         }
@@ -76,10 +76,10 @@ namespace Discord.WebSocket
 
             if (model.Attachments.IsSpecified)
             {
-                var value = model.Attachments.Value;
+                API.Attachment[] value = model.Attachments.Value;
                 if (value.Length > 0)
                 {
-                    var attachments = ImmutableArray.CreateBuilder<Attachment>(value.Length);
+                    ImmutableArray<Attachment>.Builder attachments = ImmutableArray.CreateBuilder<Attachment>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                         attachments.Add(Attachment.Create(value[i]));
                     _attachments = attachments.ToImmutable();
@@ -90,10 +90,10 @@ namespace Discord.WebSocket
 
             if (model.Embeds.IsSpecified)
             {
-                var value = model.Embeds.Value;
+                API.Embed[] value = model.Embeds.Value;
                 if (value.Length > 0)
                 {
-                    var embeds = ImmutableArray.CreateBuilder<Embed>(value.Length);
+                    ImmutableArray<Embed>.Builder embeds = ImmutableArray.CreateBuilder<Embed>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                         embeds.Add(value[i].ToEntity());
                     _embeds = embeds.ToImmutable();
@@ -104,10 +104,10 @@ namespace Discord.WebSocket
 
             if (model.Stickers.IsSpecified)
             {
-                var value = model.Stickers.Value;
+                Sticker[] value = model.Stickers.Value;
                 if (value.Length > 0)
                 {
-                    var stickers = ImmutableArray.CreateBuilder<MessageSticker>(value.Length);
+                    ImmutableArray<MessageSticker>.Builder stickers = ImmutableArray.CreateBuilder<MessageSticker>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                         stickers.Add(value[i].ToEntity());
                     _stickers = stickers.ToImmutable();
@@ -119,13 +119,13 @@ namespace Discord.WebSocket
             IReadOnlyCollection<IUser> mentions = ImmutableArray.Create<SocketUnknownUser>(); //Is passed to ParseTags to get real mention collection
             if (model.UserMentions.IsSpecified)
             {
-                var value = model.UserMentions.Value;
+                EntityOrId<User>[] value = model.UserMentions.Value;
                 if (value.Length > 0)
                 {
-                    var newMentions = ImmutableArray.CreateBuilder<SocketUnknownUser>(value.Length);
+                    ImmutableArray<SocketUnknownUser>.Builder newMentions = ImmutableArray.CreateBuilder<SocketUnknownUser>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                     {
-                        var val = value[i];
+                        EntityOrId<User> val = value[i];
                         if (val.Object != null)
                             newMentions.Add(SocketUnknownUser.Create(Discord, state, val.Object));
                     }
@@ -135,8 +135,8 @@ namespace Discord.WebSocket
 
             if (model.Content.IsSpecified)
             {
-                var text = model.Content.Value;
-                var guild = (Channel as SocketGuildChannel)?.Guild;
+                string text = model.Content.Value;
+                SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
                 _tags = MessageHelper.ParseTags(text, Channel, guild, mentions);
                 model.Content = text;
             }
@@ -170,7 +170,7 @@ namespace Discord.WebSocket
         /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="SocketNewsChannel"/> channel.</exception>
         public async Task CrosspostAsync(RequestOptions options = null)
         {
-            if (!(Channel is SocketNewsChannel))
+            if (!(Channel is INewsChannel))
             {
                 throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
             }

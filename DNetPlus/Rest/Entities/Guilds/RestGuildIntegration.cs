@@ -5,6 +5,9 @@ using Model = Discord.API.Integration;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based integration object for the guild/server.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestGuildIntegration : RestEntity<ulong>, IGuildIntegration
     {
@@ -41,7 +44,7 @@ namespace Discord.Rest
         }
         internal static RestGuildIntegration Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestGuildIntegration(discord, guild, model.Id);
+            RestGuildIntegration entity = new RestGuildIntegration(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -68,15 +71,15 @@ namespace Discord.Rest
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
-            var args = new GuildIntegrationProperties();
+            GuildIntegrationProperties args = new GuildIntegrationProperties();
             func(args);
-            var apiArgs = new API.Rest.ModifyGuildIntegrationParams
+            API.Rest.ModifyGuildIntegrationParams apiArgs = new API.Rest.ModifyGuildIntegrationParams
             {
                 EnableEmoticons = args.EnableEmoticons,
                 ExpireBehavior = args.ExpireBehavior,
                 ExpireGracePeriod = args.ExpireGracePeriod
             };
-            var model = await Discord.ApiClient.ModifyGuildIntegrationAsync(GuildId, Id, apiArgs).ConfigureAwait(false);
+            Model model = await Discord.ApiClient.ModifyGuildIntegrationAsync(GuildId, Id, apiArgs).ConfigureAwait(false);
 
             Update(model);
         }

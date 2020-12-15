@@ -47,7 +47,7 @@ namespace Discord.WebSocket
         }
         internal static SocketSelfUser Create(DiscordSocketClient discord, ClientState state, Model model)
         {
-            var entity = new SocketSelfUser(discord, discord.GetOrCreateSelfUser(state, model));
+            SocketSelfUser entity = new SocketSelfUser(discord, discord.GetOrCreateSelfUser(state, model));
             entity.Update(state, model);
             return entity;
         }

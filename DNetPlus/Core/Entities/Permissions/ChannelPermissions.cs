@@ -226,7 +226,7 @@ namespace Discord
 
         public List<ChannelPermission> ToList()
         {
-            var perms = new List<ChannelPermission>();
+            List<ChannelPermission> perms = new List<ChannelPermission>();
             for (byte i = 0; i < Permissions.MaxBits; i++)
             {
                 ulong flag = ((ulong)1 << i);

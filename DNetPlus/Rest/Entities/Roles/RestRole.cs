@@ -27,6 +27,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public int Position { get; private set; }
 
+        public GuildRoleTags Tags { get; private set; }
+
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <summary>
@@ -43,7 +45,7 @@ namespace Discord.Rest
         }
         internal static RestRole Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestRole(discord, guild, model.Id);
+            RestRole entity = new RestRole(discord, guild, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -56,12 +58,13 @@ namespace Discord.Rest
             Position = model.Position;
             Color = new Color(model.Color);
             Permissions = new GuildPermissions(model.Permissions);
+            Tags = model.Tags.IsSpecified ? new GuildRoleTags(model.Tags.Value) : new GuildRoleTags(null);
         }
 
         /// <inheritdoc />
         public async Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
-        { 
-            var model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+        {
+            Model model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />

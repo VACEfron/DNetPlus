@@ -21,5 +21,7 @@ namespace Discord.API
         public ulong Permissions { get; set; }
         [JsonProperty("managed")]
         public bool Managed { get; set; }
+        [JsonProperty("tags")]
+        public Optional<RoleTags> Tags { get; set; }
     }
 }

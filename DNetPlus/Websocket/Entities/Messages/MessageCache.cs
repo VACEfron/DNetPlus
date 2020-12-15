@@ -63,8 +63,8 @@ namespace Discord.WebSocket
                 if (!_messages.TryGetValue(fromMessageId.Value, out SocketMessage msg))
                     return ImmutableArray<SocketMessage>.Empty;
                 int around = limit / 2;
-                var before = GetMany(fromMessageId, Direction.Before, around);
-                var after = GetMany(fromMessageId, Direction.After, around).Reverse();
+                IReadOnlyCollection<SocketMessage> before = GetMany(fromMessageId, Direction.Before, around);
+                IEnumerable<SocketMessage> after = GetMany(fromMessageId, Direction.After, around).Reverse();
 
                 return after.Concat(new SocketMessage[] { msg }).Concat(before).ToImmutableArray();
             }

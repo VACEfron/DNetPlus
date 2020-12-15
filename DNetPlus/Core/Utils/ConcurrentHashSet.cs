@@ -199,7 +199,7 @@ namespace Discord
         }
         private void InitializeFromCollection(IEnumerable<T> collection)
         {
-            foreach (var value in collection)
+            foreach (T value in collection)
             {
                 if (value == null) throw new ArgumentNullException(paramName: "key");
 

@@ -32,7 +32,7 @@ namespace Discord.Rest
         }
         internal new static RestGroupChannel Create(BaseDiscordClient discord, Model model)
         {
-            var entity = new RestGroupChannel(discord, model.Id);
+            RestGroupChannel entity = new RestGroupChannel(discord, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -48,7 +48,7 @@ namespace Discord.Rest
         }
         internal void UpdateUsers(API.User[] models)
         {
-            var users = ImmutableDictionary.CreateBuilder<ulong, RestGroupUser>();
+            ImmutableDictionary<ulong, RestGroupUser>.Builder users = ImmutableDictionary.CreateBuilder<ulong, RestGroupUser>();
             for (int i = 0; i < models.Length; i++)
                 users[models[i].Id] = RestGroupUser.Create(Discord, models[i]);
             _users = users.ToImmutable();
@@ -56,7 +56,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public override async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetChannelAsync(Id, options).ConfigureAwait(false);
+            Model model = await Discord.ApiClient.GetChannelAsync(Id, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />

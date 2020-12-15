@@ -30,6 +30,7 @@ namespace Discord.Rest
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider, 
 				DiscordRestConfig.UserAgent, 
+                null,
 				rateLimitPrecision: config.RateLimitPrecision, 
 				useSystemClock: config.UseSystemClock);
 
@@ -52,7 +53,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
-            var user = await ApiClient.GetMyUserAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
+            API.User user = await ApiClient.GetMyUserAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
             ApiClient.CurrentUserId = user.Id;
             base.CurrentUser = RestSelfUser.Create(this, user);
         }

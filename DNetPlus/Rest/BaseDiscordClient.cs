@@ -58,6 +58,9 @@ namespace Discord.Rest
 
         public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
         {
+            if (tokenType == TokenType.User)
+                throw new ArgumentException("User tokens are not allowed");
+
             await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
@@ -167,6 +170,10 @@ namespace Discord.Rest
         public Task<int> GetRecommendedShardCountAsync(RequestOptions options = null)
             => ClientHelper.GetRecommendShardCountAsync(this, options);
 
+        /// <inheritdoc />
+        public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
+            => ClientHelper.GetBotGatewayAsync(this, options);
+
         //IDiscordClient
         /// <inheritdoc />
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
@@ -229,6 +236,9 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         Task IDiscordClient.StartAsync()
+            => Task.Delay(0);
+
+        Task IDiscordClient.StartAsync(UserStatus status, string name = null, string streamUrl = null, ActivityType type = ActivityType.Playing)
             => Task.Delay(0);
         /// <inheritdoc />
         Task IDiscordClient.StopAsync()

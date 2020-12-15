@@ -1,4 +1,6 @@
+using Discord.API;
 using Discord.Audio;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -68,17 +70,10 @@ namespace Discord
         /// </returns>
         string IconId { get; }
 
-        public bool IsIconAnimated
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(IconId))
-                    return false;
-                if (IconId[0] == 'a' && IconId[1] == '_')
-                    return true;
-                return false;
-            }
-        }
+        /// <summary>
+        /// Extension method to get if the guild icon is animated (gif).
+        /// </summary>
+        bool IsIconAnimated { get; }
         /// <summary>
         ///     Gets the URL of this guild's icon.
         /// </summary>
@@ -911,5 +906,76 @@ namespace Discord
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
         Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
+
+        /// <summary>
+        /// Get a guild template by code.
+        /// </summary>
+        /// <param name="code">The code for the template.</param>
+        /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
+        /// <param name="options">The option to be used when sending the request.</param>
+        /// <returns>The <see cref="IGuildTemplate"/> or null if the code is invalid.</returns>
+        Task<IGuildTemplate> GetTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null);
+
+        /// <summary>
+        /// Get a list of the guilds templates.
+        /// </summary>
+        /// <remarks>
+        /// The API and client only supports 1 template at the moment.
+        /// </remarks>
+        /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
+        /// <param name="options">The option to be used when sending the request.</param>
+        /// <returns>A list of <see cref="IGuildTemplate"/>.</returns>
+        Task<IReadOnlyCollection<IGuildTemplate>> GetTemplatesAsync(bool withSnapshot = false, RequestOptions options = null);
+
+        /// <summary>
+        /// Create a template of the guild with stored properties, channels and roles at the time of creation.
+        /// </summary>
+        /// <remarks>
+        /// The API and client only supports 1 template at the moment.
+        /// </remarks>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
+        /// <param name="options">The option to be used when sending the request.</param>
+        /// <returns>The created <see cref="IGuildTemplate"/>.</returns>
+        Task<IGuildTemplate> CreateTemplateAsync(string name = "", Optional<string> description = default(Optional<string>), bool withSnapshot = false, RequestOptions options = null);
+
+        /// <summary>
+        /// Sync the template with the parent guild for updated guild properties, channels and roles.
+        /// </summary>
+        /// <param name="code">The code for the template.</param>
+        /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
+        /// <param name="options">The option to be used when sending the request.</param>
+        /// <returns>The updated <see cref="IGuildTemplate"/>.</returns>
+        Task<IGuildTemplate> SyncTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null);
+
+        /// <summary>
+        /// Modify a guild templates name and description.
+        /// </summary>
+        /// <param name="code">The code for the template.</param>
+        /// <param name="func"></param>
+        /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
+        /// <param name="options">The option to be used when sending the request.</param>
+        /// <returns>The updated <see cref="IGuildTemplate"/>.</returns>
+        Task<IGuildTemplate> ModifyTemplateAsync(string code, Action<TemplateProperties> func, bool withSnapshot = false, RequestOptions options = null);
+
+        /// <summary>
+        /// Delete a template from the guild by code.
+        /// </summary>
+        /// <remarks>
+        /// You may get a ghost version of the template in client server settings when deleted. (Client Issue).
+        /// </remarks>
+        /// <param name="code">The code for the template.</param>
+        /// <param name="withSnapshot">Include the snapshot of the template with guild properties, channels and roles.</param>
+        /// <param name="options">The option to be used when sending the request.</param>
+        /// <returns>The deleted <see cref="IGuildTemplate"/>.</returns>
+        Task<IGuildTemplate> DeleteTemplateAsync(string code, bool withSnapshot = false, RequestOptions options = null);
+
+        /// <summary>
+        /// Get discovery metadata for the guild including category ids, keywords and partnership applied/given dates.
+        /// </summary>
+        /// <param name="options">The option to be used when sending the request.</param>
+        /// <returns>The <see cref="RestGuildDiscovery"/>.</returns>
+        Task<RestGuildDiscovery> GetDiscoveryMetadataAsync(RequestOptions options = null);
     }
 }

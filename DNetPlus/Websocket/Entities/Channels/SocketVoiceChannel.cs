@@ -44,7 +44,7 @@ namespace Discord.WebSocket
         }
         internal new static SocketVoiceChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketVoiceChannel(guild.Discord, model.Id, guild);
+            SocketVoiceChannel entity = new SocketVoiceChannel(guild.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
@@ -74,7 +74,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override SocketGuildUser GetUser(ulong id)
         {
-            var user = Guild.GetUser(id);
+            SocketGuildUser user = Guild.GetUser(id);
             if (user?.VoiceChannel?.Id == Id)
                 return user;
             return null;

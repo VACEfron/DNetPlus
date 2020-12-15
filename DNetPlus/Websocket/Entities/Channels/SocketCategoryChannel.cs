@@ -37,7 +37,7 @@ namespace Discord.WebSocket
         }
         internal new static SocketCategoryChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketCategoryChannel(guild.Discord, model.Id, guild);
+            SocketCategoryChannel entity = new SocketCategoryChannel(guild.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
@@ -46,11 +46,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override SocketGuildUser GetUser(ulong id)
         {
-            var user = Guild.GetUser(id);
+            SocketGuildUser user = Guild.GetUser(id);
             if (user != null)
             {
-                var guildPerms = Permissions.ResolveGuild(Guild, user);
-                var channelPerms = Permissions.ResolveChannel(Guild, user, this, guildPerms);
+                ulong guildPerms = Permissions.ResolveGuild(Guild, user);
+                ulong channelPerms = Permissions.ResolveChannel(Guild, user, this, guildPerms);
                 if (Permissions.GetValue(channelPerms, ChannelPermission.ViewChannel))
                     return user;
             }

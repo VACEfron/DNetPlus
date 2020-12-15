@@ -66,6 +66,8 @@ namespace Discord
         /// </returns>
         int Position { get; }
 
+        GuildRoleTags Tags { get; }
+
         /// <summary>
         ///     Modifies this role.
         /// </summary>

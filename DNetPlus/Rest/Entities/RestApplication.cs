@@ -42,7 +42,7 @@ namespace Discord.Rest
         }
         internal static RestApplication Create(BaseDiscordClient discord, Model model)
         {
-            var entity = new RestApplication(discord, model.Id);
+            RestApplication entity = new RestApplication(discord, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -58,14 +58,14 @@ namespace Discord.Rest
                 Flags = model.Flags.Value; //TODO: Do we still need this?
             if (model.Owner.IsSpecified)
                 Owner = RestUser.Create(Discord, model.Owner.Value);
-            if (model.Team.IsSpecified)
+            if (model.Team.IsSpecified && model.Team.Value != null)
                 Team = RestTeam.Create(Discord, model.Team.Value);
         }
 
         /// <exception cref="InvalidOperationException">Unable to update this object from a different application token.</exception>
         public async Task UpdateAsync()
         {
-            var response = await Discord.ApiClient.GetMyApplicationAsync().ConfigureAwait(false);
+            Model response = await Discord.ApiClient.GetMyApplicationAsync().ConfigureAwait(false);
             if (response.Id != Id)
                 throw new InvalidOperationException("Unable to update this object from a different application token.");
             Update(response);

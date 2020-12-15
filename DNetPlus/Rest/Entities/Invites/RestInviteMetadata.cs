@@ -32,7 +32,7 @@ namespace Discord.Rest
         }
         internal static RestInviteMetadata Create(BaseDiscordClient discord, IGuild guild, IChannel channel, Model model)
         {
-            var entity = new RestInviteMetadata(discord, guild, channel, model.Code);
+            RestInviteMetadata entity = new RestInviteMetadata(discord, guild, channel, model.Code);
             entity.Update(model);
             return entity;
         }

@@ -12,17 +12,10 @@ namespace Discord
         /// </summary>
         string AvatarId { get; }
 
-        public bool IsAvatarAnimated
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(AvatarId))
-                    return false;
-                if (AvatarId[0] == 'a' && AvatarId[1] == '_')
-                    return true;
-                return false;
-            }
-        }
+        /// <summary>
+        /// Extension method to get if the user's avatar is animated (gif).
+        /// </summary>
+        bool IsAvatarAnimated { get; }
 
         /// <summary>
         ///     Gets the avatar URL for this user.
@@ -39,7 +32,7 @@ namespace Discord
         ///     <code language="cs" region="GetAvatarUrl"
         ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Users\IUser.Examples.cs"/>
         /// </example>
-        /// <param name="format">The format to return.</param>
+        /// <param name="format">The format of the image to return.</param>
         /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
         /// </param>
         /// <returns>
@@ -58,6 +51,15 @@ namespace Discord
         ///     A string representing the user's avatar URL.
         /// </returns>
         string GetDefaultAvatarUrl();
+
+        /// <summary>
+        /// Get the avatar URL for this user or the default one.
+        /// </summary>
+        /// <param name="format">The format of the image to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
+        /// <returns>A string representing the user's avatar or default avatar URL.</returns>
+        string GetAvatarUrlOrDefault(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+
         /// <summary>
         ///     Gets the per-username unique ID for this user.
         /// </summary>
