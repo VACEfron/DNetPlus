@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Discord.Commands.Builders;
 
@@ -38,6 +39,41 @@ namespace Discord.Commands
         protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
         {
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions).ConfigureAwait(false);
+        }
+        /// <summary>
+        ///     Sends a file to this message channel with an optional caption.
+        /// </summary>
+        /// <param name="filePath">The file path of the file.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
+        /// <param name="embed">The <see cref="EmbedType.Rich" /> <see cref="Embed" /> to be sent.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
+        /// <param name="allowedMentions">
+        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
+        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        /// </param>
+        protected virtual async Task<IUserMessage> ReplyFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+        {
+            return await Context.Channel.SendFileAsync(filePath, text, isTTS, embed, options, isTTS, allowedMentions).ConfigureAwait(false);
+        }
+        /// <summary>
+        ///     Sends a file to this message channel with an optional caption.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream" /> of the file to be sent.</param>
+        /// <param name="filename">The name of the attachment.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
+        /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
+        /// <param name="allowedMentions">
+        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
+        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        /// </param>
+        protected virtual async Task<IUserMessage> ReplyFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+        {
+            return await Context.Channel.SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler, allowedMentions).ConfigureAwait(false);
         }
         /// <summary>
         ///     The method to execute before executing the command.
